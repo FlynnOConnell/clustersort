@@ -1,22 +1,15 @@
 version: "3.7"
 services:
-  jupyterlab-server:
+  spk2py-env:
     build:
       args:
-        - username=${USER}
-        - uid=${UID}
-        - gid=${GID}
-      context: ../..
+        - username=spk_user
+        - uid=1000
+        - gid=100
+      context: ..
       dockerfile: docker/Dockerfile
-    ports:
-      - "8888:8888"
     volumes:
-      - ../bin:/home/${USER}/app/bin
-      - ../data:/home/${USER}/app/data
-      - ../doc:/home/${USER}/app/doc
-      - ../notebooks:/home/${USER}/app/notebooks
-      - ../results:/home/${USER}/app/results
-      - ../src:/home/${USER}/app/src
+      - ..:/home/spk_user/app
     init: true
     stdin_open: true
     tty: true

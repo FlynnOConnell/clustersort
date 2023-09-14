@@ -1,51 +1,54 @@
-# Use a more recent Ubuntu version
 FROM ubuntu:20.04
 
-SHELL [ "/bin/bash", "--login", "-c" ]
-
+# Create a non-root user, standard practice for security reasons
 ARG username=spk_user
 ARG uid=1000
 ARG gid=100
-ENV USER $username
-ENV HOME /home/$USER
-# Fixed the typo here
+
+ENV HOME /home/$username
+
 RUN adduser --disabled-password \
     --gecos "Non-root user" \
     --uid $uid \
     --gid $gid \
     --home $HOME \
-    $USER
+    $username
 
-COPY ../environment.yml /tmp/requirements.txt /tmp/
+COPY ../environment.yml /tmp/
+COPY ../requirements.txt /tmp/
 RUN chown $uid:$gid /tmp/environment.yml /tmp/requirements.txt
 
-COPY docker/entrypoint.sh /usr/local/bin/
-
-RUN chown $uid:$gid /usr/local/bin/entrypoint.sh && \
-    chmod u+x /usr/local/bin/entrypoint.sh
-
-# install miniconda
-USER $USER
+# Install miniconda
+USER $username
 ENV MINICONDA_VERSION 4.8.2
 ENV CONDA_DIR $HOME/miniconda3
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O $HOME/miniconda.sh && \
-    chmod +x $HOME/miniconda.sh && \
-    $HOME/miniconda.sh -b -p $CONDA_DIR && \
-    rm $HOME/miniconda.sh
 
+RUN apt-get update && apt-get install -y wget
+
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
+    chmod +x ~/miniconda.sh && \
+    ~/miniconda.sh -b -p $CONDA_DIR && \
+    rm ~/miniconda.sh
+
+# Make conda activate command available
 ENV PATH=$CONDA_DIR/bin:$PATH
-RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> $HOME/.profile
+RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 RUN conda init bash
 
+# Create a project directory inside user home
 ENV PROJECT_DIR $HOME/app
 RUN mkdir $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
+# Build the conda environment
 ENV ENV_PREFIX $PWD/env
 RUN conda update --name base --channel defaults conda && \
     conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force && \
     conda clean --all --yes
 
-RUN conda run -n env python -m pip install -r /tmp/requirements.txt
+# Set up a script to activate the environment when the container starts
+RUN echo "source $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate $ENV_PREFIX" >> ~/.bashrc
 
-ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
+USER $username
+CMD [ "/bin/bash" ]
