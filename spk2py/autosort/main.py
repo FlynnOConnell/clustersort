@@ -2,12 +2,10 @@
 import sys
 import os
 import shutil
-import AutoSort.Autosorting as AS
-import config
+from spk2py import autosort as AS
 import time
 import multiprocessing
 import math
-import h5py
 import datetime
 import warnings
 import traceback

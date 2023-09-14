@@ -5,9 +5,7 @@ import easygui
 import ast
 import pylab as plt
 from sklearn.mixture import GaussianMixture
-import AutoSort.Pl2_waveforms_datashader
-import AutoSort.Clustering as clust
-from AutoSort import config
+from spk2py import autosort, autosort as clust
 import json
 import shutil
 import sys
@@ -29,7 +27,7 @@ dsdir=temp_dir+'/ds'
 
 # Check for user name and ensure user has a folder for data to go into
 os.chdir("R:\Autobots Roll Out") # Go to data folder
-folderlist = os.listdir('./' ) # Check for all folders in data folder
+folderlist = os.listdir('/') # Check for all folders in data folder
 
 # Create list of all folders (users)
 userlist=[]
@@ -56,7 +54,7 @@ if not os.path.isdir("R:\\Autobots Roll Out\\"+UserName+'/Info_Files'):
 
 # Determine which files have already been analyzed
 os.chdir("R:\\Autobots Roll Out\\%s\\JSON_Files" %UserName) # Change directory to folder containing all json files
-Analyzedlist = os.listdir('./' ) # Check for all folders in data folder
+Analyzedlist = os.listdir('/') # Check for all folders in data folder
 
 # Get directory where the hdf5 file sits, and change to that directory
 check = easygui.msgbox(msg = 'Hello %s, please select the folder containing the file(s) you want to check.' %UserName)
@@ -81,7 +79,7 @@ elif reanalyze==0:
     Redo=False
 
 # Look for the hdf5 file in the directory
-file_list = os.listdir('./')
+file_list = os.listdir('/')
 hdf5_name = ''
 first = True # Indicating first file
 
@@ -243,7 +241,7 @@ for files in file_list:
                             ISIs = np.ediff1d(np.sort(times_dejittered))/40.0       # Get number of points between waveforms and divide by frequency per ms (40)
                             violations1 = 100.0*float(np.sum(ISIs < 1.0)/split_points.shape[0])
                             violations2 = 100.0*float(np.sum(ISIs < 2.0)/split_points.shape[0])
-                            fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x, dir_name=dsdir)
+                            fig, ax = autosort.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x, dir_name=dsdir)
             				# plt.plot(x-15, slices_dejittered[split_points, :].T, linewidth = 0.01, color = 'red')
                             ax.set_xlabel('Sample (40 points per ms)')
                             ax.set_ylabel('Voltage (microvolts)')
@@ -277,7 +275,7 @@ for files in file_list:
                             violations1 = 100.0*float(np.sum(ISIs < 1.0)/split_points.shape[0])
                             ISIList.append(round(violations1,1))
                             violations2 = 100.0*float(np.sum(ISIs < 2.0)/split_points.shape[0])
-                            fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x, dir_name=dsdir)
+                            fig, ax = autosort.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x, dir_name=dsdir)
             				# plt.plot(x-15, slices_dejittered[split_points, :].T, linewidth = 0.01, color = 'red')
                             ax.set_xlabel('Sample (40 points per ms)')
                             ax.set_ylabel('Voltage (microvolts)')
@@ -367,7 +365,7 @@ for files in file_list:
                 elif len(clusters) == 1:
                     unit_waveforms = spike_waveforms[np.where(predictions == int(clusters[0]))[0], :]
                     x = np.arange(len(unit_waveforms[0])/10) + 1
-                    fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
+                    fig, ax = autosort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
                     ax.set_xlabel('Sample (40 points per ms)')
                     ax.set_ylabel('Voltage (microvolts)')
                     ax.set_title("Channel: "+str(electrode_num+1)+", Solution: "+str(num_clusters)+", Cluster: "+str(clusters[0]))
@@ -419,7 +417,7 @@ for files in file_list:
                         
             			# Show the merged cluster to the user, and ask if they still want to merge
                         x = np.arange(len(unit_waveforms[0])/10) + 1
-                        fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
+                        fig, ax = autosort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
             			# plt.plot(x - 15, unit_waveforms[:, ::10].T, linewidth = 0.01, color = 'red')
                         ax.set_xlabel('Sample (40 points per ms)')
                         ax.set_ylabel('Voltage (microvolts)')
@@ -469,7 +467,7 @@ for files in file_list:
                         for cluster in clusters:
                             unit_waveforms = spike_waveforms[np.where(predictions == int(cluster))[0], :]
                             x = np.arange(len(unit_waveforms[0])/10) + 1
-                            fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
+                            fig, ax = autosort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
                             ax.set_xlabel('Sample (40 points per ms)')
                             ax.set_ylabel('Voltage (microvolts)')
                             ax.set_title("Channel: "+str(electrode_num+1)+", Solution: "+str(num_clusters)+", Cluster: "+str(cluster))

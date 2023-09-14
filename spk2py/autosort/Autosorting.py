@@ -3,12 +3,10 @@ import pandas as pd
 import os
 import shutil
 import sys
-import h5py
-import AutoSort.Clustering as clust
+from spk2py import autosort as clust
 from scipy.spatial.distance import mahalanobis  # Used to get distance between clusters
 from scipy import linalg  # Used for very fast linear algebra
 import numpy as np  # Used for number processing
-import matplotlib  # Used for plots
 import cv2
 from PIL import ImageFont, ImageDraw, Image
 import configparser
