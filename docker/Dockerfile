@@ -48,11 +48,9 @@ WORKDIR $PROJECT_DIR
 ENV ENV_PREFIX $PWD/env
 RUN conda update --name base --channel defaults conda && \
     conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force && \
-    conda clean --all --yes# run the postBuild script to install any JupyterLab extensions
+    conda clean --all --yes
 RUN conda activate $ENV_PREFIX && \
     /usr/local/bin/postBuild.sh && \
     conda deactivate
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
-
-CMD [ "jupyter", "lab", "--no-browser", "--ip", "0.0.0.0" ]
