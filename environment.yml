@@ -1,0 +1,16 @@
+name: spk2py
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy=1.23
+  - pandas
+  - matplotlib
+  - h5py
+  - pillow
+  - Opencv
+  - scipy
+  - scikit-learn
+  - scikit-image
+  - openpyxl
+  - OpenSSL
