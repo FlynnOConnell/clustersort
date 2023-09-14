@@ -1,7 +1,6 @@
 import os
 import numpy as np
-import tables
-
+import hdf5
 
 # Create EArrays in hdf5 file
 def create_hdf_arrays(file_name, units=None, lfp=None):
