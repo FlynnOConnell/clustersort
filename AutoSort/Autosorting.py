@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import shutil
 import sys
-import hdf5
+import h5py
 import AutoSort.Clustering as clust
 from scipy.spatial.distance import mahalanobis  # Used to get distance between clusters
 from scipy import linalg  # Used for very fast linear algebra

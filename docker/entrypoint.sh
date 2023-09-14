@@ -1,3 +1,5 @@
 #!/bin/bash --login
-set -econda activate $ENV_PREFIX
+set -e
+source $CONDA_DIR/etc/profile.d/conda.sh
+conda activate $ENV_PREFIX
 exec "$@"

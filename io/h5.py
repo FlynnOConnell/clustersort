@@ -1,10 +1,11 @@
 import os
 import numpy as np
-import hdf5
+import h5py
+
 
 # Create EArrays in hdf5 file
 def create_hdf_arrays(file_name, units=None, lfp=None):
-    hf5 = tables.open_file(file_name, 'r+')
+    hf5 = h5py.open_file(file_name, 'r+')
     atom = tables.IntAtom()
 
     # Create arrays unit and lfp data

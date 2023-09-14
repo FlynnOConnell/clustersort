@@ -117,7 +117,7 @@ if __name__ == '__main__':
             processes = []
             for i in range(a, b):  # run so many times
                 p = multiprocessing.Process(target=AS.Processing, args=(
-                i, filename, params))  # Run Processing function using multiple processes and input argument i
+                    i, filename, params))  # Run Processing function using multiple processes and input argument i
                 p.start()  # Start the processes
                 processes.append(p)  # catalogue the processes
             for p in processes:
