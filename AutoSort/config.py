@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 23 17:03:55 2020
-
-@author: Di Lorenzo Tech
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 13 10:08:58 2020
-
-@author: Di Lorenzo Tech
-"""
 import os
 import configparser
 

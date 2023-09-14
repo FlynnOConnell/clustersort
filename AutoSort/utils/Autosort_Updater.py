@@ -28,8 +28,8 @@ def update_autosort():
     if not os.path.isdir(autosort_path):
         os.mkdir(autosort_path)
         shutil.copy(autosort_repo+'/Json2Nex.py',autosort_path)
-        shutil.copy(autosort_repo+'/Utilities/Autosort_Updater.py',autosort_path)
-    shutil.copy(autosort_repo+'/Autosort_Main.py',autosort_path)
+        shutil.copy(autosort_repo+'/utils/Autosort_Updater.py',autosort_path)
+    shutil.copy(autosort_repo+'/main.py',autosort_path)
     shutil.copy(autosort_repo+'/Autosort_Post.py',autosort_path)
     
     #make config file

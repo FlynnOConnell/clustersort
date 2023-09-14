@@ -5,16 +5,16 @@ import easygui
 import ast
 import pylab as plt
 from sklearn.mixture import GaussianMixture
-import pypl2.Pl2_waveforms_datashader
-import pypl2.Clustering as clust
-from pypl2 import config_handler
+import AutoSort.Pl2_waveforms_datashader
+import AutoSort.Clustering as clust
+from AutoSort import config
 import json
 import shutil
 import sys
 import pandas as pd
 from datetime import date
 
-params=config_handler.do_the_config()
+params= config_handler.do_the_config()
 reanalyze=int(params['reanalyze'])
 simple_GMM=int(params['simple gmm'])
 temp_dir=params['temporary dir']
@@ -243,7 +243,7 @@ for files in file_list:
                             ISIs = np.ediff1d(np.sort(times_dejittered))/40.0       # Get number of points between waveforms and divide by frequency per ms (40)
                             violations1 = 100.0*float(np.sum(ISIs < 1.0)/split_points.shape[0])
                             violations2 = 100.0*float(np.sum(ISIs < 2.0)/split_points.shape[0])
-                            fig, ax = pypl2.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x,dir_name=dsdir)
+                            fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x, dir_name=dsdir)
             				# plt.plot(x-15, slices_dejittered[split_points, :].T, linewidth = 0.01, color = 'red')
                             ax.set_xlabel('Sample (40 points per ms)')
                             ax.set_ylabel('Voltage (microvolts)')
@@ -277,7 +277,7 @@ for files in file_list:
                             violations1 = 100.0*float(np.sum(ISIs < 1.0)/split_points.shape[0])
                             ISIList.append(round(violations1,1))
                             violations2 = 100.0*float(np.sum(ISIs < 2.0)/split_points.shape[0])
-                            fig, ax = pypl2.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x,dir_name=dsdir)
+                            fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(slices_dejittered[split_points, :], x, dir_name=dsdir)
             				# plt.plot(x-15, slices_dejittered[split_points, :].T, linewidth = 0.01, color = 'red')
                             ax.set_xlabel('Sample (40 points per ms)')
                             ax.set_ylabel('Voltage (microvolts)')
@@ -367,7 +367,7 @@ for files in file_list:
                 elif len(clusters) == 1:
                     unit_waveforms = spike_waveforms[np.where(predictions == int(clusters[0]))[0], :]
                     x = np.arange(len(unit_waveforms[0])/10) + 1
-                    fig, ax = pypl2.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x,dir_name=dsdir)
+                    fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
                     ax.set_xlabel('Sample (40 points per ms)')
                     ax.set_ylabel('Voltage (microvolts)')
                     ax.set_title("Channel: "+str(electrode_num+1)+", Solution: "+str(num_clusters)+", Cluster: "+str(clusters[0]))
@@ -419,7 +419,7 @@ for files in file_list:
                         
             			# Show the merged cluster to the user, and ask if they still want to merge
                         x = np.arange(len(unit_waveforms[0])/10) + 1
-                        fig, ax = pypl2.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x,dir_name=dsdir)
+                        fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
             			# plt.plot(x - 15, unit_waveforms[:, ::10].T, linewidth = 0.01, color = 'red')
                         ax.set_xlabel('Sample (40 points per ms)')
                         ax.set_ylabel('Voltage (microvolts)')
@@ -469,7 +469,7 @@ for files in file_list:
                         for cluster in clusters:
                             unit_waveforms = spike_waveforms[np.where(predictions == int(cluster))[0], :]
                             x = np.arange(len(unit_waveforms[0])/10) + 1
-                            fig, ax = pypl2.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x,dir_name=dsdir)
+                            fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(unit_waveforms, x, dir_name=dsdir)
                             ax.set_xlabel('Sample (40 points per ms)')
                             ax.set_ylabel('Voltage (microvolts)')
                             ax.set_title("Channel: "+str(electrode_num+1)+", Solution: "+str(num_clusters)+", Cluster: "+str(cluster))
@@ -603,7 +603,7 @@ for files in file_list:
             elif len(infofile)==0:
                 sys.exit("If you don't have an infofile, you should be using an older version of the postprocess script")
             else:
-                file_iso['Recording Type']=config_handler.rec_info(filedir+'/'+os.path.splitext(hdf5_name)[0]+'/'+infofile[0])
+                file_iso['Recording Type']= config_handler.rec_info(filedir + '/' + os.path.splitext(hdf5_name)[0] + '/' + infofile[0])
                 shutil.copy(filedir+'/'+os.path.splitext(hdf5_name)[0]+'/'+infofile[0],'R:/Autobots Roll Out/'+UserName+'/Info_Files')
         except Exception as e:
             print(e)
