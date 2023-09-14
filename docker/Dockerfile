@@ -18,17 +18,17 @@ COPY ../environment.yml /tmp/
 COPY ../requirements.txt /tmp/
 RUN chown $uid:$gid /tmp/environment.yml /tmp/requirements.txt
 
-# Install miniconda
-USER $username
-ENV MINICONDA_VERSION 4.8.2
-ENV CONDA_DIR $HOME/miniconda3
-
+USER root
 RUN apt-get update && apt-get install -y wget
 
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
-    chmod +x ~/miniconda.sh && \
-    ~/miniconda.sh -b -p $CONDA_DIR && \
-    rm ~/miniconda.sh
+# Install miniconda
+ENV MINICONDA_VERSION latest
+ENV CONDA_DIR $HOME/miniconda3
+
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O /home/$username/miniconda.sh && \
+    chmod +x /home/$username/miniconda.sh && \
+    /home/$username/miniconda.sh -b -p $CONDA_DIR && \
+    rm /home/$username/miniconda.sh
 
 # Make conda activate command available
 ENV PATH=$CONDA_DIR/bin:$PATH
