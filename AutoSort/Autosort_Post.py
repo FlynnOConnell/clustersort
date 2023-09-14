@@ -14,7 +14,6 @@ import sys
 import pandas as pd
 from datetime import date
 
-#Get parameters
 params=config_handler.do_the_config()
 reanalyze=int(params['reanalyze'])
 simple_GMM=int(params['simple gmm'])
