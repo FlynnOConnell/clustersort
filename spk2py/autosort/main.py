@@ -57,14 +57,6 @@ def main(default_config=False):
 
         h5file = io.h5.read_h5(curr_file)
         num_chan = len(h5file.keys())
-        no_cell_sorting_flag = curr_file.with_name(curr_file.stem + "/NoCellSortingRunOnThisFile.txt")
-
-        if no_cell_sorting_flag.is_file():
-            print(curr_file, ' cannot be sorted. Probably because there were not enough licks.')
-            shutil.move(str(curr_file), str(completed_path / curr_file))
-            shutil.move(str(curr_file.with_name(curr_file.stem)), str(outpath / curr_file.stem))
-            ranfiles.remove(curr_file)
-
         hdf5_dirs = [
             curr_file,
             curr_file / 'spike_waveforms',
@@ -76,31 +68,23 @@ def main(default_config=False):
         for dir_path in hdf5_dirs:
             dir_path.mkdir(parents=True, exist_ok=True)
 
-        h5file = io.h5.read_h5(curr_file / hdf5_name)
-
-        # Determine how many times to loop through processing based on cpu cores used and
-        # number of electrodes
-
-    #     elNum = len(h5file.keys())
-    #     filename = file_path / hdf5_name
-    #     runs = math.ceil(
-    #         elNum / num_cpu)
-    #     for n in range(runs):  # For the number of runs
-    #         a = num_cpu * n  # First electrode to start with
-    #         b = num_cpu * (n + 1)  # Electrode to stop with
-    #         if b > elNum:  # If the last electrode is within the group
-    #             b = elNum  # That will be the last electrode to run processing on
-    #         print("Currently analyzing electrodes %i-%i." % (a + 1, b))
-    #         processes = []
-    #         for i in range(a, b):  # run so many times
-    #             p = multiprocessing.Process(target=AS.Processing, args=(
-    #                 i, filename, params))
-    #             p.start()
-    #             processes.append(p)
-    #         for p in processes:
-    #             p.join()
-    #     elapsed_time = time.time() - filestart  # sort time
-    #     print("That file ran for", (elapsed_time / 3600), "hours.")
+        runs = math.ceil(num_cpu / num_cpu)
+        for n in range(runs):  # For the number of runs
+            a = num_cpu * n  # First electrode to start with
+            b = num_cpu * (n + 1)  # Electrode to stop with
+            if b > num_chan:  # If the last electrode is within the group
+                b = num_chan  # That will be the last electrode to run processing on
+            print("Currently analyzing electrodes %i-%i." % (a + 1, b))
+            processes = []
+            for i in range(a, b):
+                p = multiprocessing.Process(target=AS.Processing, args=(
+                    i, filename, params))
+                p.start()
+                processes.append(p)
+            for p in processes:
+                p.join()
+        elapsed_time = time.time() - filestart  # sort time
+        print("That file ran for", (elapsed_time / 3600), "hours.")
     #
     #     # Integrity check
     #     print("Performing integrity check for sort...")

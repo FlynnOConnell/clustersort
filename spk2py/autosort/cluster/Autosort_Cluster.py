@@ -7,17 +7,17 @@ Created on Wed Mar 25 15:06:04 2020
 import os
 import shutil
 import sys
-import Autosorting as AS
-import config_handler
+import spk2py.autosort as AS
+from spk2py.autosort import config
 import time
 import multiprocessing
 import math
-import tables
+import h5py
 import traceback
 import warnings
 
 if __name__ == '__main__':
-    params = config_handler.do_the_config()
+    params = config.set_config()
     print('Running Script: ' + __file__)
     try:
         n_files = int(params['n-files'])
