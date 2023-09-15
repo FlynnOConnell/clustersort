@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import sys
-import h5py
 from pathlib import Path
 import os
 import shutil
@@ -44,7 +43,8 @@ def main(default_config=False):
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
     # Get the files to run
-    runfiles = [f for f in Path(params['running_path']).glob('*.smr')][:n_files]
+    runpath = Path(params['run_path'])
+    runfiles = [f for f in runpath.glob('*.hdf5')][:n_files]
 
     completed_path = Path(params['completed_path'])
     outpath = Path(params['results_path'])
@@ -52,9 +52,11 @@ def main(default_config=False):
     resort_limit = int(params['resort_limit'])
 
     ranfiles = runfiles.copy()
-
     for curr_file in runfiles:  # loop through each file
         curr_file = Path(curr_file)
+
+        h5file = io.h5.read_h5(curr_file)
+        num_chan = len(h5file.keys())
         no_cell_sorting_flag = curr_file.with_name(curr_file.stem + "/NoCellSortingRunOnThisFile.txt")
 
         if no_cell_sorting_flag.is_file():
@@ -63,12 +65,6 @@ def main(default_config=False):
             shutil.move(str(curr_file.with_name(curr_file.stem)), str(outpath / curr_file.stem))
             ranfiles.remove(curr_file)
 
-        hdf5_name = curr_file.name
-
-        filestart = time.time()
-        print("Opening file " + str(hdf5_name))
-
-        hdf5_path_stem = Path(hdf5_name).stem
         hdf5_dirs = [
             curr_file,
             curr_file / 'spike_waveforms',
@@ -175,4 +171,4 @@ def main(default_config=False):
 
 
 if __name__ == '__main__':
-    main()
+    main(default_config=True)

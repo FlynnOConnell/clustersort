@@ -5,9 +5,9 @@ from pathlib import Path
 
 def set_config(path: Path | str = '', default=False) -> dict[str, str | int | float]:
     if default:
-        path = Path().home() / 'spk2py' / 'autosort' / 'default_config.ini'
+        path = Path().home() / 'autosort' / 'autosort_config.ini'
 
-    if not path.is_file():
+    if not path.is_file() or default:
         default_config(path)
         print(f'Default configuration file has been created. You can find it in {path}')
         return read_config(path)
@@ -17,10 +17,13 @@ def set_config(path: Path | str = '', default=False) -> dict[str, str | int | fl
 
 def default_config(path: Path, config_ver: int = 5) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    default_data_path = Path().home() / 'data'
+    default_data_path = path.parent
     default_run_path = default_data_path / 'to_run'
+    default_run_path.mkdir(parents=True, exist_ok=True)
     default_results_path = default_data_path / 'results'
+    default_results_path.mkdir(parents=True, exist_ok=True)
     default_completed_path = default_data_path / 'completed'
+    default_completed_path.mkdir(parents=True, exist_ok=True)
 
     config = configparser.ConfigParser()
     config['run-settings'] = {
@@ -109,12 +112,9 @@ def get_config_params(config: configparser.ConfigParser) -> dict[str, str | int 
         "run_type": config.get('run-settings', 'run-type'),
         "manual_run": config.getint('run-settings', 'manual-run'),
 
-        "to_run_path": config.get('paths', 'to-run-path'),
-        "running_path": config.get('paths', 'running-path'),
+        "run_path": config.get('paths', 'run-path'),
         "results_path": config.get('paths', 'results-path'),
         "completed_path": config.get('paths', 'completed-path'),
-        "use_path": config.getint('paths', 'use-path'),
-        "else_path": config.get('paths', 'else-path'),
 
         "max_clusters": config.getint('clustering', 'max-clusters'),
         "max_iterations": config.getint('clustering', 'max-iterations'),

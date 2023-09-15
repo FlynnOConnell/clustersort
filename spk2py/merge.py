@@ -3,19 +3,24 @@ from __future__ import annotations
 from math import floor
 from pathlib import Path
 import numpy as np
-import h5py
-from .io import h5
-
+from spk2py.io import h5
+import logging
 from sonpy import lib as sp
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-def merge_files(filepath: Path | str):
+def merge_files(filepath: Path | str, savepath: Path | str = None) -> None:
     """
     Merge two .smr files into one .hdf5 file.
 
     :param filepath: Path to the directory containing the .smr files
+    :param savepath: Path to the directory where the .hdf5 file will be saved
     :return: None
     """
+    start_time = time.time()
     filepath = Path(filepath)
     files = list(filepath.glob('*.smr'))
 
@@ -25,10 +30,15 @@ def merge_files(filepath: Path | str):
         )
 
     sonfiles = [sp.SonFile(str(filename), True) for filename in files]
-    savepath = Path().home() / 'data' / 'h5'
-    savepath.mkdir(parents=True, exist_ok=True)
+    files = [Path(f) for f in files]
+    logger.info(f"Files to be merged: {files}")
+    if not savepath:
+        savepath = Path().home() / 'autosort' / 'h5'
+        savepath.mkdir(parents=True, exist_ok=True)
+    else:
+        savepath = Path(savepath)
+        savepath.mkdir(parents=True, exist_ok=True)
 
-    # Get the common prefix of the filenames for saving
     base_names = [str(f.stem) for f in files]
     common_prefixes = [name.rsplit('_', 1)[0] for name in base_names]
     if common_prefixes[0] == common_prefixes[1]:
@@ -55,20 +65,20 @@ def merge_files(filepath: Path | str):
                 chan_max_time = spkfile.ChannelMaxTime(i)
                 chan_divide = spkfile.ChannelDivide(i)
 
-                num_seconds = chan_max_time * file_time_base
+                recording_length = chan_max_time * file_time_base
                 dPeriod = chan_divide * file_time_base
-                nPoints2 = floor(num_seconds / dPeriod)
+                num_ticks = floor(recording_length / dPeriod)
                 chan_units = spkfile.GetChannelUnits(i)
 
                 # Read data
-                wavedata = spkfile.ReadFloats(i, nPoints2, 0)
+                wavedata = spkfile.ReadFloats(i, num_ticks, 0)
                 # time = np.arange(0, len(wavedata) * dPeriod, dPeriod) #  Need this later
 
                 data[channel_title] = {
                     'chan_units': chan_units,
                     'wavedata': wavedata,
                     'sampling_rate': 1 / dPeriod,
-                    'num_seconds': num_seconds,
+                    'recording_length': recording_length,
                 }
         filedata.append(data)
 
@@ -94,8 +104,15 @@ def merge_files(filepath: Path | str):
                 'chan_units': pre_infusion_data[key]['chan_units'],  # Assuming chan_units remain same in both files
                 'wavedata': combined_wavedata,
                 'sampling_rate': pre_infusion_data[key]['sampling_rate'],
-                'num_seconds': pre_infusion_data[key]['num_seconds'] + post_infusion_data[key]['num_seconds'],
+                'recording_length': pre_infusion_data[key]['recording_length'] + \
+                                    post_infusion_data[key]['recording_length'],
                 # 'time': combined_time,
             }
     h5.save_h5(savename, combined_data, overwrite=True)
-    print(f'Files saved to: {savename}')
+    logger.info(f"Files merged in {time.time() - start_time} seconds.")
+    logger.info(f"{len(sonfiles)} files saved to {savename}")
+
+
+if __name__ == '__main__':
+    mergepath = Path().home() / 'autosort' / 'to_run'
+    merge_files(mergepath)
