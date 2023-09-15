@@ -9,8 +9,10 @@ from sklearn.mixture import GaussianMixture
 from sklearn.decomposition import PCA
 
 
-def get_filtered_electrode(el, freq=[300, 6000.0],
-                           sampling_rate=40000.0):  #############################    MODIFIED    #####################################
+def get_filtered_electrode(el,
+                           freq=[300, 6000.0],
+                           sampling_rate=40000.0
+                           ):
     m, n = butter(2, [2.0 * freq[0] / sampling_rate, 2.0 * freq[1] / sampling_rate], btype='bandpass')
     filt_el = filtfilt(m, n, el)
     return filt_el
@@ -18,14 +20,13 @@ def get_filtered_electrode(el, freq=[300, 6000.0],
 
 def extract_waveforms(filt_el, spike_snapshot=[0.2, 0.6], sampling_rate=40000.0, STD=2.0, cutoff_std=10.0):
     m = np.mean(filt_el)
-    th = np.std(filt_el) * STD  ################### was 5.0*np.median(np.abs(filt_el)/0.6745)
+    th = np.std(filt_el) * STD
     pos = np.where(filt_el <= m - th)[0]
     changes = []
     for i in range(len(pos) - 1):
         if pos[i + 1] - pos[i] > 1:
             changes.append(i + 1)
 
-    # slices = np.zeros((len(changes)-1,150))
     slices = []
     spike_times = []
     for i in range(len(changes) - 1):
@@ -33,7 +34,8 @@ def extract_waveforms(filt_el, spike_snapshot=[0.2, 0.6], sampling_rate=40000.0,
             0]
         # print minimum, len(slices), len(changes), len(filt_el)
         # try slicing out the putative waveform, only do this if there are 10ms of data points (waveform is not too close to the start or end of the recording)
-        if pos[minimum[0] + changes[i]] - int((spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)) > 0 and pos[
+        if pos[minimum[0]
+               + changes[i]] - int((spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)) > 0 and pos[
             minimum[0] + changes[i]] + int((spike_snapshot[1] + 0.1) * (sampling_rate / 1000.0)) < len(filt_el):
             tempslice = filt_el[
                         pos[minimum[0] + changes[i]] - int((spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)): pos[
