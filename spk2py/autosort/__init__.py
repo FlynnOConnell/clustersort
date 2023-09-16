@@ -8,6 +8,8 @@ from .cluster import (
     get_Lratios
 )
 
+from .autosort import process
+
 __all__ = [
     'get_filtered_electrode',
     'extract_waveforms',
@@ -15,5 +17,6 @@ __all__ = [
     'scale_waveforms',
     'implement_pca',
     'clusterGMM',
-    'get_Lratios'
+    'get_Lratios',
+    'process'
 ]

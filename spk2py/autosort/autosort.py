@@ -1,121 +1,114 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
+from __future__ import annotations
+import configparser
 import os
 import shutil
-import h5py
-from spk2py import autosort as clust
-from scipy.spatial.distance import mahalanobis
-from scipy import linalg
-import numpy as np
-import cv2
-from PIL import ImageFont, ImageDraw, Image
-import configparser
-from datetime import date
+import time
 import traceback
 import warnings
-from scipy.interpolate import interp1d
-import time
+from datetime import date
+from pathlib import Path
+
+import cv2
+import h5py
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from PIL import ImageFont, ImageDraw, Image
 from matplotlib import cm
+from scipy import linalg
+from scipy.interpolate import interp1d
+from scipy.spatial.distance import mahalanobis
+
+from spk2py import autosort as clust
 
 
-def infofile(h5_filename, path, sort_time, AS_file, params):
+def infofile(filename, path, sort_time, params):
     # dumps run info to a .info file
-    with h5py.File(path + '.h5', 'r') as hf5:
-        if hf5.root.__contains__('/LFP'):
-            record_type = 'Continuous Signal'
-        else:
-            record_type = 'Thresholded Waveforms'
     config = configparser.ConfigParser()
-    config['METADATA'] = {'h5 File': h5_filename, 'Recording Type': record_type, 'Run Time': sort_time,
-                          'Creator Script': AS_file, 'Run Date': date.today().strftime("%m/%d/%y")}
+    config['METADATA'] = {
+        'h5 File': filename, 'Run Time': sort_time,
+        'Run Date': date.today().strftime("%m/%d/%y")
+      }
     config['PARAMS USED'] = params
-    with open(path + '/' + os.path.splitext(h5_filename)[0] + '_' + 'sort.info', 'w') as info_file:
+    with open(path + '/' + os.path.splitext(filename)[0] + '_' + 'sort.info', 'w') as info_file:
         config.write(info_file)
 
 
-def Processing(chan_num, h5_filepath, params):
+def process(
+        filename: Path | str,
+        data: np.ndarray,
+        temp_path: Path | str,
+        chan_num: int,
+        params,
+):
     retried = 0
     while True:
         try:
-            filename = os.path.splitext(h5_filepath)[0] + '\n'
-            filedir = [os.path.split(h5_filepath)[0] + '\n']
-            os.chdir(filedir[0][:-1])
+            filename = Path(filename).resolve()
 
-            # find the hdf5 (.h5) file
-            hdf5_name = filename[:-1] + '.h5'
+            # Replace any existing paths to flush the old data
+            paths_to_check = [
+                filename.parent / "Plots" / str(chan_num + 1),
+                filename.parent / "spike_waveforms" / f"channel {chan_num + 1}",
+                filename.parent / "spike_times" / f"channel {chan_num + 1}",
+                filename.parent / "clustering_results" / f"channel {chan_num + 1}",
+            ]
 
-            # Check if the directories for this electrode number exist.
-            # If they do, delete them.
-            # Existence of the directories indicates a job restart on the hpc_cluster, so restart afresh.
-            if os.path.isdir(hdf5_name[:-3] + '/Plots/' + str(chan_num + 1)):
-                shutil.rmtree(hdf5_name[:-3] + '/Plots/' + str(chan_num + 1))
-            if os.path.isdir(hdf5_name[:-3] + '/spike_waveforms/electrode ' + str(chan_num + 1)):
-                shutil.rmtree(hdf5_name[:-3] + '/spike_waveforms/electrode ' + str(chan_num + 1))
-            if os.path.isdir(hdf5_name[:-3] + '/spike_times/electrode ' + str(chan_num + 1)):
-                shutil.rmtree(hdf5_name[:-3] + '/spike_times/electrode ' + str(chan_num + 1))
-            if os.path.isdir(hdf5_name[:-3] + '/clustering_results/electrode ' + str(chan_num + 1)):
-                shutil.rmtree(hdf5_name[:-3] + '/clustering_results/electrode ' + str(chan_num + 1))
-
-            # Then make all these directories
-            os.mkdir(hdf5_name[:-3] + '/Plots/' + str(chan_num + 1))
-            os.mkdir(hdf5_name[:-3] + '/spike_waveforms/electrode ' + str(chan_num + 1))
-            os.mkdir(hdf5_name[:-3] + '/spike_times/electrode ' + str(chan_num + 1))
-            os.mkdir(hdf5_name[:-3] + '/clustering_results/electrode ' + str(chan_num + 1))
+            for path in paths_to_check:
+                if path.is_dir():
+                    shutil.rmtree(path)
+                path.mkdir(parents=True, exist_ok=True)
 
             # Assign the parameters to variables
-            max_clusters = int(params['max clusters'])
-            num_iter = int(params['max iterations'])
-            thresh = float(params['convergence criterion'])
-            num_restarts = int(params['random restarts'])
-            wf_amplitude_sd_cutoff = float(params['intra-hpc_cluster cutoff'])
-            sampling_rate = float(params['sampling rate'])
-            cutoff_std = float(params['artifact removal'])
-            pvar = float(params['variance explained'])
-            usepvar = int(params['use percent variance'])
-            userpc = int(params['principal component n'])
+            max_clusters = int(params['max_clusters'])
+            num_iter = int(params['max_iterations'])
+            thresh = float(params['convergence_criterion'])
+            num_restarts = int(params['random_restarts'])
+            wf_amplitude_sd_cutoff = float(params['intra_cluster_cutoff'])
+            sampling_rate = float(params['sampling_rate'])
+            cutoff_std = float(params['artifact_removal'])
+            pvar = float(params['variance_explained'])
+            usepvar = int(params['use_percent_variance'])
+            userpc = int(params['principal_component_n'])
 
-            hf5 = h5py.File(hdf5_name, 'r')
-            slices = np.array(getattr(hf5.root.SPKwf, 'SPK' + f'{chan_num + 1:02d}')[:])
-            times_final = np.array(getattr(hf5.root.SPKwf, 'SPK' + f'{chan_num + 1:02d}' + 'times')[
-                                   :]) * sampling_rate
-            hf5.close()
-            if len(slices) == 0 or len(times_final) == 0:  # if there are no spikes, record as such
-                with open(hdf5_name[:-3] + '/Plots/' + str(chan_num + 1) + '/' + 'no_spikes.txt', 'w') as txt:
-                    txt.write(
-                        'No spikes were found on this channel.'
-                        ' The most likely cause is an early recording cutoff.'
-                    )
-                    warnings.warn(
-                        'No spikes were found on this channel. The most likely cause is an early recording cutoff.')
-                    with open(hdf5_name[:-3] + '/clustering_results/electrode {}'.format(
-                            chan_num + 1) + '/success.txt', 'w+') as f:
-                        f.write('Sorting finished. No spikes found')
-                    return
-            slices_final = []
-            xnew = np.linspace(0, len(slices[0]) - 1, len(slices[0]) * 10)
-            slice_cutoff = np.std(slices) * cutoff_std
-            for i in range(len(slices)):  # this loops through each slice and interpolates the waveform
-                if np.any(np.absolute(slices[i]) > slice_cutoff):
+            spikes = data['wavedata']
+            chan_dir = filename.parent / "Plots" / str(chan_num + 1)
+            clustering_results_dir = filename.parent / "clustering_results" / f"channel {chan_num + 1}"
+            if spikes.size == 0:
+                (chan_dir / 'no_spikes.txt').write_text(
+                    'No spikes were found on this channel.'
+                    ' The most likely cause is an early recording cutoff.'
+                )
+                warnings.warn(
+                    'No spikes were found on this channel. The most likely cause is an early recording cutoff.'
+                )
+                (clustering_results_dir / 'success.txt').write_text('Sorting finished. No spikes found')
+                return
+            spikes_final = []
+            xnew = np.linspace(0, len(spikes[0]) - 1, len(spikes[0]) * 10)
+            slice_cutoff = np.std(spikes) * cutoff_std
+            for i in range(len(spikes)):  # this loops through each spike and interpolates the waveform
+                if np.any(np.absolute(spikes[i]) > slice_cutoff):
                     continue
-                f = interp1d(np.arange(0, len(slices[0]), 1), slices[i])
+                f = interp1d(np.arange(0, len(spikes[0]), 1), spikes[i])
                 ynew = f(xnew)
-                slices_final.append(ynew)
-            slices_final = np.array(slices_final)
-            del xnew, f, ynew, slices
+                spikes_final.append(ynew)
+            spikes_final = np.array(spikes_final)
+            del xnew, f, ynew, spikes
 
             # Dejitter these spike waveforms, and get their maximum amplitudes
-            amplitudes = np.min(slices_final, axis=1)
+            amplitudes = np.min(spikes_final, axis=1)
 
-            # Save these slices/spike waveforms and their times to their respective folders
+            # Save these spikes/spike waveforms and their times to their respective folders
             np.save(os.path.normpath(
-                hdf5_name[:-3] + '/spike_waveforms/electrode {}/spike_waveforms.npy'.format(chan_num + 1)),
-                slices_final)
+                filename[:-3] + '/spike_waveforms/channel {}/spike_waveforms.npy'.format(chan_num + 1)),
+                spikes_final)
             np.save(os.path.normpath(
-                hdf5_name[:-3] + '/spike_times/electrode {}/spike_times.npy'.format(chan_num + 1)), times_final)
+                filename[:-3] + '/spike_times/channel {}/spike_times.npy'.format(chan_num + 1)))
 
-            # Scale the dejittered slices by the energy of the waveforms
-            scaled_slices, energy = clust.scale_waveforms(slices_final)
+            # Scale the dejittered spikes by the energy of the waveforms
+            scaled_slices, energy = clust.scale_waveforms(spikes_final)
 
             # Run PCA on the scaled waveforms
             pca_slices, explained_variance_ratio = clust.implement_pca(scaled_slices)
@@ -129,15 +122,15 @@ def Processing(chan_num, h5_filepath, params):
             else:
                 n_pc = userpc
 
-            # Save the pca_slices, energy and amplitudes to the spike_waveforms folder for this electrode
+            # Save the pca_slices, energy and amplitudes to the spike_waveforms folder for this channel
             np.save(os.path.normpath(
-                hdf5_name[:-3] + '/spike_waveforms/electrode {}/pca_waveforms.npy'.format(chan_num + 1)),
+                filename[:-3] + '/spike_waveforms/channel {}/pca_waveforms.npy'.format(chan_num + 1)),
                 pca_slices)
             np.save(
-                os.path.normpath(hdf5_name[:-3] + '/spike_waveforms/electrode {}/energy.npy'.format(chan_num + 1)),
+                os.path.normpath(filename[:-3] + '/spike_waveforms/channel {}/energy.npy'.format(chan_num + 1)),
                 energy)
             np.save(os.path.normpath(
-                hdf5_name[:-3] + '/spike_waveforms/electrode {}/spike_amplitudes.npy'.format(chan_num + 1)),
+                filename[:-3] + '/spike_waveforms/channel {}/spike_amplitudes.npy'.format(chan_num + 1)),
                 amplitudes)
 
             # Create file for saving plots, and plot explained variance ratios of the PCA
@@ -152,7 +145,7 @@ def Processing(chan_num, h5_filepath, params):
             plt.title('Variance ratios explained by PCs (cumulative)')
             plt.xlabel('PC #')
             plt.ylabel('Explained variance ratio')
-            fig.savefig(os.path.normpath(hdf5_name[:-3] + '/Plots/{}/pca_variance.png'.format(chan_num + 1)),
+            fig.savefig(os.path.normpath(filename[:-3] + '/Plots/{}/pca_variance.png'.format(chan_num + 1)),
                         bbox_inches='tight')
             plt.close("all")
 
@@ -171,7 +164,7 @@ def Processing(chan_num, h5_filepath, params):
                 traceback.print_exc()
                 return
             warnings.warn(
-                f"Warning, could not allocate memory for electrode {chan_num + 1}. This program will wait and try "
+                f"Warning, could not allocate memory for channel {chan_num + 1}. This program will wait and try "
                 f"again in a bit."
             )
             retried = 1
@@ -190,17 +183,17 @@ def Processing(chan_num, h5_filepath, params):
             # print "Clustering didn't work - solution with %i clusters most likely didn't converge" % (i+3)
             continue
         if np.any([len(np.where(predictions[:] == cluster)[0]) <= n_pc + 2 for cluster in range(i + 3)]):
-            os.mkdir(hdf5_name[:-3] + '/Plots/%i/%i_clusters' % ((chan_num + 1), i + 3))
-            os.mkdir(hdf5_name[:-3] + '/Plots/%i/%i_clusters_waveforms_ISIs' % ((chan_num + 1), i + 3))
-            with open(hdf5_name[:-3] + '/Plots/%i/%i_clusters' % ((chan_num + 1), i + 3) + '/invalid_sort.txt',
+            os.mkdir(filename[:-3] + '/Plots/%i/%i_clusters' % ((chan_num + 1), i + 3))
+            os.mkdir(filename[:-3] + '/Plots/%i/%i_clusters_waveforms_ISIs' % ((chan_num + 1), i + 3))
+            with open(filename[:-3] + '/Plots/%i/%i_clusters' % ((chan_num + 1), i + 3) + '/invalid_sort.txt',
                       "w+") as f:
                 f.write("There are too few waveforms to properly sort this clustering")
-            with open(hdf5_name[:-3] + '/Plots/%i/%i_clusters_waveforms_ISIs' % (
+            with open(filename[:-3] + '/Plots/%i/%i_clusters_waveforms_ISIs' % (
                     (chan_num + 1), i + 3) + '/invalid_sort.txt', "w+") as f:
                 f.write("There are too few waveforms to properly sort this clustering")
             continue
         # Sometimes large amplitude noise waveforms hpc_cluster with the spike waveforms because the amplitude has
-        # been factored out of the scaled slices. Run through the clusters and find the waveforms that are more than
+        # been factored out of the scaled spikes. Run through the clusters and find the waveforms that are more than
         # wf_amplitude_sd_cutoff larger than the hpc_cluster mean. Set predictions = -1 at these points so that they
         # aren't picked up by Pl2_PostProcess
         for cluster in range(i + 3):
@@ -216,17 +209,17 @@ def Processing(chan_num, h5_filepath, params):
             predictions[cluster_points] = this_cluster
 
             # Make folder for results of i+2 clusters, and store results there
-        os.mkdir(hdf5_name[:-3] + '/clustering_results/electrode %i/clusters%i' % ((chan_num + 1), i + 3))
+        os.mkdir(filename[:-3] + '/clustering_results/channel %i/clusters%i' % ((chan_num + 1), i + 3))
         np.save(os.path.normpath(
-            hdf5_name[:-3] + '/clustering_results/electrode {}/clusters{}/predictions.npy'.format(chan_num + 1,
+            filename[:-3] + '/clustering_results/channel {}/clusters{}/predictions.npy'.format(chan_num + 1,
                                                                                                   i + 3)), predictions)
         np.save(os.path.normpath(
-            hdf5_name[:-3] + '/clustering_results/electrode {}/clusters{}/bic.npy'.format(chan_num + 1, i + 3)),
+            filename[:-3] + '/clustering_results/channel {}/clusters{}/bic.npy'.format(chan_num + 1, i + 3)),
             bic
         )
 
-        # Plot the graphs, for this set of clusters, in the directory made for this electrode
-        os.mkdir(hdf5_name[:-3] + '/Plots/%i/%i_clusters' % ((chan_num + 1), i + 3))
+        # Plot the graphs, for this set of clusters, in the directory made for this channel
+        os.mkdir(filename[:-3] + '/Plots/%i/%i_clusters' % ((chan_num + 1), i + 3))
         colors = cm.rainbow(np.linspace(0, 1, i + 3))
 
         for feature1 in range(len(data[0])):
@@ -247,7 +240,7 @@ def Processing(chan_num, h5_filepath, params):
                                scatterpoints=1, loc='lower left', ncol=3, fontsize=8)
                     plt.title("%i clusters" % (i + 3))
                     fig.savefig(os.path.normpath(
-                        hdf5_name[:-3] + '/Plots/{}/{}_clusters/feature{}vs{}.png'.format(chan_num + 1, i + 3,
+                        filename[:-3] + '/Plots/{}/{}_clusters/feature{}vs{}.png'.format(chan_num + 1, i + 3,
                                                                                           feature2, feature1)))
                     plt.close("all")
 
@@ -272,27 +265,27 @@ def Processing(chan_num, h5_filepath, params):
             plt.legend(loc='upper right', fontsize=8)
             plt.title('Mahalanobis distance of all clusters from Reference Cluster: %i' % ref_cluster)
             fig.savefig(os.path.normpath(
-                hdf5_name[:-3] + '/Plots/{}/{}_clusters/Mahalonobis_cluster{}.png'.format(chan_num + 1, i + 3,
+                filename[:-3] + '/Plots/{}/{}_clusters/Mahalonobis_cluster{}.png'.format(chan_num + 1, i + 3,
                                                                                           ref_cluster)))
             plt.close("all")
 
         # Create file, and plot spike waveforms for the different clusters. Plot 10 times downsampled
         # dejittered/smoothed waveforms. Plot the ISI distribution of each hpc_cluster
-        os.mkdir(hdf5_name[:-3] + '/Plots/%i/%i_clusters_waveforms_ISIs' % ((chan_num + 1), i + 3))
+        os.mkdir(filename[:-3] + '/Plots/%i/%i_clusters_waveforms_ISIs' % ((chan_num + 1), i + 3))
         ISIList = []
         for cluster in range(i + 3):
             cluster_points = np.where(predictions[:] == cluster)[0]
             fig, ax = plt.subplots()
             # fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(
-            #     slices_final[cluster_points, :],
+            #     spikes_final[cluster_points, :],
             #     x,
-            #     dir_name=os.path.normpath(hdf5_name[:-3] + "_datashader_temp_el" + str(chan_num + 1))
+            #     dir_name=os.path.normpath(filename[:-3] + "_datashader_temp_el" + str(chan_num + 1))
             # )
             ax.set_xlabel('Sample ({:d} samples per ms)'.format(int(sampling_rate / 1000)))
             ax.set_ylabel('Voltage (microvolts)')
             ax.set_title('Cluster%i' % cluster)
             fig.savefig(os.path.normpath(
-                hdf5_name[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_waveforms'.format(chan_num + 1,
+                filename[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_waveforms'.format(chan_num + 1,
                                                                                                    i + 3, cluster)))
             plt.close("all")
 
@@ -308,7 +301,7 @@ def Processing(chan_num, h5_filepath, params):
                           (float(len(np.where(ISIs < 1.0)[0])) / float(len(cluster_times))) * 100.0,
                           len(np.where(ISIs < 1.0)[0]), len(cluster_times)))
             fig.savefig(os.path.normpath(
-                hdf5_name[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_ISIs'.format(chan_num + 1, i + 3,
+                filename[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_ISIs'.format(chan_num + 1, i + 3,
                                                                                               cluster)))
             plt.close("all")
             ISIList.append("%.1f" % ((float(len(np.where(ISIs < 1.0)[0])) / float(len(cluster_times))) * 100.0))
@@ -317,7 +310,7 @@ def Processing(chan_num, h5_filepath, params):
         Lrats = clust.get_Lratios(data, predictions)
         isodf = pd.DataFrame({
             'IsoRating': 'TBD',
-            'File': os.path.split(hdf5_name[:-3])[-1],
+            'File': os.path.split(filename[:-3])[-1],
             'Channel': chan_num + 1,
             'Solution': i + 3,
             'Cluster': range(i + 3),
@@ -325,7 +318,7 @@ def Processing(chan_num, h5_filepath, params):
             'ISIs (%)': ISIList,
             'L-Ratio': [round(Lrats[cl], 3) for cl in range(i + 3)],
         })
-        isodf.to_csv(os.path.splitext(hdf5_name)[0] + '/clustering_results/electrode {}/clusters{}/isoinfo.csv'.format(
+        isodf.to_csv(os.path.splitext(filename)[0] + '/clustering_results/channel {}/clusters{}/isoinfo.csv'.format(
             chan_num + 1, i + 3), index=False)
         # output this all in a plot in the plots folder and replace the ISI plot in superplots
         for cluster in range(i + 3):
@@ -341,9 +334,9 @@ def Processing(chan_num, h5_filepath, params):
                                 align='left')  # draw the text
             draw.multiline_text((380, 100), text2, font=font, fill=(0, 0, 0, 255), spacing=50)  # draw the text
             isoimg = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)  # convert back to openCV image
-            cv2.imwrite(hdf5_name[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_Isolation.png'.format(
+            cv2.imwrite(filename[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_Isolation.png'.format(
                 chan_num + 1, i + 3, cluster), isoimg)  # save the image
-    with open(hdf5_name[:-3] + '/clustering_results/electrode {}'.format(chan_num + 1) + '/success.txt',
+    with open(filename[:-3] + '/clustering_results/channel {}'.format(chan_num + 1) + '/success.txt',
               'w+') as f:
         f.write('Congratulations, this channel was sorted successfully')
 
@@ -377,7 +370,7 @@ def superplots(full_filename, maxclust):
                         isi = cv2.resize(isi, (640, 480))
                     blank = np.ones((240, 640, 3), np.uint8) * 255  # make whitespace for info
                     text = "Electrode: " + channel + "\nSolution: " + str(soln) + "\nCluster: " + str(
-                        cluster)  # text to output to whitespace (hpc_cluster, electrode, and solution numbers)
+                        cluster)  # text to output to whitespace (hpc_cluster, channel, and solution numbers)
                     cv2_im_rgb = cv2.cvtColor(blank, cv2.COLOR_BGR2RGB)  # convert to color space pillow can use
                     pil_im = Image.fromarray(cv2_im_rgb)  # get pillow image
                     draw = ImageDraw.Draw(pil_im)  # create draw object for text

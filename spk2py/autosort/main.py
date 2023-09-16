@@ -6,11 +6,11 @@ import logging
 import math
 import multiprocessing
 import shutil
-import time
 from pathlib import Path
 
 import config
 from spk2py import io
+from autosort import process
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,39 +49,41 @@ def main(default_config=False):
     resort_limit = int(params['resort_limit'])
 
     for curr_file in runfiles:  # loop through each file
-        curr_file = Path(curr_file)
+        file_name = curr_file.name
+        file_stem = curr_file.stem
+        file_parent = curr_file.parent
+        temp_path = file_parent / file_stem / 'temp'  # !TODO: clean later
+        res_dir = completed_path
+        res_file = completed_path / file_stem
 
         h5file = io.h5.read_h5(curr_file)
         num_chan = len(h5file.keys())
         hdf5_dirs = [
-            curr_file,
-            curr_file / 'spike_waveforms',
-            curr_file / 'spike_times',
-            curr_file / 'clustering_results',
-            curr_file / 'Plots'
+            res_file / 'spike_waveforms',
+            res_file / 'spike_times',
+            res_file / 'clustering_results',
+            res_file / 'Plots'
         ]
 
         for dir_path in hdf5_dirs:
             dir_path.mkdir(parents=True, exist_ok=True)
 
-        runs = math.ceil(num_cpu / num_cpu)
+        runs = math.ceil(num_chan / num_cpu)
         for n in range(runs):  # For the number of runs
-            a = num_cpu * n  # First channel to start with
-            b = num_cpu * (n + 1)  # Channel to stop with
-            if b > num_chan:
-                b = num_chan  # That will be the last channel to run processing on
-            print("Currently analyzing electrodes %i-%i." % (a + 1, b))
+            chan_start = num_cpu * n  # First channel to start with
+            chan_end = num_cpu * (n + 1)  # Channel to stop with
+            if chan_end > num_chan:
+                chan_end = num_chan
             processes = []
-            for i in range(a, b):
-                p = multiprocessing.Process(target=AS.Processing, args=(
-                    i, filename, params))
+            for i in range(chan_start, chan_end):
+                # Get the current channel
+                this_chan = h5file[list(h5file.keys())[i]]
+                p = multiprocessing.Process(target=process, args=(
+                    curr_file, this_chan, temp_path, i, params))
                 p.start()
                 processes.append(p)
             for p in processes:
                 p.join()
-        elapsed_time = time.time() - filestart
-        print("That file ran for", (elapsed_time / 3600), "hours.")
-
     #     # Integrity check
     #     print("Performing integrity check for sort...")
     #     bad_runs = [9001]
