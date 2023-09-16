@@ -353,13 +353,12 @@ def process_continuous(spkc, cont_params, filename, electrode_num, temp_path) ->
     cutoff_std = float(cont_params['artifact_removal'])
     sampling_rate = float(cont_params['sampling_rate'])
 
-    filt_el = clust.get_filtered_electrode(spkc, freq=[bandpass_lower_cutoff, bandpass_upper_cutoff],
-                                           sampling_rate=sampling_rate)
+    filt_el = clust.filter_signal(spkc, freq=[bandpass_lower_cutoff, bandpass_upper_cutoff],
+                                  sampling_rate=sampling_rate)
 
     # Delete raw electrode recording from memory
     del spkc
 
-    # Calculate the 3 voltage parameters
     breach_rate = float(len(np.where(filt_el > voltage_cutoff)[0]) * int(sampling_rate)) / len(filt_el)
     test_el = np.reshape(filt_el[:int(sampling_rate) * int(len(filt_el) / sampling_rate)], (-1, int(sampling_rate)))
     breaches_per_sec = [len(np.where(test_el[i] > voltage_cutoff)[0]) for i in range(len(test_el))]
@@ -376,6 +375,7 @@ def process_continuous(spkc, cont_params, filename, electrode_num, temp_path) ->
             and mean_breach_rate_persec >= max_breach_avg):
         # Find the first 1-second epoch where the number of cutoff breaches is higher than the maximum allowed mean
         # breach rate
+        print('Bad recording, headstage fell off mid-experiment')
         recording_cutoff = np.where(breaches_per_sec > max_breach_avg)[0][0]
 
         # Dump a plot showing where the recording was cut off at
@@ -393,7 +393,6 @@ def process_continuous(spkc, cont_params, filename, electrode_num, temp_path) ->
         # Then cut the recording accordingly
         filt_el = filt_el[:recording_cutoff * int(sampling_rate)]
 
-    # Slice waveforms out of the filtered electrode recordings
     if len(filt_el) == 0:
         slices, spike_times = [], []
     else:

@@ -1,5 +1,5 @@
 from .cluster import (
-    get_filtered_electrode,
+    filter_signal,
     extract_waveforms,
     dejitter,
     scale_waveforms,
@@ -11,7 +11,7 @@ from .cluster import (
 from .autosort import process
 
 __all__ = [
-    'get_filtered_electrode',
+    'filter_signal',
     'extract_waveforms',
     'dejitter',
     'scale_waveforms',

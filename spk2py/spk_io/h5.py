@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import h5py
 
 
@@ -48,5 +49,11 @@ def read_h5(filename):
                 if key in ('wavedata', 'time'):
                     data[channel_name][key] = value[:]
                 else:
-                    data[channel_name][key] = value
+                    data[channel_name][key] = value[:]
     return data
+
+
+if __name__ == "__main__":
+    fname = Path().home() / 'data' / 'LHE_test.hdf5'
+    file = read_h5(fname)
+    x = 5

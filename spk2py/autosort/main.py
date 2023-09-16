@@ -9,7 +9,7 @@ import shutil
 from pathlib import Path
 
 import config
-from spk2py import io
+from spk2py import spk_io
 from autosort import process
 
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +57,7 @@ def main(default_config=False):
         res_dir = completed_path
         res_file = completed_path / file_stem
 
-        h5file = io.h5.read_h5(curr_file)
+        h5file = spk_io.h5.read_h5(curr_file)
         num_chan = len(h5file.keys())
         hdf5_dirs = [
             res_file / 'spike_waveforms',
