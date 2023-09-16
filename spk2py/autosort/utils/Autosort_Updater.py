@@ -34,7 +34,7 @@ def update_autosort():
         shutil.copy(autosort_repo / '/Json2Nex.py', autosort_path)
         shutil.copy(autosort_repo / '/utils/Autosort_Updater.py', autosort_path)
     shutil.copy(autosort_repo / '/main.py', autosort_path)
-    shutil.copy(autosort_repo / '/Autosort_Post.py', autosort_path)
+    shutil.copy(autosort_repo / '/autosort_post.py', autosort_path)
 
     # make config file
     config.set_config(autosort_path / '/Autosort_config.ini')
