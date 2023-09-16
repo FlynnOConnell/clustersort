@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-import os
-import shutil
-import config
-import time
-import multiprocessing
-import math
 import datetime
-import warnings
-import traceback
 import logging
+import math
+import multiprocessing
+import shutil
+import time
+from pathlib import Path
+
+import config
 from spk2py import io
 
 logging.basicConfig(level=logging.INFO)
@@ -51,7 +48,6 @@ def main(default_config=False):
     num_cpu = int(params['cores_used'])
     resort_limit = int(params['resort_limit'])
 
-    ranfiles = runfiles.copy()
     for curr_file in runfiles:  # loop through each file
         curr_file = Path(curr_file)
 
@@ -70,10 +66,10 @@ def main(default_config=False):
 
         runs = math.ceil(num_cpu / num_cpu)
         for n in range(runs):  # For the number of runs
-            a = num_cpu * n  # First electrode to start with
-            b = num_cpu * (n + 1)  # Electrode to stop with
-            if b > num_chan:  # If the last electrode is within the group
-                b = num_chan  # That will be the last electrode to run processing on
+            a = num_cpu * n  # First channel to start with
+            b = num_cpu * (n + 1)  # Channel to stop with
+            if b > num_chan:
+                b = num_chan  # That will be the last channel to run processing on
             print("Currently analyzing electrodes %i-%i." % (a + 1, b))
             processes = []
             for i in range(a, b):
@@ -83,9 +79,9 @@ def main(default_config=False):
                 processes.append(p)
             for p in processes:
                 p.join()
-        elapsed_time = time.time() - filestart  # sort time
+        elapsed_time = time.time() - filestart
         print("That file ran for", (elapsed_time / 3600), "hours.")
-    #
+
     #     # Integrity check
     #     print("Performing integrity check for sort...")
     #     bad_runs = [9001]

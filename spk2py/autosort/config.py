@@ -51,7 +51,7 @@ def default_config(path: Path, config_ver: int = 5) -> None:
         'max-breach-rate': '.2',
         'max-breach-count': '10',
         'max-breach-avg': '20',
-        'intra-cluster-cutoff': '3'
+        'intra-hpc_cluster-cutoff': '3'
     }
     config['filtering'] = {
         'low-cutoff': '600',
@@ -126,7 +126,7 @@ def get_config_params(config: configparser.ConfigParser) -> dict[str, str | int 
         "max_breach_rate": config.getfloat('signal', 'max-breach-rate'),
         "max_breach_count": config.getint('signal', 'max-breach-count'),
         "max_breach_avg": config.getint('signal', 'max-breach-avg'),
-        "intra_cluster_cutoff": config.getint('signal', 'intra-cluster-cutoff'),
+        "intra_cluster_cutoff": config.getint('signal', 'intra-hpc_cluster-cutoff'),
 
         "low_cutoff": config.getint('filtering', 'low-cutoff'),
         "high_cutoff": config.getint('filtering', 'high-cutoff'),
