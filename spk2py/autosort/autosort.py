@@ -29,7 +29,7 @@ def infofile(filename, path, sort_time, params):
     config['METADATA'] = {
         'h5 File': filename, 'Run Time': sort_time,
         'Run Date': date.today().strftime("%m/%d/%y")
-      }
+    }
     config['PARAMS USED'] = params
     with open(path + '/' + os.path.splitext(filename)[0] + '_' + 'sort.info', 'w') as info_file:
         config.write(info_file)
@@ -67,7 +67,6 @@ def process(
             num_restarts = int(params['random_restarts'])
             wf_amplitude_sd_cutoff = float(params['intra_cluster_cutoff'])
             sampling_rate = float(params['sampling_rate'])
-            cutoff_std = float(params['artifact_removal'])
             pvar = float(params['variance_explained'])
             usepvar = int(params['use_percent_variance'])
             userpc = int(params['principal_component_n'])
@@ -85,17 +84,8 @@ def process(
                 )
                 (clustering_results_dir / 'success.txt').write_text('Sorting finished. No spikes found')
                 return
-            spikes_final = []
-            xnew = np.linspace(0, len(spikes[0]) - 1, len(spikes[0]) * 10)
-            slice_cutoff = np.std(spikes) * cutoff_std
-            for i in range(len(spikes)):  # this loops through each spike and interpolates the waveform
-                if np.any(np.absolute(spikes[i]) > slice_cutoff):
-                    continue
-                f = interp1d(np.arange(0, len(spikes[0]), 1), spikes[i])
-                ynew = f(xnew)
-                spikes_final.append(ynew)
-            spikes_final = np.array(spikes_final)
-            del xnew, f, ynew, spikes
+            else:
+                spikes_final, times_final = process_continuous(spikes, params, filename, chan_num, temp_path)
 
             # Dejitter these spike waveforms, and get their maximum amplitudes
             amplitudes = np.min(spikes_final, axis=1)
@@ -212,7 +202,7 @@ def process(
         os.mkdir(filename[:-3] + '/clustering_results/channel %i/clusters%i' % ((chan_num + 1), i + 3))
         np.save(os.path.normpath(
             filename[:-3] + '/clustering_results/channel {}/clusters{}/predictions.npy'.format(chan_num + 1,
-                                                                                                  i + 3)), predictions)
+                                                                                               i + 3)), predictions)
         np.save(os.path.normpath(
             filename[:-3] + '/clustering_results/channel {}/clusters{}/bic.npy'.format(chan_num + 1, i + 3)),
             bic
@@ -241,7 +231,7 @@ def process(
                     plt.title("%i clusters" % (i + 3))
                     fig.savefig(os.path.normpath(
                         filename[:-3] + '/Plots/{}/{}_clusters/feature{}vs{}.png'.format(chan_num + 1, i + 3,
-                                                                                          feature2, feature1)))
+                                                                                         feature2, feature1)))
                     plt.close("all")
 
         for ref_cluster in range(i + 3):
@@ -266,7 +256,7 @@ def process(
             plt.title('Mahalanobis distance of all clusters from Reference Cluster: %i' % ref_cluster)
             fig.savefig(os.path.normpath(
                 filename[:-3] + '/Plots/{}/{}_clusters/Mahalonobis_cluster{}.png'.format(chan_num + 1, i + 3,
-                                                                                          ref_cluster)))
+                                                                                         ref_cluster)))
             plt.close("all")
 
         # Create file, and plot spike waveforms for the different clusters. Plot 10 times downsampled
@@ -286,7 +276,7 @@ def process(
             ax.set_title('Cluster%i' % cluster)
             fig.savefig(os.path.normpath(
                 filename[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_waveforms'.format(chan_num + 1,
-                                                                                                   i + 3, cluster)))
+                                                                                                  i + 3, cluster)))
             plt.close("all")
 
             fig = plt.figure()
@@ -302,7 +292,7 @@ def process(
                           len(np.where(ISIs < 1.0)[0]), len(cluster_times)))
             fig.savefig(os.path.normpath(
                 filename[:-3] + '/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_ISIs'.format(chan_num + 1, i + 3,
-                                                                                              cluster)))
+                                                                                             cluster)))
             plt.close("all")
             ISIList.append("%.1f" % ((float(len(np.where(ISIs < 1.0)[0])) / float(len(cluster_times))) * 100.0))
 
@@ -339,6 +329,102 @@ def process(
     with open(filename[:-3] + '/clustering_results/channel {}'.format(chan_num + 1) + '/success.txt',
               'w+') as f:
         f.write('Congratulations, this channel was sorted successfully')
+
+
+def process_continuous(spkc, cont_params, filename, electrode_num, temp_path) -> tuple[list[np.ndarray], list[np.ndarray]] | None:
+    """
+    This function is used to sort continuous data, and is called by the autosort_continuous function
+    :param temp_path: Path to save temporary files to
+    :param spkc: continuous signal as np.ndarray
+    :param cont_params:
+    :param filename:
+    :param electrode_num:
+    :return: tuple with processed wf's
+    """
+    bandpass_lower_cutoff = float(cont_params['low_cutoff'])
+    bandpass_upper_cutoff = float(cont_params['high_cutoff'])
+    voltage_cutoff = float(cont_params['disconnect_voltage'])
+    max_breach_rate = float(cont_params['max_breach_rate'])
+    max_breach_count = float(cont_params['max_breach_count'])
+    max_breach_avg = float(cont_params['max_breach_avg'])
+    spike_snapshot_before = int(cont_params['pre_time'])
+    spike_snapshot_after = int(cont_params['post_time'])
+    STD = int(cont_params['spike_detection'])
+    cutoff_std = float(cont_params['artifact_removal'])
+    sampling_rate = float(cont_params['sampling_rate'])
+
+    filt_el = clust.get_filtered_electrode(spkc, freq=[bandpass_lower_cutoff, bandpass_upper_cutoff],
+                                           sampling_rate=sampling_rate)
+
+    # Delete raw electrode recording from memory
+    del spkc
+
+    # Calculate the 3 voltage parameters
+    breach_rate = float(len(np.where(filt_el > voltage_cutoff)[0]) * int(sampling_rate)) / len(filt_el)
+    test_el = np.reshape(filt_el[:int(sampling_rate) * int(len(filt_el) / sampling_rate)], (-1, int(sampling_rate)))
+    breaches_per_sec = [len(np.where(test_el[i] > voltage_cutoff)[0]) for i in range(len(test_el))]
+    breaches_per_sec = np.array(breaches_per_sec)
+    secs_above_cutoff = len(np.where(breaches_per_sec > 0)[0])
+    if secs_above_cutoff == 0:
+        mean_breach_rate_persec = 0
+    else:
+        mean_breach_rate_persec = np.mean(breaches_per_sec[np.where(breaches_per_sec > 0)[0]])
+
+    # And if they all exceed the cutoffs, assume that the headstage fell off mid-experiment
+    if (breach_rate >= max_breach_rate
+            and secs_above_cutoff >= max_breach_count
+            and mean_breach_rate_persec >= max_breach_avg):
+        # Find the first 1-second epoch where the number of cutoff breaches is higher than the maximum allowed mean
+        # breach rate
+        recording_cutoff = np.where(breaches_per_sec > max_breach_avg)[0][0]
+
+        # Dump a plot showing where the recording was cut off at
+        fig = plt.figure()
+        plt.plot(np.arange(test_el.shape[0]), np.mean(test_el, axis=1))
+        plt.plot((recording_cutoff, recording_cutoff), (np.min(np.mean(test_el, axis=1)), np.max(np.mean(test_el, axis=1))),
+                 'k-', linewidth=4.0)
+        plt.xlabel('Recording time (secs)')
+        plt.ylabel('Average voltage recorded per sec (microvolts)')
+        plt.title('Recording cutoff time (indicated by the black horizontal line)')
+        fig.savefig(temp_path / f'/Plots/{electrode_num + 1}/cutoff_time.png',
+                    bbox_inches='tight')
+        plt.close("all")
+
+        # Then cut the recording accordingly
+        filt_el = filt_el[:recording_cutoff * int(sampling_rate)]
+
+    # Slice waveforms out of the filtered electrode recordings
+    if len(filt_el) == 0:
+        slices, spike_times = [], []
+    else:
+        slices, spike_times = clust.extract_waveforms(filt_el,
+                                                      spike_snapshot=[spike_snapshot_before, spike_snapshot_after],
+                                                      sampling_rate=sampling_rate, STD=STD, cutoff_std=cutoff_std)
+
+    if len(slices) == 0 or len(spike_times) == 0:
+        with open(temp_path / '/Plots/' + str(electrode_num + 1) + '/' + 'no_spikes.txt', 'w') as txt:
+            txt.write(
+                'No spikes were found on channel {}. The most likely cause is an early recording cutoff. RIP'.format(
+                    electrode_num + 1))
+            warnings.warn(
+                'No spikes were found on channel {}. The most likely cause is an early recording cutoff. RIP'.format(
+                    electrode_num + 1))
+            with open(temp_path / '/clustering_results/electrode {}'.format(electrode_num + 1) + '/success.txt',
+                      'w+') as f:
+                f.write('Sorting finished. No spikes found')
+            return None
+
+    # Delete filtered electrode from memory
+    del filt_el, test_el
+
+    slices_final, times_final = clust.dejitter(slices, spike_times,
+                                               spike_snapshot=[spike_snapshot_before, spike_snapshot_after],
+                                               sampling_rate=sampling_rate)
+
+    # Delete the original slices and times now that dejittering is complete
+    del slices
+    del spike_times
+    return slices_final, times_final
 
 
 def superplots(full_filename, maxclust):

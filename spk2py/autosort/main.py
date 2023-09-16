@@ -53,6 +53,7 @@ def main(default_config=False):
         file_stem = curr_file.stem
         file_parent = curr_file.parent
         temp_path = file_parent / file_stem / 'temp'  # !TODO: clean later
+        temp_path.mkdir(parents=True, exist_ok=True)
         res_dir = completed_path
         res_file = completed_path / file_stem
 
