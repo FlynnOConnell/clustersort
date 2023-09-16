@@ -126,7 +126,7 @@ We are working with data from an Analog-to-Digital Converter (ADC). A bit about 
 means:</p>
 <h3>ADC (Analog-to-Digital Converter)</h3>
 <p>An ADC converts continuous analog signals (like electrical voltage) into a digital representation.
-The digital representation is often stored in bits, and in your case, it's stored in 16 bits, which means each measurement (or sample) is represented with 16 bits of data.
+The digital representation is often stored in bits, and in this case, it's stored in 16 bits, which means each measurement (or sample) is represented with 16 bits of data.
 This gives you a range of possible values from -32768 to 32767, which are derived from 2^16 different possible 16-bit values (ranging from 0 to 65535) but offset to allow for negative values.
 </p><h3>Waveform Data</h3><p>This term refers to data representing a wave acquired over time, and it is time-continuous meaning that it has been sampled at regular intervals over time, forming a continuous signal.
 </p>
