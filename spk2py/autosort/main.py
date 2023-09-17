@@ -11,6 +11,7 @@ from pathlib import Path
 import config
 from spk2py import spk_io
 from autosort import process
+from directory_manager import DirectoryManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,30 +44,20 @@ def main(default_config=False):
     runpath = Path(params["run_path"])
     runfiles = [f for f in runpath.glob("*.hdf5")][:n_files]
 
-    completed_path = Path(params["completed_path"])
-    outpath = Path(params["results_path"])
     num_cpu = int(params["cores_used"])
     resort_limit = int(params["resort_limit"])
 
     for curr_file in runfiles:  # loop through each file
-        file_stem = curr_file.stem
-        file_parent = curr_file.parent
-        temp_path = file_parent / file_stem / "temp"  # !TODO: clean later
-        temp_path.mkdir(parents=True, exist_ok=True)
-        res_dir = completed_path
-        res_file = completed_path / file_stem
+
+        # Create the necessary directories
+        dirs = DirectoryManager(curr_file)
+        dirs.create_base_directories()
+        dirs.flush_directories()
 
         h5file = spk_io.h5.read_h5(curr_file)
         num_chan = len(h5file.keys())
-        hdf5_dirs = [
-            res_file / "spike_waveforms",
-            res_file / "spike_times",
-            res_file / "clustering_results",
-            res_file / "Plots",
-        ]
-
-        for dir_path in hdf5_dirs:
-            dir_path.mkdir(parents=True, exist_ok=True)
+        for chan in range(num_chan):
+            dirs.create_channel_directories(chan, ["clustering_results", "superplots", "isolation_compilation"])
 
         runs = math.ceil(num_chan / num_cpu)
         for n in range(runs):  # For the number of runs
@@ -78,8 +69,9 @@ def main(default_config=False):
             for i in range(chan_start, chan_end):
                 # Get the current channel
                 this_chan = h5file[list(h5file.keys())[i]]
+                dirs.idx = i
                 p = multiprocessing.Process(
-                    target=process, args=(curr_file, this_chan, temp_path, i, params)
+                    target=process, args=(curr_file, this_chan, dirs, i, params)
                 )
                 p.start()
                 processes.append(p)

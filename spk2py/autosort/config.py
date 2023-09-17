@@ -58,8 +58,8 @@ def default_config(path: Path, config_ver: int = 5) -> None:
         'high-cutoff': '3000'
     }
     config['spike'] = {
-        'pre-time': '.2',
-        'post-time': '.6',
+        'pre-time': '0.2',
+        'post-time': '0.6',
         'sampling-rate': '20000'
     }
     config['std-dev'] = {
