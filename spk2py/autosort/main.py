@@ -29,30 +29,29 @@ def main(default_config=False):
         params = config.set_config()
 
     # If the script is being run automatically, on Fridays it will run a greater number of files
-    if params['run_type'] == 'Auto':
+    if params["run_type"] == "Auto":
         if datetime.datetime.weekday(datetime.date.today()) == 4:
-            n_files = int(params['weekend_run'])
+            n_files = int(params["weekend_run"])
         else:
-            n_files = int(params['weekday_run'])
-    elif params['run_type'] == 'Manual':
-        n_files = params['manual_run']
+            n_files = int(params["weekday_run"])
+    elif params["run_type"] == "Manual":
+        n_files = params["manual_run"]
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
     # Get the files to run
-    runpath = Path(params['run_path'])
-    runfiles = [f for f in runpath.glob('*.hdf5')][:n_files]
+    runpath = Path(params["run_path"])
+    runfiles = [f for f in runpath.glob("*.hdf5")][:n_files]
 
-    completed_path = Path(params['completed_path'])
-    outpath = Path(params['results_path'])
-    num_cpu = int(params['cores_used'])
-    resort_limit = int(params['resort_limit'])
+    completed_path = Path(params["completed_path"])
+    outpath = Path(params["results_path"])
+    num_cpu = int(params["cores_used"])
+    resort_limit = int(params["resort_limit"])
 
     for curr_file in runfiles:  # loop through each file
-        file_name = curr_file.name
         file_stem = curr_file.stem
         file_parent = curr_file.parent
-        temp_path = file_parent / file_stem / 'temp'  # !TODO: clean later
+        temp_path = file_parent / file_stem / "temp"  # !TODO: clean later
         temp_path.mkdir(parents=True, exist_ok=True)
         res_dir = completed_path
         res_file = completed_path / file_stem
@@ -60,10 +59,10 @@ def main(default_config=False):
         h5file = spk_io.h5.read_h5(curr_file)
         num_chan = len(h5file.keys())
         hdf5_dirs = [
-            res_file / 'spike_waveforms',
-            res_file / 'spike_times',
-            res_file / 'clustering_results',
-            res_file / 'Plots'
+            res_file / "spike_waveforms",
+            res_file / "spike_times",
+            res_file / "clustering_results",
+            res_file / "Plots",
         ]
 
         for dir_path in hdf5_dirs:
@@ -79,8 +78,9 @@ def main(default_config=False):
             for i in range(chan_start, chan_end):
                 # Get the current channel
                 this_chan = h5file[list(h5file.keys())[i]]
-                p = multiprocessing.Process(target=process, args=(
-                    curr_file, this_chan, temp_path, i, params))
+                p = multiprocessing.Process(
+                    target=process, args=(curr_file, this_chan, temp_path, i, params)
+                )
                 p.start()
                 processes.append(p)
             for p in processes:
@@ -153,5 +153,5 @@ def main(default_config=False):
     # print("Sorting Complete!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(default_config=True)
