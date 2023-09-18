@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import configparser
+import logging
 import os
 import shutil
-import time
-import traceback
 import warnings
 from datetime import date
 from pathlib import Path
@@ -19,8 +18,13 @@ from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
-from spk2py import autosort as clust
 from directory_manager import DirectoryManager
+from spk2py import autosort as clust
+
+logger = logging.getLogger(__name__)
+logpath = Path().home() / "autosort" / "directory_logs.log"
+logging.basicConfig(filename=logpath, level=logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
 
 def infofile(filename, path, sort_time, params):
@@ -38,132 +42,136 @@ def infofile(filename, path, sort_time, params):
         config.write(info_file)
 
 
-def process(
+def process_channel(
     filename: Path | str,
     data: np.ndarray,
-    dirs: DirectoryManager,
+    dir_manager: DirectoryManager,
     chan_num: int,
     params,
 ):
     retried = 0
     while True:
-        try:
-            # Assign the parameters to variables
-            max_clusters = int(params["max_clusters"])
-            num_iter = int(params["max_iterations"])
-            thresh = float(params["convergence_criterion"])
-            num_restarts = int(params["random_restarts"])
-            wf_amplitude_sd_cutoff = float(params["intra_cluster_cutoff"])
-            sampling_rate = float(params["sampling_rate"])
-            pvar = float(params["variance_explained"])
-            usepvar = int(params["use_percent_variance"])
-            userpc = int(params["principal_component_n"])
+        # try:
+        # Assign the parameters to variables
+        max_clusters = int(params["max_clusters"])
+        num_iter = int(params["max_iterations"])
+        thresh = float(params["convergence_criterion"])
+        num_restarts = int(params["random_restarts"])
+        wf_amplitude_sd_cutoff = float(params["intra_cluster_cutoff"])
+        sampling_rate = float(params["sampling_rate"])
+        pvar = float(params["variance_explained"])
+        usepvar = int(params["use_percent_variance"])
+        userpc = int(params["principal_component_n"])
 
-            spikes = data["wavedata"]
-            if spikes.size == 0:
-                (dirs.reports / "no_spikes.txt").write_text(
-                    "No spikes were found on this channel."
-                    " The most likely cause is an early recording cutoff."
-                )
-                warnings.warn(
-                    "No spikes were found on this channel. The most likely cause is an early recording cutoff."
-                )
-                (dirs.reports / "success.txt").write_text(
-                    "Sorting finished. No spikes found"
-                )
-                return
-            else:
-                spikes_final, times_final = process_continuous(
-                    spikes, params, filename, chan_num, dirs
-                )
-
-            # Dejitter these spike waveforms, and get their maximum amplitudes
-            amplitudes = np.min(spikes_final, axis=1)
-
-            # Save these spikes/spike waveforms and their times to their respective folders
-            spike_waveforms_path = dirs.temporary / f"channel_{chan_num + 1}"
-            spike_times_path = dirs.temporary / f"channel_{chan_num + 1}"
-
-            np.save(spike_waveforms_path / "spike_waveforms.npy", spikes_final)
-            np.save(spike_times_path / "spike_times.npy", times_final)
-
-            # Scale the dejittered spikes by the energy of the waveforms and perform PCA
-            scaled_slices, energy = clust.scale_waveforms(spikes_final)
-            pca_slices, explained_variance_ratio = clust.implement_pca(scaled_slices)
-            cumulvar = np.cumsum(explained_variance_ratio)
-            graphvar = list(cumulvar[0 : np.where(cumulvar > 0.999)[0][0] + 1])
-
-            if usepvar == 1:
-                n_pc = np.where(cumulvar > pvar)[0][0] + 1
-            else:
-                n_pc = userpc
-
-            spike_waveforms_pca_path = (
-                spike_waveforms_path / f"channel_{chan_num + 1}" / "pca_waveforms.npy"
+        spikes = data["wavedata"]
+        if spikes.size == 0:
+            (
+                dir_manager.reports / f"channel_{chan_num + 1}" / "no_spikes.txt"
+            ).write_text(
+                "No spikes were found on this channel."
+                " The most likely cause is an early recording cutoff."
             )
-            spike_waveforms_energy_path = (
-                spike_waveforms_path / f"channel_{chan_num + 1}" / "energy.npy"
-            )
-            spike_waveforms_amplitudes_path = (
-                spike_waveforms_path
-                / f"channel_{chan_num + 1}"
-                / "spike_amplitudes.npy"
-            )
-            spike_waveforms_pca_path.parent.mkdir(parents=True, exist_ok=True)
-            spike_waveforms_energy_path.parent.mkdir(parents=True, exist_ok=True)
-            spike_waveforms_amplitudes_path.parent.mkdir(parents=True, exist_ok=True)
-
-            np.save(spike_waveforms_pca_path, pca_slices)
-            np.save(spike_waveforms_energy_path, energy)
-            np.save(spike_waveforms_amplitudes_path, amplitudes)
-            annot = f"{str(n_pc)} PC's used for GMM.\nVariance explained= {str(round(cumulvar[n_pc - 1], 3))}%."
-
-            plots_path = dirs.temporary / f"Plots/channel_{chan_num + 1}"
-            # Create file for saving plots, and plot explained variance ratios of the PCA
-            fig = plt.figure()
-            x = np.arange(0, len(graphvar) + 1)
-            graphvar.insert(0, 0)
-            plt.plot(x, graphvar)
-            plt.vlines(n_pc, 0, 1, colors="r")
-            plt.annotate(
-                str(n_pc)
-                + " PC's used for GMM.\nVariance explained= "
-                + str(round(cumulvar[n_pc - 1], 3))
-                + "%.",
-                (n_pc + 0.25, cumulvar[n_pc - 1] - 0.1),
-            )
-            plt.title("Variance ratios explained by PCs (cumulative)")
-            plt.xlabel("PC #")
-            plt.ylabel("Explained variance ratio")
-            fig.savefig(
-                dirs.plots / "pca_variance.png",
-                bbox_inches="tight",
-            )
-            plt.close("all")
-
-            # Make an array of the data to be used for clustering, and delete pca_slices, scaled_slices, energy and
-            # amplitudes
-            data = np.zeros((len(pca_slices), n_pc + 2))
-            data[:, 2:] = pca_slices[:, :n_pc]
-            data[:, 0] = energy[:] / np.max(energy)
-            data[:, 1] = np.abs(amplitudes) / np.max(np.abs(amplitudes))
-            del pca_slices
-            del scaled_slices
-            del energy
-            break
-        except MemoryError:
-            if retried == 1:
-                traceback.print_exc()
-                return
             warnings.warn(
-                f"Warning, could not allocate memory for channel {chan_num + 1}. This program will wait and try "
-                f"again in a bit."
+                "No spikes were found on this channel. The most likely cause is an early recording cutoff."
             )
-            retried = 1
-            time.sleep(1200)
-        except:
-            traceback.print_exc()
+            (
+                dir_manager.reports / f"channel_{chan_num + 1}" / "success.txt"
+            ).write_text("Sorting finished. No spikes found")
             return
+        else:
+            spikes_final, times_final = process_continuous(
+                spikes, params, filename, chan_num, dir_manager
+            )
+
+        # Dejitter these spike waveforms, and get their maximum amplitudes
+        amplitudes = np.min(spikes_final, axis=1)
+
+        np.save(
+            dir_manager.intermediate
+            / f"channel_{chan_num + 1}"
+            / "spike_waveforms.npy",
+            spikes_final,
+        )
+        np.save(
+            dir_manager.intermediate / f"channel_{chan_num + 1}" / "spike_times.npy",
+            times_final,
+        )
+
+        # Scale the dejittered spikes by the energy of the waveforms and perform PCA
+        scaled_slices, energy = clust.scale_waveforms(spikes_final)
+        pca_slices, explained_variance_ratio = clust.implement_pca(scaled_slices)
+        cumulvar = np.cumsum(explained_variance_ratio)
+        graphvar = list(cumulvar[0 : np.where(cumulvar > 0.999)[0][0] + 1])
+
+        if usepvar == 1:
+            n_pc = np.where(cumulvar > pvar)[0][0] + 1
+        else:
+            n_pc = userpc
+
+        np.save(
+            dir_manager.intermediate
+            / f"channel_{chan_num + 1}"
+            / "spike_waveforms.npy",
+            spikes_final,
+        )
+        np.save(
+            dir_manager.intermediate / f"channel_{chan_num + 1}" / "spike_times.npy",
+            times_final,
+        )
+        np.save(
+            dir_manager.intermediate
+            / f"channel_{chan_num + 1}"
+            / "spike_waveforms_pca.npy",
+            pca_slices,
+        )
+
+        annot = f"{str(n_pc)} PC's used for GMM.\nVariance explained= {str(round(cumulvar[n_pc - 1], 3))}%."
+
+        # Create file for saving plots, and plot explained variance ratios of the PCA
+        fig = plt.figure()
+        x = np.arange(0, len(graphvar) + 1)
+        graphvar.insert(0, 0)
+        plt.plot(x, graphvar)
+        plt.vlines(n_pc, 0, 1, colors="r")
+        plt.annotate(
+            str(n_pc)
+            + " PC's used for GMM.\nVariance explained= "
+            + str(round(cumulvar[n_pc - 1], 3))
+            + "%.",
+            (n_pc + 0.25, cumulvar[n_pc - 1] - 0.1),
+        )
+        plt.title("Variance ratios explained by PCs (cumulative)")
+        plt.xlabel("PC #")
+        plt.ylabel("Explained variance ratio")
+        fig.savefig(
+            dir_manager.plots / f"channel_{chan_num + 1}" / "pca_variance.png",
+            bbox_inches="tight",
+        )
+        plt.close("all")
+
+        # Make an array of the data to be used for clustering, and delete pca_slices, scaled_slices, energy and
+        # amplitudes
+        data = np.zeros((len(pca_slices), n_pc + 2))
+        data[:, 2:] = pca_slices[:, :n_pc]
+        data[:, 0] = energy[:] / np.max(energy)
+        data[:, 1] = np.abs(amplitudes) / np.max(np.abs(amplitudes))
+        del pca_slices
+        del scaled_slices
+        del energy
+        break
+    # except MemoryError:
+    #     if retried == 1:
+    #         traceback.print_exc()
+    #         return
+    #     warnings.warn(
+    #         f"Warning, could not allocate memory for channel {chan_num + 1}. This program will wait and try "
+    #         f"again in a bit."
+    #     )
+    #     retried = 1
+    #     time.sleep(1200)
+    # except:
+    #     traceback.print_exc()
+    #     return
 
     # Run GMM, from 3 to max_clusters
     for i in range(max_clusters - 2):
@@ -177,7 +185,7 @@ def process(
                 threshold=thresh,
             )
         except:
-            # print "Clustering didn't work - solution with %i clusters most likely didn't converge" % (i+3)
+            logger.debug("Error in clusterGMM", exc_info=True)
             continue
         if np.any(
             [
@@ -186,15 +194,20 @@ def process(
             ]
         ):
             plots_waveforms_ISIs_path = (
-                dirs.plots / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
+                dir_manager.plots
+                / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
             )
             plots_waveforms_ISIs_path.mkdir(parents=True, exist_ok=True)
 
             # Create and write to the invalid_sort.txt files
-            with open(dirs.plots / "invalid_sort.txt", "w+") as f:
+            with open(
+                dir_manager.plots / f"channel_{chan_num + 1}" / "invalid_sort.txt", "w+"
+            ) as f:
                 f.write("There are too few waveforms to properly sort this clustering")
 
-            with open(plots_waveforms_ISIs_path / "invalid_sort.txt", "w+") as f:
+            with open(
+                dir_manager.plots / f"channel_{chan_num + 1}" / "invalid_sort.txt", "w+"
+            ) as f:
                 f.write("There are too few waveforms to properly sort this clustering")
 
             continue
@@ -218,7 +231,8 @@ def process(
 
             # Make folder for results of i+2 clusters, and store results there
             clusters_path = (
-                dirs.plots / f"clustering_results/channel_{chan_num + 1}/clusters{i + 3}"
+                dir_manager.plots
+                / f"clustering_results/channel_{chan_num + 1}/clusters{i + 3}"
             )
             clusters_path.mkdir(parents=True, exist_ok=True)
 
@@ -226,7 +240,7 @@ def process(
             np.save(clusters_path / "bic.npy", bic)
 
             # Plot the graphs, for this set of clusters, in the directory made for this channel
-            plots_path = dirs.plots / f"channel_{chan_num + 1}/{i + 3}_clusters"
+            plots_path = dir_manager.plots / f"channel_{chan_num + 1}/{i + 3}_clusters"
             plots_path.mkdir(parents=True, exist_ok=True)
 
             colors = cm.rainbow(np.linspace(0, 1, i + 3))
@@ -260,12 +274,8 @@ def process(
                     )
                     plt.title("%i clusters" % (i + 3))
                     fig.savefig(
-                        os.path.normpath(
-                            filename[:-3]
-                            + "/Plots/{}/{}_clusters/feature{}vs{}.png".format(
-                                chan_num + 1, i + 3, feature2, feature1
-                            )
-                        )
+                        dir_manager.plots
+                        / f"channel_{chan_num + 1}/{i + 3}_clusters/feature{feature2}vs{feature1}.png",
                     )
                     plt.close("all")
 
@@ -299,29 +309,28 @@ def process(
                 % ref_cluster
             )
             fig.savefig(
-                os.path.normpath(
-                    filename[:-3]
-                    + "/Plots/{}/{}_clusters/Mahalonobis_cluster{}.png".format(
-                        chan_num + 1, i + 3, ref_cluster
-                    )
-                )
+                dir_manager.plots
+                / f"channel_{chan_num + 1}/{i + 3}_clusters/Mahalonobis_cluster{ref_cluster}.png",
             )
             plt.close("all")
 
         # Create file, and plot spike waveforms for the different clusters. Plot 10 times downsampled
         # dejittered/smoothed waveforms. Plot the ISI distribution of each hpc_cluster
-        os.mkdir(
-            filename[:-3]
-            + "/Plots/%i/%i_clusters_waveforms_ISIs" % ((chan_num + 1), i + 3)
-        )
+        for cluster in range(i + 3):
+            clust_path = (
+                dir_manager.plots
+                / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
+            )
+            clust_path.mkdir(parents=True, exist_ok=True)
+
         ISIList = []
         for cluster in range(i + 3):
             cluster_points = np.where(predictions[:] == cluster)[0]
             fig, ax = plt.subplots()
-            # fig, ax = AutoSort.Pl2_waveforms_datashader.waveforms_datashader(
+            # fig, ax = waveforms_datashader(
             #     spikes_final[cluster_points, :],
             #     x,
-            #     dir_name=os.path.normpath(filename[:-3] + "_datashader_temp_el" + str(chan_num + 1))
+            #     dir_manager.filename + "_datashader_temp_el" + str(chan_num + 1),
             # )
             ax.set_xlabel(
                 "Sample ({:d} samples per ms)".format(int(sampling_rate / 1000))
@@ -329,12 +338,8 @@ def process(
             ax.set_ylabel("Voltage (microvolts)")
             ax.set_title("Cluster%i" % cluster)
             fig.savefig(
-                os.path.normpath(
-                    filename[:-3]
-                    + "/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_waveforms".format(
-                        chan_num + 1, i + 3, cluster
-                    )
-                )
+                dir_manager.plots
+                / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_waveforms"
             )
             plt.close("all")
 
@@ -378,12 +383,8 @@ def process(
                 )
             )
             fig.savefig(
-                os.path.normpath(
-                    filename[:-3]
-                    + "/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_ISIs".format(
-                        chan_num + 1, i + 3, cluster
-                    )
-                )
+                dir_manager.plots
+                / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_ISIs"
             )
             plt.close("all")
             ISIList.append(
@@ -394,12 +395,13 @@ def process(
                 )
             )
 
-            # Get isolation statistics for each solution
+        # Get isolation statistics for each solution
         Lrats = clust.get_Lratios(data, predictions)
+
         isodf = pd.DataFrame(
             {
                 "IsoRating": "TBD",
-                "File": os.path.split(filename[:-3])[-1],
+                "File": dir_manager.filename,
                 "Channel": chan_num + 1,
                 "Solution": i + 3,
                 "Cluster": range(i + 3),
@@ -411,11 +413,11 @@ def process(
                 "L-Ratio": [round(Lrats[cl], 3) for cl in range(i + 3)],
             }
         )
+        cluster_path = dir_manager.reports / f"channel_{chan_num + 1}" / f"clusters_{i + 3}"
+        cluster_path.mkdir(parents=True, exist_ok=True)
         isodf.to_csv(
-            os.path.splitext(filename)[0]
-            + "/clustering_results/channel {}/clusters{}/isoinfo.csv".format(
-                chan_num + 1, i + 3
-            ),
+            cluster_path
+            / "isoinfo.csv",
             index=False,
         )
         # output this all in a plot in the plots folder and replace the ISI plot in superplots
@@ -434,35 +436,28 @@ def process(
             )  # convert to color space pillow can use
             pil_im = Image.fromarray(cv2_im_rgb)  # get pillow image
             draw = ImageDraw.Draw(pil_im)  # create draw object for text
-            font = ImageFont.truetype(
-                os.path.split(__file__)[0] + "/bin/arial.ttf", 60
-            )  # use arial font
             draw.multiline_text(
                 (90, 100),
                 text,
-                font=font,
                 fill=(0, 0, 0, 255),
                 spacing=50,
                 align="left",
             )  # draw the text
             draw.multiline_text(
-                (380, 100), text2, font=font, fill=(0, 0, 0, 255), spacing=50
+                (380, 100), text2, fill=(0, 0, 0, 255), spacing=50
             )  # draw the text
             isoimg = cv2.cvtColor(
                 np.array(pil_im), cv2.COLOR_RGB2BGR
             )  # convert back to openCV image
             cv2.imwrite(
-                filename[:-3]
-                + "/Plots/{}/{}_clusters_waveforms_ISIs/Cluster{}_Isolation.png".format(
-                    chan_num + 1, i + 3, cluster
-                ),
+                dir_manager.plots
+                / f"channel_{chan_num + 1}"
+                / f"clusters_{i + 3}"
+                / f"cluser_{cluster}_isoimg.png",
                 isoimg,
             )  # save the image
     with open(
-        filename[:-3]
-        + "/clustering_results/channel {}".format(chan_num + 1)
-        + "/success.txt",
-        "w+",
+        dir_manager.reports / f"channel_{chan_num + 1}" / "success.txt", "w+"
     ) as f:
         f.write("Congratulations, this channel was sorted successfully")
 

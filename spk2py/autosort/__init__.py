@@ -8,7 +8,7 @@ from .cluster import (
     get_Lratios
 )
 
-from .autosort import process
+from .autosort import process_channel
 
 __all__ = [
     'filter_signal',
@@ -18,5 +18,5 @@ __all__ = [
     'implement_pca',
     'clusterGMM',
     'get_Lratios',
-    'process'
+    'process_channel'
 ]

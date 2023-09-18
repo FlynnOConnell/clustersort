@@ -41,7 +41,7 @@ if __name__ == '__main__':
             processed=0
             while processed<len(rerun_channels): #start processing for each channel
                 print("Initializing resort for channel "+rerun_channels[processed]+'...')
-                AS.process(int(rerun_channels[processed]) - 1, filename, params)
+                AS.process_channel(int(rerun_channels[processed]) - 1, filename, params)
                 processed+=1
             ### Superplots
             try: AS.superplots(filename,int(params['max clusters']))

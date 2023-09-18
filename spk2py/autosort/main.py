@@ -10,7 +10,7 @@ from pathlib import Path
 
 import config
 from spk2py import spk_io
-from autosort import process
+from autosort import process_channel
 from directory_manager import DirectoryManager
 
 logging.basicConfig(level=logging.INFO)
@@ -40,7 +40,6 @@ def main(default_config=False):
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
-    # Get the files to run
     runpath = Path(params["run_path"])
     runfiles = [f for f in runpath.glob("*.hdf5")][:n_files]
 
@@ -50,28 +49,30 @@ def main(default_config=False):
     for curr_file in runfiles:  # loop through each file
 
         # Create the necessary directories
-        dirs = DirectoryManager(curr_file)
-        dirs.create_base_directories()
-        dirs.flush_directories()
+        dir_manager = DirectoryManager(curr_file)
+        dir_manager.flush_directories()
+        dir_manager.create_base_directories()
 
         h5file = spk_io.h5.read_h5(curr_file)
         num_chan = len(h5file.keys())
-        for chan in range(num_chan):
-            dirs.create_channel_directories(chan, ["clustering_results", "superplots", "isolation_compilation"])
+        dir_manager.create_channel_directories(num_chan)
 
         runs = math.ceil(num_chan / num_cpu)
-        for n in range(runs):  # For the number of runs
-            chan_start = num_cpu * n  # First channel to start with
-            chan_end = num_cpu * (n + 1)  # Channel to stop with
+        for n in range(runs):
+            channels_per_run = (
+                num_chan // runs
+            )
+            chan_start = n * channels_per_run
+            chan_end = (n + 1) * channels_per_run if n < (runs - 1) else num_chan
             if chan_end > num_chan:
                 chan_end = num_chan
+
             processes = []
             for i in range(chan_start, chan_end):
-                # Get the current channel
                 this_chan = h5file[list(h5file.keys())[i]]
-                dirs.idx = i
+                dir_manager.idx = i
                 p = multiprocessing.Process(
-                    target=process, args=(curr_file, this_chan, dirs, i, params)
+                    target=process_channel, args=(curr_file, this_chan, dir_manager, i, params)
                 )
                 p.start()
                 processes.append(p)
