@@ -115,7 +115,7 @@ To initialize a configuration file with default settings, use the `default_confi
 
 ```python
 from pathlib import Path
-from spk2py.autosort.config import default_config
+from spk2py.autosort.spk_config import default_config
 
 default_config(path=Path('/path/to/your/config.ini'))
 ```

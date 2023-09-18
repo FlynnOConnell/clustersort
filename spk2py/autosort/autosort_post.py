@@ -7,14 +7,14 @@ import pylab as plt
 from sklearn.mixture import GaussianMixture
 from spk2py import autosort
 from spk2py.autosort import hpc_cluster as clust
-from spk2py.autosort import config
+from spk2py.autosort import spk_config
 import json
 import shutil
 import sys
 import pandas as pd
 from datetime import date
 
-params = config.set_config()
+params = spk_config.set_config()
 reanalyze = int(params['reanalyze'])
 simple_GMM = int(params['simple gmm'])
 temp_dir = params['temporary dir']

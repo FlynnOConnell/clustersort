@@ -8,7 +8,7 @@ import os
 import shutil
 import sys
 import spk2py.autosort as AS
-from spk2py.autosort import config
+from spk2py.autosort import spk_config
 import time
 import multiprocessing
 import math

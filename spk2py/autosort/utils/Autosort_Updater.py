@@ -11,7 +11,7 @@ from configparser import ConfigParser
 import shutil
 import sys
 from datetime import date
-from spk2py.autosort import config
+from spk2py.autosort import spk_config
 
 python_path = Path(site.getsitepackages()[0])
 autosort_repo = Path().home() / 'repos' / 'spk2py' / 'autosort'

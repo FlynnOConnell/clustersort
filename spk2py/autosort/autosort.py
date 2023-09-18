@@ -27,6 +27,9 @@ logpath = Path().home() / "autosort" / "directory_logs.log"
 logging.basicConfig(filename=logpath, level=logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
+# Factory
+def run_spk_process(filename, data, params, dir_manager, chan_num):
+    ProcessChannel(filename, data, params, dir_manager, chan_num)
 
 def infofile(filename, path, sort_time, params):
     # dumps run info to a .info file
