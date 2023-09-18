@@ -20,6 +20,7 @@ from scipy.spatial.distance import mahalanobis
 
 from directory_manager import DirectoryManager
 from spk2py import autosort as clust
+from .utils import excepts
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"
@@ -319,10 +320,10 @@ class ProcessChannel:
                     restarts=self.num_restarts,
                     threshold=self.thresh,
                 )
-            # TODO: add exception type GMMException
-            except:
+            except Exception as e:
                 logger.debug("Error in clusterGMM", exc_info=True)
                 continue
+
             if np.any(
                 [
                     len(np.where(predictions[:] == cluster)[0]) <= n_pc + 2

@@ -7,6 +7,13 @@ from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
+from .utils import excepts
+import logging
+from pathlib import Path
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logpath = Path().home() / 'autosort' / "cluster.log"
 
 
 def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
@@ -229,29 +236,32 @@ def clusterGMM(data, n_clusters, n_iter, restarts, threshold):
     g = []
     bayesian = []
 
-    for i in range(restarts):
-        g.append(
-            GaussianMixture(
-                n_components=n_clusters,
-                covariance_type="full",
-                tol=threshold,
-                random_state=i,
-                max_iter=n_iter,
+    # Run the GMM
+    try:
+        for i in range(restarts):
+            g.append(
+                GaussianMixture(
+                    n_components=n_clusters,
+                    covariance_type="full",
+                    tol=threshold,
+                    random_state=i,
+                    max_iter=n_iter,
+                )
             )
-        )
-        g[-1].fit(data)
-        if g[-1].converged_:
-            bayesian.append(g[-1].bic(data))
-        else:
-            del g[-1]
+            g[-1].fit(data)
+            if g[-1].converged_:
+                bayesian.append(g[-1].bic(data))
+            else:
+                del g[-1]
 
-    # print len(akaike)
-    bayesian = np.array(bayesian)
-    best_fit = np.where(bayesian == np.min(bayesian))[0][0]
+        # print len(akaike)
+        bayesian = np.array(bayesian)
+        best_fit = np.where(bayesian == np.min(bayesian))[0][0]
 
-    predictions = g[best_fit].predict(data)
-
-    return g[best_fit], predictions, np.min(bayesian)
+        predictions = g[best_fit].predict(data)
+        return g[best_fit], predictions, np.min(bayesian)
+    except excepts.GmmFitException as e:
+        logger.warning(f"Error in clusterGMM: {e.message}", exc_info=True)
 
 
 def get_Lratios(data, predictions):
