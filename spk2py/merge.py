@@ -7,6 +7,7 @@ from spk2py.spk_io import h5
 import logging
 from sonpy import lib as sp
 import time
+import smr_extract
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -127,5 +128,9 @@ def merge_files(filepath: Path | str, savepath: Path | str = None) -> None:
 
 
 if __name__ == "__main__":
-    mergepath = Path().home() / "data"
-    merge_files(mergepath)
+    prepath = Path().home() / "autosort" / "h5"
+    prefile = prepath / "pre.smr"
+    postfile = prepath / "post.smr"
+    smr = smr_extract.SmrExtract(postfile)
+    smr.get_adc_channels()
+    x = 5

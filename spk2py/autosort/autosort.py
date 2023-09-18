@@ -18,7 +18,7 @@ from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
-from directory_manager import DirectoryManager
+from .directory_manager import DirectoryManager
 from spk2py import autosort as clust
 from .utils import excepts
 
@@ -29,7 +29,8 @@ logger.addHandler(logging.StreamHandler())
 
 # Factory
 def run_spk_process(filename, data, params, dir_manager, chan_num):
-    ProcessChannel(filename, data, params, dir_manager, chan_num)
+    proc = ProcessChannel(filename, data, params, dir_manager, chan_num)
+
 
 def infofile(filename, path, sort_time, params):
     # dumps run info to a .info file
@@ -592,7 +593,7 @@ class ProcessChannel:
             f.write("Congratulations, this channel was sorted successfully")
 
 
-    def superplots(self, full_filename, maxclust):
+    def superplots(self, maxclust):
         path = (
             self.dir_manager.plots / f"channel_{self.chan_num + 1}"
         )
