@@ -13,7 +13,7 @@ import imageio
 
 def waveforms_datashader(waveforms, x_values, dir_name="datashader_temp"):
     """
-    Create a Datashader image from a numpy array of waveforms.
+    Create a Datashader image from an array of waveforms.
 
     Parameters:
     -----------

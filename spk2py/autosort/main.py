@@ -72,7 +72,7 @@ def main(default_config=False):
                 this_chan = h5file[list(h5file.keys())[i]]
                 dir_manager.idx = i
                 p = multiprocessing.Process(
-                    target=process_channel, args=(curr_file, this_chan, dir_manager, i, params)
+                    target=process_channel, args=(this_chan, dir_manager, i, params)
                 )
                 p.start()
                 processes.append(p)
