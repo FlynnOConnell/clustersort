@@ -1,136 +1,84 @@
 from __future__ import annotations
 
-from math import floor
+import h5py
 from pathlib import Path
 import numpy as np
-from spk2py.spk_io import h5
 import logging
-from sonpy import lib as sp
-import time
-import smr_extract
+from spike_data import SpikeData
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-def merge_files(filepath: Path | str, savepath: Path | str = None) -> None:
-    """
-    Merge two .smr files into one .hdf5 file.
-
-    :param filepath: Path to the directory containing the .smr files
-    :param savepath: Path to the directory where the .hdf5 file will be saved
-    :return: None
-    """
-    start_time = time.time()
-    filepath = Path(filepath)
-    files = list(filepath.glob("*.smr"))
-
-    if not files or len(files) < 2:
+def get_files(filepath: Path | str) -> tuple[SpikeData, ...]:
+    file_list = list(Path(filepath).glob("*.smr"))
+    if len(file_list) < 2:
         raise FileNotFoundError(
-            f"No files found in {filepath} or less than two files found."
+            f"Less than two files found in {filepath}"
         )
+    return tuple(SpikeData(f) for f in file_list)
 
-    sonfiles = [sp.SonFile(str(filename), True) for filename in files]
-    files = [Path(f) for f in files]
-    logger.info(f"Files to be merged: {files}")
-    if not savepath:
-        savepath = Path().home() / "autosort" / "h5"
-        savepath.mkdir(parents=True, exist_ok=True)
+
+def concatenate_spike_data(spike_data_1: SpikeData, spike_data_2: SpikeData):
+    # Ensure one is preinfusion and the other is postinfusion
+    if not ((spike_data_1.preinfusion and spike_data_2.postinfusion) or
+            (spike_data_2.preinfusion and spike_data_1.postinfusion)):
+        raise ValueError("One SpikeData object should be preinfusion and the other postinfusion.")
+
+    # Determine the order of concatenation based on infusion type
+    if spike_data_1.preinfusion:
+        pre_spike_data = spike_data_1
+        post_spike_data = spike_data_2
     else:
-        savepath = Path(savepath)
-        savepath.mkdir(parents=True, exist_ok=True)
+        pre_spike_data = spike_data_2
+        post_spike_data = spike_data_1
 
-    base_names = [str(f.stem) for f in files]
-    common_prefixes = [name.rsplit("_", 1)[0] for name in base_names]
-    if common_prefixes[0] == common_prefixes[1]:
-        hdf5_filename = common_prefixes[0] + "_combined.hdf5"
-    else:
-        raise ValueError(
-            "The filenames before '_preinfusion' or '_postinfusion' are not identical."
-        )
+    combined_lfp = {}
+    combined_unit = {}
+    index_track_lfp = {}
+    index_track_unit = {}
 
-    savename = savepath / hdf5_filename
+    # Concatenate lfp
+    for key in pre_spike_data.lfp:
+        combined_lfp[key] = np.concatenate([pre_spike_data.lfp[key], post_spike_data.lfp[key]])
+        index_track_lfp[key] = len(pre_spike_data.lfp[key])
 
-    # These are unused in the spike-sorting pipeline, so we'll exclude them
-    exclude = [
-        "Respirat",
-        "RefBrain",
-        "Sniff",
-    ]
+    # Concatenate unit
+    for key in pre_spike_data.unit:
+        combined_unit[key] = np.concatenate([pre_spike_data.unit[key], post_spike_data.unit[key]])
+        index_track_unit[key] = len(pre_spike_data.unit[key])
 
-    filedata = []
-    for spkfile in sonfiles:
-        data = {}
-        file_time_base = spkfile.GetTimeBase()
-        for i in range(spkfile.MaxChannels()):
-            channel_title = spkfile.GetChannelTitle(i)
+    return combined_lfp, combined_unit, index_track_lfp, index_track_unit
 
-            if (
-                spkfile.ChannelType(i) == sp.DataType.Adc
-                and channel_title not in exclude
-                and "LFP" not in channel_title
-            ):
-                chan_max_time = spkfile.ChannelMaxTime(i)
-                chan_divide = spkfile.ChannelDivide(i)
 
-                recording_length = chan_max_time * file_time_base
-                dPeriod = chan_divide * file_time_base
-                num_ticks = floor(recording_length / dPeriod)
-                chan_units = spkfile.GetChannelUnits(i)
+def save_to_h5(filename: str,
+               lfp_dict: dict,
+               unit_dict: dict,
+               idx_lfp: dict,
+               idx_unit: dict
+               ):
+    with h5py.File(filename, 'w') as f:
+        # Save combined lfp waveform array
+        lfp_group = f.create_group('lfp')
+        for key, data in lfp_dict.items():
+            lfp_group.create_dataset(key, data=data)
 
-                # Read data
-                wavedata = spkfile.ReadFloats(i, num_ticks, 0)
-                # time = np.arange(0, len(wavedata) * dPeriod, dPeriod) #  Need this later
+        # Save combined unit waveform array
+        unit_group = f.create_group('unit')
+        for key, data in unit_dict.items():
+            unit_group.create_dataset(key, data=data)
 
-                data[channel_title] = {
-                    "chan_units": chan_units,
-                    "wavedata": wavedata,
-                    "sampling_rate": 1 / dPeriod,
-                    "recording_length": recording_length,
-                }
-        filedata.append(data)
+        # Save index where lfp was concatenated
+        index_lfp_group = f.create_group('idx_lfp')
+        for key, index in idx_lfp.items():
+            index_lfp_group.create_dataset(key, data=index)
 
-    pre_infusion_data = filedata[0]
-    post_infusion_data = filedata[1]
-    combined_data = {}
-    for key in pre_infusion_data.keys():
-        # Ensure the key exists in both dictionaries before combining
-        if key in post_infusion_data:
-            # Combine wavedata arrays
-            combined_wavedata = np.concatenate(
-                [
-                    pre_infusion_data[key]["wavedata"],
-                    post_infusion_data[key]["wavedata"],
-                ]
-            )
-
-            # Combine time arrays
-            # For the post-infusion time array, we need to add the last time value of pre-infusion data
-            # to all the time values to maintain continuity in the time series
-            # last_pre_infusion_time = pre_infusion_data[key]['time'][-1]
-            # adjusted_post_infusion_time = post_infusion_data[key]['time'] + last_pre_infusion_time
-            # combined_time = np.concatenate([pre_infusion_data[key]['time'], adjusted_post_infusion_time])
-
-            # Now save this data to the new dictionary
-            combined_data[key] = {
-                "chan_units": pre_infusion_data[key][
-                    "chan_units"
-                ],
-                "wavedata": combined_wavedata,
-                "sampling_rate": pre_infusion_data[key]["sampling_rate"],
-                "recording_length": pre_infusion_data[key]["recording_length"]
-                + post_infusion_data[key]["recording_length"],
-                # 'time': combined_time,
-            }
-    h5.save_h5(savename, combined_data, overwrite=True)
-    logger.info(f"Files merged in {time.time() - start_time} seconds.")
-    logger.info(f"{len(sonfiles)} files saved to {savename}")
-
+        # Save index where unit was concatenated
+        index_unit_group = f.create_group('idx_unit')
+        for key, index in idx_unit.items():
+            index_unit_group.create_dataset(key, data=index)
 
 if __name__ == "__main__":
-    prepath = Path().home() / "autosort" / "h5"
-    prefile = prepath / "pre.smr"
-    postfile = prepath / "post.smr"
-    smr = smr_extract.SmrExtract(postfile)
-    smr.get_adc_channels()
+    prepath = Path().home() / "data" / "smr"
+    files = get_files(prepath)
+    lfp, unit, lfp_idx, unit_idx = concatenate_spike_data(files[0], files[1])
     x = 5

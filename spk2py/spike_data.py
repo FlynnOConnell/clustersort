@@ -21,7 +21,7 @@ class SpikeData:
     - A string, where the string is the filename stem.
     - A Path object, for filename.stem, name, parent, suffix, absolute, and exists properties.
     """
-    def __init__(self, filepath: Path | str, exclude: tuple = (),):
+    def __init__(self, filepath: Path | str , exclude: tuple = ("Respirat", "Sniff", "RefBrain"),):
         """
         Class for reading and storing data from a Spike2 file.
 
@@ -75,6 +75,7 @@ class SpikeData:
         exists : bool
             Whether the file exists or not.
         """
+        self.errors = {}
         self.exclude = exclude
         self.empty = False
         self.filename = Path(filepath)
@@ -99,14 +100,6 @@ class SpikeData:
             return self.lfp[key]
         elif key in self.unit:
             return self.unit[key]
-        else:
-            raise KeyError(f"{key} not found in SpikeData object.")
-
-    def __setitem__(self, key, value):
-        if key in self.lfp:
-            self.lfp[key] = value
-        elif key in self.unit:
-            self.unit[key] = value
         else:
             raise KeyError(f"{key} not found in SpikeData object.")
 
@@ -141,7 +134,8 @@ class SpikeData:
         return "post" in self.filename.stem
 
     def get_adc_channels(self):
-        """Fill dictionaries for LFP and unit channels.
+        """
+        Fill dictionaries for LFP and unit channels.
 
         If there are gaps in the Spike2 file, this will not be read as zero or NaN etc., it will simply be passed over,
         and  we end up with fewer points than the channel divide would otherwise.
@@ -149,16 +143,19 @@ class SpikeData:
         for idx in range(self.max_channels):
             title = self.sonfile.GetChannelTitle(idx)
             if self.sonfile.ChannelType(idx) == sp.DataType.Adc and title not in self.exclude:
-                # this will always show "parameter filter is not used" because SonPy hides the actual parameter filter
-
                 # we want all waveforms, so we want max_ticks to exceed the number of ticks in the file
                 # if this is a 32bit file, the max number of ticks is 2e9 (technically 2.147e9, but close enough)
                 # if this is a 64bit file, the max number of ticks is 1e12 (...1.844e19, close enough!)
                 if self.bitrate == 32:
-                    max_ticks = 2e9
+                    max_ticks = int(2e9)
                 else:
-                    max_ticks = 1e12
-                waveforms = self.sonfile.ReadFloats(idx, max_ticks, 0)
+                    max_ticks = int(1e12)
+                try:
+                    # this will always show "parameter filter is not used" because SonPy hides the actual parameter filter
+                    waveforms = self.sonfile.ReadFloats(idx, max_ticks, 0)
+                except TypeError as e:
+                    self.errors[title] = e
+                    continue
                 if "LFP" in title:
                     self.lfp[title] = waveforms
                 elif "U" in title:
@@ -225,34 +222,6 @@ class SpikeData:
     def recording_length(self):
         """The total recording length, in seconds."""
         return self.max_time * self.time_base
-
-    @property
-    def stem(self):
-        """The filename without the extension."""
-        return self.filename.stem
-
-    @property
-    def suffix(self):
-        """The filename extension."""
-        return self.filename.suffix
-
-    @property
-    def name(self):
-        """The filename with extension."""
-        return self.filename.name
-
-    @property
-    def parent(self):
-        """The parent directory path"""
-        return self.filename.parent
-
-    @property
-    def absolute(self):
-        return self.filename.absolute()
-
-    @property
-    def exists(self):
-        return self.filename.exists()
 
 
 if __name__ == "__main__":

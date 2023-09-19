@@ -1,4 +1,4 @@
 from autosort import *
-from . import smr_extract
+from . import spike_data
 
-__all__ = ["autosort", "smr_extract"]
+__all__ = ["autosort", "spike_data.py"]
