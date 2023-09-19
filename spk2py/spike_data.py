@@ -62,24 +62,13 @@ class SpikeData:
             Whether the file is 32bit (old) or 64bit (new).
         recording_length : float
             The total recording length, in seconds.
-        stem : str
-            The filename without the extension.
-        suffix : str
-            The filename extension.
-        name : str
-            The filename with extension.
-        parent : Path
-            The parent directory path
-        absolute : Path
-            The absolute path to the file.
-        exists : bool
-            Whether the file exists or not.
         """
         self.errors = {}
         self.exclude = exclude
         self.empty = False
         self.filename = Path(filepath)
         self.sonfile = sp.SonFile(str(self.filename), True)
+        self.bitrate = 32 if self.sonfile.is32file() else 64
         self.lfp = {}
         self.unit = {}
         self.get_adc_channels()
@@ -212,11 +201,6 @@ class SpikeData:
     def max_channels(self):
         """The number of channels in the file."""
         return self.sonfile.MaxChannels()
-
-    @property
-    def bitrate(self):
-        """Whether the file is 32bit (old) or 64bit (new)."""
-        return 32 if self.sonfile.is32file() else 64
 
     @property
     def recording_length(self):

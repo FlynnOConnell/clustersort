@@ -30,6 +30,7 @@ logger.addHandler(logging.StreamHandler())
 # Factory
 def run_spk_process(filename, data, params, dir_manager, chan_num):
     proc = ProcessChannel(filename, data, params, dir_manager, chan_num)
+    proc.process_channel()
 
 
 def infofile(filename, path, sort_time, params):
@@ -220,13 +221,11 @@ class ProcessChannel:
 
     def process_channel(
         self,
-        dir_manager: DirectoryManager,
-        chan_num: int,
     ):
         while True:
             if self.data['wavedata'].size == 0:
                 (
-                    dir_manager.reports / f"channel_{chan_num + 1}" / "no_spikes.txt"
+                    self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "no_spikes.txt"
                 ).write_text(
                     "No spikes were found on this channel."
                     " The most likely cause is an early recording cutoff."
@@ -235,7 +234,7 @@ class ProcessChannel:
                     "No spikes were found on this channel. The most likely cause is an early recording cutoff."
                 )
                 (
-                    dir_manager.reports / f"channel_{chan_num + 1}" / "success.txt"
+                    self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "success.txt"
                 ).write_text("Sorting finished. No spikes found")
                 return
             else:
@@ -245,13 +244,13 @@ class ProcessChannel:
             amplitudes = np.min(spikes_final, axis=1)
 
             np.save(
-                dir_manager.intermediate
-                / f"channel_{chan_num + 1}"
+                self.dir_manager.intermediate
+                / f"channel_{self.chan_num + 1}"
                 / "spike_waveforms.npy",
                 spikes_final,
             )
             np.save(
-                dir_manager.intermediate / f"channel_{chan_num + 1}" / "spike_times.npy",
+                self.dir_manager.intermediate / f"channel_{self.chan_num + 1}" / "spike_times.npy",
                 times_final,
             )
 
@@ -267,18 +266,18 @@ class ProcessChannel:
                 n_pc = self.userpc
 
             np.save(
-                dir_manager.intermediate
-                / f"channel_{chan_num + 1}"
+                self.dir_manager.intermediate
+                / f"channel_{self.chan_num + 1}"
                 / "spike_waveforms.npy",
                 spikes_final,
             )
             np.save(
-                dir_manager.intermediate / f"channel_{chan_num + 1}" / "spike_times.npy",
+                self.dir_manager.intermediate / f"channel_{self.chan_num + 1}" / "spike_times.npy",
                 times_final,
             )
             np.save(
-                dir_manager.intermediate
-                / f"channel_{chan_num + 1}"
+                self.dir_manager.intermediate
+                / f"channel_{self.chan_num + 1}"
                 / "spike_waveforms_pca.npy",
                 pca_slices,
             )
@@ -301,7 +300,7 @@ class ProcessChannel:
             plt.xlabel("PC #")
             plt.ylabel("Explained variance ratio")
             fig.savefig(
-                dir_manager.plots / f"channel_{chan_num + 1}" / "pca_variance.png",
+                self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "pca_variance.png",
                 bbox_inches="tight",
             )
             plt.close("all")
@@ -314,7 +313,7 @@ class ProcessChannel:
             break
 
 
-    def spk_gmm(self, data, times_final, chan_num, n_pc, amplitudes):
+    def spk_gmm(self, data, times_final, n_pc, amplitudes):
         for i in range(self.max_clusters - 2):
             try:
                 model, predictions, bic = clust.clusterGMM(
@@ -336,18 +335,18 @@ class ProcessChannel:
             ):
                 plots_waveforms_ISIs_path = (
                     self.dir_manager.plots
-                    / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
+                    / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
                 )
                 plots_waveforms_ISIs_path.mkdir(parents=True, exist_ok=True)
         
                 # Create and write to the invalid_sort.txt files
                 with open(
-                    self.dir_manager.plots / f"channel_{chan_num + 1}" / "invalid_sort.txt", "w+"
+                    self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "invalid_sort.txt", "w+"
                 ) as f:
                     f.write("There are too few waveforms to properly sort this clustering")
         
                 with open(
-                    self.dir_manager.plots / f"channel_{chan_num + 1}" / "invalid_sort.txt", "w+"
+                    self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "invalid_sort.txt", "w+"
                 ) as f:
                     f.write("There are too few waveforms to properly sort this clustering")
         
@@ -371,7 +370,7 @@ class ProcessChannel:
                 # Make folder for results of i+2 clusters, and store results there
                 clusters_path = (
                     self.dir_manager.plots
-                    / f"clustering_results/channel_{chan_num + 1}/clusters{i + 3}"
+                    / f"clustering_results/channel_{self.chan_num + 1}/clusters{i + 3}"
                 )
                 clusters_path.mkdir(parents=True, exist_ok=True)
         
@@ -379,7 +378,7 @@ class ProcessChannel:
                 np.save(clusters_path / "bic.npy", bic)
         
                 # Plot the graphs, for this set of clusters, in the directory made for this channel
-                plots_path = self.dir_manager.plots / f"channel_{chan_num + 1}/{i + 3}_clusters"
+                plots_path = self.dir_manager.plots / f"channel_{self.chan_num + 1}/{i + 3}_clusters"
                 plots_path.mkdir(parents=True, exist_ok=True)
 
             # Ignore cm.rainbow type checking because the dynamic __init__.py isn't recognized
@@ -415,7 +414,7 @@ class ProcessChannel:
                         plt.title("%i clusters" % (i + 3))
                         fig.savefig(
                             self.dir_manager.plots
-                            / f"channel_{chan_num + 1}/{i + 3}_clusters/feature{feature2}vs{feature1}.png",
+                            / f"channel_{self.chan_num + 1}/{i + 3}_clusters/feature{feature2}vs{feature1}.png",
                         )
                         plt.close("all")
         
@@ -448,7 +447,7 @@ class ProcessChannel:
                 )
                 fig.savefig(
                     self.dir_manager.plots
-                    / f"channel_{chan_num + 1}/{i + 3}_clusters/Mahalonobis_cluster{ref_cluster}.png",
+                    / f"channel_{self.chan_num + 1}/{i + 3}_clusters/Mahalonobis_cluster{ref_cluster}.png",
                 )
                 plt.close("all")
         
@@ -457,7 +456,7 @@ class ProcessChannel:
             for cluster in range(i + 3):
                 clust_path = (
                     self.dir_manager.plots
-                    / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
+                    / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
                 )
                 clust_path.mkdir(parents=True, exist_ok=True)
         
@@ -468,14 +467,14 @@ class ProcessChannel:
                 # fig, ax = waveforms_datashader(
                 #     spikes_final[cluster_points, :],
                 #     x,
-                #     self.dir_manager.filename + "_datashader_temp_el" + str(chan_num + 1),
+                #     self.dir_manager.filename + "_datashader_temp_el" + str(self.chan_num + 1),
                 # )
                 ax.set_xlabel("Sample ({:d} samples per ms)".format(int(self.sampling_rate / 1000)))
                 ax.set_ylabel("Voltage (microvolts)")
                 ax.set_title("Cluster%i" % cluster)
                 fig.savefig(
                     self.dir_manager.plots
-                    / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_waveforms"
+                    / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_waveforms"
                 )
                 plt.close("all")
         
@@ -520,7 +519,7 @@ class ProcessChannel:
                 )
                 fig.savefig(
                     self.dir_manager.plots
-                    / f"channel_{chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_ISIs"
+                    / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_ISIs"
                 )
                 plt.close("all")
                 ISIList.append(
@@ -538,7 +537,7 @@ class ProcessChannel:
                 {
                     "IsoRating": "TBD",
                     "File": self.dir_manager.filename,
-                    "Channel": chan_num + 1,
+                    "Channel": self.chan_num + 1,
                     "Solution": i + 3,
                     "Cluster": range(i + 3),
                     "wf count": [
@@ -548,7 +547,7 @@ class ProcessChannel:
                     "L-Ratio": [round(Lrats[cl], 3) for cl in range(i + 3)],
                 }
             )
-            cluster_path = self.dir_manager.reports / f"channel_{chan_num + 1}" / f"clusters_{i + 3}"
+            cluster_path = self.dir_manager.reports / f"channel_{self.chan_num + 1}" / f"clusters_{i + 3}"
             cluster_path.mkdir(parents=True, exist_ok=True)
             isodf.to_csv(
                 cluster_path / "isoinfo.csv",
@@ -584,12 +583,12 @@ class ProcessChannel:
                 )
                 cv2.imwrite(
                     self.dir_manager.plots
-                    / f"channel_{chan_num + 1}"
+                    / f"channel_{self.chan_num + 1}"
                     / f"clusters_{i + 3}"
                     / f"cluser_{cluster}_isoimg.png",
                     isoimg,
                 )  # save the image
-        with open(self.dir_manager.reports / f"channel_{chan_num + 1}" / "success.txt", "w+") as f:
+        with open(self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "success.txt", "w+") as f:
             f.write("Congratulations, this channel was sorted successfully")
 
 

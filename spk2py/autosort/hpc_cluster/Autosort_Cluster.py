@@ -17,7 +17,7 @@ import traceback
 import warnings
 
 if __name__ == '__main__':
-    params = config.set_config()
+    params = spk_config.set_config()
     print('Running Script: ' + __file__)
     try:
         n_files = int(params['n-files'])

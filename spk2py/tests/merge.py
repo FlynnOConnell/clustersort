@@ -1,6 +1,5 @@
 import unittest
 from pathlib import Path
-from spk2py.merge import merge_files
 
 
 class TestMergeFiles(unittest.TestCase):

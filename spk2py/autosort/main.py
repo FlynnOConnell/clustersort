@@ -9,7 +9,6 @@ import shutil
 from pathlib import Path
 
 import spk_config
-from spk2py import spk_io
 from autosort import run_spk_process
 from directory_manager import DirectoryManager
 

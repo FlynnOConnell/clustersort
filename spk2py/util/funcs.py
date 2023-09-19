@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from sonpy import lib as sp
 
 
 def get_spikes(data, spike_window=80, tf=5, offset=10, max_thresh=350):
