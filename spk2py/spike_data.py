@@ -57,6 +57,12 @@ class SpikeData:
         """Get the waveform sample period, in seconds."""
         return self.get_channel_interval(channel) / self.time_base
 
+    def get_waveform_time(self,):
+        """ Create a numpy array of time values for the waveform. """
+        # TODO: Implement this
+        # time = np.arange(0, len(wavedata) * dPeriod, dPeriod)
+        pass
+
     def num_ticks(self, channel: int):
         """The total number of clock ticks for this channel."""
         return floor(self.recording_length / self.get_channel_period(channel))
