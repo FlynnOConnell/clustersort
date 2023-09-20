@@ -1,6 +1,3 @@
-import logging
-from pathlib import Path
-
 import numpy as np
 from scipy import linalg
 from scipy.interpolate import interp1d
@@ -10,8 +7,10 @@ from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
-
-# from spk2py.autosort.utils import excepts
+from .utils import excepts
+import logging
+from pathlib import Path
+from numba import jit
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -50,8 +49,9 @@ def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
     return filt_el
 
 
+@jit
 def extract_waveforms(
-    filt_el, sampling_rate,spike_snapshot=(0.2, 0.6), STD=2.0, cutoff_std=10.0
+    signal: np.ndarray, sampling_rate: int, spike_snapshot: tuple=(0.2, 0.6), STD=2.0, cutoff_std=10.0
 ):
     """
     Extract individual spike waveforms from the filtered electrode signal.
@@ -77,9 +77,9 @@ def extract_waveforms(
     spike_times : list of int
         List of indices indicating the positions of the extracted spikes in the input array.
     """
-    m = np.mean(filt_el)
-    th = np.std(filt_el) * STD
-    pos = np.where(filt_el <= m - th)[0]
+    m = np.mean(signal)
+    th = np.std(signal) * STD
+    pos = np.where(signal <= m - th)[0]
     changes = []
     for i in range(len(pos) - 1):
         if pos[i + 1] - pos[i] > 1:
@@ -89,23 +89,23 @@ def extract_waveforms(
     spike_times = []
     for i in range(len(changes) - 1):
         minimum = np.where(
-            filt_el[pos[changes[i] : changes[i + 1]]]
-            == np.min(filt_el[pos[changes[i] : changes[i + 1]]])
+            signal[pos[changes[i]: changes[i + 1]]]
+            == np.min(signal[pos[changes[i]: changes[i + 1]]])
         )[0]
         if pos[minimum[0] + changes[i]] - int(
             (spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)
         ) > 0 and pos[minimum[0] + changes[i]] + int(
             (spike_snapshot[1] + 0.1) * (sampling_rate / 1000.0)
         ) < len(
-            filt_el
+            signal
         ):
-            tempslice = filt_el[
+            tempslice = signal[
                 pos[minimum[0] + changes[i]]
                 - int((spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)) : pos[
                     minimum[0] + changes[i]
                 ]
                 + int((spike_snapshot[1] + 0.1) * (sampling_rate / 1000.0))
-            ]
+                        ]
             if ~np.any(np.absolute(tempslice) > (th * cutoff_std) / STD):
                 slices.append(tempslice)
                 spike_times.append(pos[minimum[0] + changes[i]])
@@ -113,7 +113,7 @@ def extract_waveforms(
     return np.array(slices), spike_times
 
 
-def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6),):
+def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000.0):
     """
     Adjust the alignment of extracted spike waveforms to minimize jitter.
 
@@ -121,12 +121,12 @@ def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6),):
     ----------
     slices : list of array-like
         List of extracted spike waveforms, each as a 1-D array.
-    sampling_rate : float, optional
-        The sampling rate of the signal in Hz. Default is 20000.0 Hz.
     spike_times : list of int
         List of indices indicating the positions of the extracted spikes in the input array.
     spike_snapshot : tuple of float, optional
         The time range (in milliseconds) around each spike to extract, given as (pre_spike_time, post_spike_time).
+    sampling_rate : float, optional
+        The sampling rate of the signal in Hz. Default is 20000.0 Hz.
 
     Returns
     -------
@@ -260,7 +260,7 @@ def clusterGMM(data, n_clusters, n_iter, restarts, threshold):
 
         predictions = g[best_fit].predict(data)
         return g[best_fit], predictions, np.min(bayesian)
-    except Exception as e:
+    except excepts.GmmFitException as e:
         logger.warning(f"Error in clusterGMM: {e.message}", exc_info=True)
 
 
