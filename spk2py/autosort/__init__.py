@@ -1,4 +1,4 @@
-from .cluster import (
+from spk2py.cluster import (
     filter_signal,
     extract_waveforms,
     dejitter,

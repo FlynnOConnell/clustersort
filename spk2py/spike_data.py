@@ -1,16 +1,41 @@
 from __future__ import annotations
 
 import logging
+from collections import namedtuple
+from datetime import datetime
 from math import floor
 from pathlib import Path
 
+import numpy as np
+import pytz
 from sonpy import lib as sp
 
-logging.basicConfig(level=logging.INFO)
+from cluster import extract_waveforms, filter_signal
+
+# Define a custom logging format
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(filename)s - %(asctime)s - %(message)s',
+    datefmt='%m-%d-%Y %I:%M:%S %p',
+    handlers=[logging.StreamHandler()]
+)
 logger = logging.getLogger(__name__)
 
+# Set timezone to EST
+class ESTFormatter(logging.Formatter):
+    def formatTime(self, record, datefmt=None):
+        dt = datetime.fromtimestamp(record.created, pytz.timezone('US/Eastern'))
+        if datefmt:
+            return dt.strftime(datefmt)
+        else:
+            return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+for handler in logger.handlers:
+    handler.setFormatter(ESTFormatter('%(filename)s - %(asctime)s - %(message)s', datefmt='%m-%d-%Y %I:%M:%S %p'))
 
 class SpikeData:
+    UnitData = namedtuple("UnitData", ["slices", "times"])
+    Segment = namedtuple("Segment", ["segment_number", "data"])
     """
     Container class for Spike2 data.
 
@@ -19,7 +44,6 @@ class SpikeData:
     - A list, where the elements are the channel names.
     - A boolean, where True means the file is empty and False means it is not.
     - A string, where the string is the filename stem.
-    - A Path object, for filename.stem, name, parent, suffix, absolute, and exists properties.
     """
     def __init__(self, filepath: Path | str , exclude: tuple = ("Respirat", "Sniff", "RefBrain"),):
         """
@@ -63,6 +87,8 @@ class SpikeData:
         recording_length : float
             The total recording length, in seconds.
         """
+        self._bandpass_low = 300
+        self._bandpass_high = 3000
         self.errors = {}
         self.exclude = exclude
         self.empty = False
@@ -122,33 +148,80 @@ class SpikeData:
     def postinfusion(self):
         return "post" in self.filename.stem
 
-    def get_adc_channels(self):
-        """
-        Fill dictionaries for LFP and unit channels.
+    def filter_extract(
+        self, waveforms, sampling_rate: int | float, overlap=0.5
+    ):
+        # Ensure the Nyquist-Shannon sampling theorem is satisfied
+        if self.time_base > 1 / (2 * self.bandpass_high):
+            raise ValueError(
+                "Sampling rate is too low for the given bandpass filter frequencies."
+            )
+    
+        segment_points = len(waveforms)
+        overlap_points = int(overlap * segment_points)
+    
+        all_slices = []
+        all_spike_times = []
+    
+        # Initialize start and end points for segmentation
+        start, end = 0, segment_points
+    
+        while end <= len(waveforms):
+            segment = waveforms[start:end]
+            filtered_segment = filter_signal(
+                segment, (self.bandpass_low, self.bandpass_high), sampling_rate
+            )
 
-        If there are gaps in the Spike2 file, this will not be read as zero or NaN etc., it will simply be passed over,
-        and  we end up with fewer points than the channel divide would otherwise.
-        """
+            slices, spike_times = extract_waveforms(
+                filtered_segment,
+                sampling_rate,
+            )
+            spike_times = [time + start for time in spike_times]
+    
+            all_slices.extend(slices)
+            all_spike_times.extend(spike_times)
+    
+            # Move the start and end for the next segment
+            start = end - overlap_points
+            end = start + segment_points
+    
+        return np.array(all_slices), all_spike_times
+    
+    
+    def get_adc_channels(self, segment_duration: int = 300):
+        segment_ticks = int(segment_duration / self.time_base)
+
+        # Initialize master dictionaries
+        self.lfp = {}
+        self.unit = {}
+
         for idx in range(self.max_channels):
             title = self.sonfile.GetChannelTitle(idx)
-            if self.sonfile.ChannelType(idx) == sp.DataType.Adc and title not in self.exclude:
-                # we want all waveforms, so we want max_ticks to exceed the number of ticks in the file
-                # if this is a 32bit file, the max number of ticks is 2e9 (technically 2.147e9, but close enough)
-                # if this is a 64bit file, the max number of ticks is 1e12 (...1.844e19, close enough!)
-                if self.bitrate == 32:
-                    max_ticks = int(2e9)
-                else:
-                    max_ticks = int(1e12)
-                try:
-                    # this will always show "parameter filter is not used" because SonPy hides the actual parameter filter
-                    waveforms = self.sonfile.ReadFloats(idx, max_ticks, 0)
-                except TypeError as e:
-                    self.errors[title] = e
-                    continue
-                if "LFP" in title:
-                    self.lfp[title] = waveforms
-                elif "U" in title:
-                    self.unit[title] = waveforms
+            if self.sonfile.ChannelType(idx) == sp.DataType.Adc and title not in self.exclude and "LFP" not in title:
+
+                sampling_rate = np.round(1 / (self.sonfile.ChannelDivide(idx) * self.time_base), 2)
+                total_ticks = self.sonfile.ChannelMaxTime(idx)
+                num_segments = int(total_ticks / segment_ticks)
+
+                # Initialize list to hold all segments for this channel
+                segments = []
+
+                # Chunk the channel into segments
+                for segment_num in range(num_segments):
+                    tFrom = int(segment_num * segment_ticks)
+                    tUpto = int(tFrom + segment_ticks)
+                    tUpto = min(tUpto, total_ticks)  # Ensure we don't exceed the channel's available ticks
+
+                    # Extract and filter waveforms for this chunk
+                    waveforms = self.sonfile.ReadFloats(idx, int(2e9), tFrom, tUpto)
+                    slices, spike_times = self.filter_extract(waveforms, sampling_rate)
+
+                    # Create a Segment instance and populate its data
+                    # There's an argument to make this a dictionary instead,
+                    # but a namedtuple is more readable and has less overhead
+                    segment = self.Segment(segment_number=segment_num, data=self.UnitData(slices=slices, times=spike_times))
+                    segments.append(segment)
+                self.unit[title] = segments
 
         if not self.lfp and not self.unit:
             self.empty = True
@@ -207,9 +280,28 @@ class SpikeData:
         """The total recording length, in seconds."""
         return self.max_time * self.time_base
 
+    @property
+    def bandpass_low(self):
+        """The lower bound of the bandpass filter."""
+        return self._bandpass_low
+
+    @bandpass_low.setter
+    def bandpass_low(self, value):
+        """Set the lower bound of the bandpass filter."""
+        self._bandpass_low = value
+
+    @property
+    def bandpass_high(self):
+        """The upper bound of the bandpass filter."""
+        return self._bandpass_high
+
+    @bandpass_high.setter
+    def bandpass_high(self, value):
+        """Set the upper bound of the bandpass filter."""
+        self._bandpass_high = value
 
 if __name__ == "__main__":
-    path = Path().home() / "data" / "smr"
+    path = Path().home() / "data"
     files = [f for f in path.glob("*")]
     file = files[0]
     data = SpikeData(file, ("Respirat", "RefBrain", "Sniff"),)

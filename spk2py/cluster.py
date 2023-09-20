@@ -1,3 +1,6 @@
+import logging
+from pathlib import Path
+
 import numpy as np
 from scipy import linalg
 from scipy.interpolate import interp1d
@@ -7,9 +10,8 @@ from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
-from .utils import excepts
-import logging
-from pathlib import Path
+
+# from spk2py.autosort.utils import excepts
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -49,7 +51,7 @@ def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
 
 
 def extract_waveforms(
-    filt_el, spike_snapshot=None, sampling_rate=20000.0, STD=2.0, cutoff_std=10.0
+    filt_el, sampling_rate,spike_snapshot=(0.2, 0.6), STD=2.0, cutoff_std=10.0
 ):
     """
     Extract individual spike waveforms from the filtered electrode signal.
@@ -75,8 +77,6 @@ def extract_waveforms(
     spike_times : list of int
         List of indices indicating the positions of the extracted spikes in the input array.
     """
-    if spike_snapshot is None:
-        spike_snapshot = [0.2, 0.6]
     m = np.mean(filt_el)
     th = np.std(filt_el) * STD
     pos = np.where(filt_el <= m - th)[0]
@@ -113,7 +113,7 @@ def extract_waveforms(
     return np.array(slices), spike_times
 
 
-def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000.0):
+def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6),):
     """
     Adjust the alignment of extracted spike waveforms to minimize jitter.
 
@@ -121,12 +121,12 @@ def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000
     ----------
     slices : list of array-like
         List of extracted spike waveforms, each as a 1-D array.
+    sampling_rate : float, optional
+        The sampling rate of the signal in Hz. Default is 20000.0 Hz.
     spike_times : list of int
         List of indices indicating the positions of the extracted spikes in the input array.
     spike_snapshot : tuple of float, optional
         The time range (in milliseconds) around each spike to extract, given as (pre_spike_time, post_spike_time).
-    sampling_rate : float, optional
-        The sampling rate of the signal in Hz. Default is 20000.0 Hz.
 
     Returns
     -------
@@ -260,7 +260,7 @@ def clusterGMM(data, n_clusters, n_iter, restarts, threshold):
 
         predictions = g[best_fit].predict(data)
         return g[best_fit], predictions, np.min(bayesian)
-    except excepts.GmmFitException as e:
+    except Exception as e:
         logger.warning(f"Error in clusterGMM: {e.message}", exc_info=True)
 
 
