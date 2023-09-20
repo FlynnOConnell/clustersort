@@ -7,16 +7,17 @@ from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
-from .utils import excepts
 import logging
 from pathlib import Path
 from numba import jit
+from numba.typed import List
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 logpath = Path().home() / 'autosort' / "cluster.log"
 
 
+@jit(nopython=True)
 def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
     """
     Apply a bandpass filter to the input electrode signal using a Butterworth digital and analog filter design.
@@ -49,7 +50,7 @@ def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
     return filt_el
 
 
-@jit
+@jit(nopython=True)
 def extract_waveforms(
     signal: np.ndarray, sampling_rate: int, spike_snapshot: tuple=(0.2, 0.6), STD=2.0, cutoff_std=10.0
 ):
@@ -58,7 +59,7 @@ def extract_waveforms(
 
     Parameters
     ----------
-    filt_el : array-like
+    signal : array-like
         The filtered electrode signal as a 1-D array.
     spike_snapshot : list of float, optional
         The time range (in milliseconds) around each spike to extract, given as [pre_spike_time, post_spike_time].
@@ -80,13 +81,13 @@ def extract_waveforms(
     m = np.mean(signal)
     th = np.std(signal) * STD
     pos = np.where(signal <= m - th)[0]
-    changes = []
+    changes = List()
     for i in range(len(pos) - 1):
         if pos[i + 1] - pos[i] > 1:
             changes.append(i + 1)
 
-    slices = []
-    spike_times = []
+    slices = List()
+    spike_times = List()
     for i in range(len(changes) - 1):
         minimum = np.where(
             signal[pos[changes[i]: changes[i + 1]]]
@@ -110,9 +111,10 @@ def extract_waveforms(
                 slices.append(tempslice)
                 spike_times.append(pos[minimum[0] + changes[i]])
 
-    return np.array(slices), spike_times
+    return slices, spike_times
 
 
+@jit(nopython=True)
 def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000.0):
     """
     Adjust the alignment of extracted spike waveforms to minimize jitter.
@@ -142,8 +144,8 @@ def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000
     before = int((sampling_rate / 1000.0) * (spike_snapshot[0]))
     after = int((sampling_rate / 1000.0) * (spike_snapshot[1]))
 
-    slices_dejittered = []
-    spike_times_dejittered = []
+    slices_dejittered = List()
+    spike_times_dejittered = List()
     for i in range(len(slices)):
         f = interp1d(x, slices[i])
         # 10-fold interpolated spike
@@ -158,7 +160,7 @@ def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000
         ) < int(10.0 * (sampling_rate / 10000.0)):
             slices_dejittered.append(ynew[minimum - before * 10 : minimum + after * 10])
             spike_times_dejittered.append(spike_times[i])
-    return np.array(slices_dejittered), np.array(spike_times_dejittered)
+    return slices_dejittered, spike_times_dejittered
 
 
 def scale_waveforms(slices_dejittered):
@@ -260,8 +262,8 @@ def clusterGMM(data, n_clusters, n_iter, restarts, threshold):
 
         predictions = g[best_fit].predict(data)
         return g[best_fit], predictions, np.min(bayesian)
-    except excepts.GmmFitException as e:
-        logger.warning(f"Error in clusterGMM: {e.message}", exc_info=True)
+    except Exception as e:
+        logger.warning(f"Error in clusterGMM: {e}", exc_info=True)
 
 
 def get_Lratios(data, predictions):

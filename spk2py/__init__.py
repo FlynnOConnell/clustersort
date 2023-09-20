@@ -1,4 +1,4 @@
-from autosort import *
+# from autosort import *
 from . import spike_data
 
-__all__ = ["autosort"]
+# __all__ = ["autosort"]
