@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 logpath = Path().home() / 'autosort' / "cluster.log"
 
 
-@jit(nopython=True)
 def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
     """
     Apply a bandpass filter to the input electrode signal using a Butterworth digital and analog filter design.

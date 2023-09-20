@@ -7,7 +7,6 @@ from collections import namedtuple
 from math import floor
 from pathlib import Path
 from sonpy import lib as sp
-from numba import jit
 
 from cluster import extract_waveforms, filter_signal
 from spk_logging.logger_config import configure_logger
@@ -15,6 +14,43 @@ from spk_logging.logger_config import configure_logger
 logfile = Path().home() / "data" / "spike_data.log"
 logger = configure_logger(__name__, logfile, level=logging.DEBUG)
 
+Segment = namedtuple("Segment", ["segment_number", "data"])
+UnitData = namedtuple("UnitData", ["slices", "times"])
+
+def load_from_h5(filename):
+    # Dictionary to hold the loaded data
+    data_dict = {}
+    with h5py.File(filename, "r") as f:
+        # Load metadata
+        metadata_grp = f["metadata"]
+        data_dict["metadata"] = {
+            attr: metadata_grp.attrs[attr] for attr in metadata_grp.attrs
+        }
+
+        # Load unit data
+        unit_grp = f["unit"]
+        data_dict["unit"] = {}
+
+        for title in unit_grp.keys():
+            channel_grp = unit_grp[title]
+            segments = []
+
+            for segment_name in channel_grp.keys():
+                segment_grp = channel_grp[segment_name]
+
+                slices = np.array(segment_grp["slices"])
+                times = np.array(segment_grp["times"])
+
+                # Assuming Segment and UnitData are namedtuples
+                segment = Segment(
+                    segment_number=int(segment_name.split("_")[1]),
+                    data=UnitData(slices=slices, times=times),
+                )
+                segments.append(segment)
+
+            data_dict["unit"][title] = segments
+
+    return data_dict
 
 class SpikeData:
     UnitData = namedtuple("UnitData", ["slices", "times"])
@@ -28,7 +64,6 @@ class SpikeData:
     - A boolean, where True means the file is empty and False means it is not.
     - A string, where the string is the filename stem.
     """
-
     def __init__(
         self,
         filepath: Path | str,
@@ -108,17 +143,6 @@ class SpikeData:
 
     def _validate(self):
         """General checks to make sure the data is valid"""
-
-        # with empty waveform data, the size of each channel array is 1 for some reason
-        # the check for > 20 is arbitrary, theoretically it could be a lot more
-        for k, v in self.lfp.items():
-            if len(v) < 1:
-                self.lfp[k] = {}
-        for k, v in self.unit.items():
-            if len(v) < 20:
-                self.unit[k] = {}
-                self.empty = True
-
         if self.preinfusion and self.postinfusion:
             raise ValueError(
                 f"File {self.filename.stem} contains both a pre- and post-infusion filename."
@@ -129,6 +153,7 @@ class SpikeData:
             )
 
     def save_to_h5(self, filename):
+        logger.debug(f"Saving data to {filename}")
         with h5py.File(filename, "w") as f:
             # All metadata we may need later
             metadata_grp = f.create_group("metadata")
@@ -143,6 +168,7 @@ class SpikeData:
             metadata_grp.attrs["filename"] = self.filename.stem
             metadata_grp.attrs["empty"] = self.empty
             metadata_grp.attrs["exclude"] = self.exclude
+            logger.debug(f"Saved metadata to {filename}")
 
             # Create a group for unit data
             unit_grp = f.create_group("unit")
@@ -159,6 +185,7 @@ class SpikeData:
                     # Save slices and times as datasets within the segment group
                     segment_grp.create_dataset("slices", data=segment.data.slices)
                     segment_grp.create_dataset("times", data=segment.data.times)
+                    logger.debug("Subgroups saved")
         logger.debug(f"Saved data to {filename}")
 
     def save_data(self, savepath, overwrite=False):
@@ -236,12 +263,14 @@ class SpikeData:
         segment_ticks = int(segment_duration / self.time_base)
 
         for idx in range(self.max_channels):
+            logger.debug(f"Max channels: {self.max_channels}")
             title = self.sonfile.GetChannelTitle(idx)
             if (
                 self.sonfile.ChannelType(idx) == sp.DataType.Adc
                 and title not in self.exclude
                 and "LFP" not in title
             ):
+                logger.debug(f"Processing {title}")
                 sampling_rate = np.round(
                     1 / (self.sonfile.ChannelDivide(idx) * self.time_base), 2
                 )
@@ -253,6 +282,7 @@ class SpikeData:
 
                 # Chunk the channel into segments
                 for segment_num in range(num_segments):
+                    logger.debug(f"Processing segment {segment_num} of {num_segments}")
                     tFrom = int(segment_num * segment_ticks)
                     tUpto = int(tFrom + segment_ticks)
                     tUpto = min(
@@ -273,9 +303,6 @@ class SpikeData:
                     segments.append(segment)
                 self.unit[title] = segments
 
-        if not self.lfp and not self.unit:
-            self.empty = True
-
     def get_channel_interval(self, channel: int):
         """
         Get the waveform sample interval, in clock ticks. Used by channels that sample
@@ -286,14 +313,6 @@ class SpikeData:
     def get_channel_period(self, channel: int):
         """Get the waveform sample period, in seconds."""
         return self.get_channel_interval(channel) / self.time_base
-
-    def get_waveform_time(
-        self,
-    ):
-        """Create a numpy array of time values for the waveform."""
-        # TODO: Implement this
-        # time = np.arange(0, len(wavedata) * dPeriod, dPeriod)
-        pass
 
     def num_ticks(self, channel: int):
         """The total number of clock ticks for this channel."""
@@ -355,11 +374,11 @@ class SpikeData:
 
 if __name__ == "__main__":
     path_test = Path().home() / "data"
-    files = [f for f in path_test.glob("*")]
+    files = [f for f in path_test.glob("*.smr")]
     file = files[0]
     data = SpikeData(
         file,
         ("Respirat", "RefBrain", "Sniff"),
     )
-    data.save_data(path_test)
+    data.save_data(path_test, overwrite=True)
     x = 5

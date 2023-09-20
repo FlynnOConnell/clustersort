@@ -6,7 +6,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from spike_data import SpikeData
+from spike_data import SpikeData, load_from_h5
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -97,15 +97,13 @@ def concatenate_spike_data(spike_data_1: SpikeData, spike_data_2: SpikeData):
 
     # Save to h5
     path = Path().home() / "data" / "combined" / f"{base_filename}.h5"
-    save_to_h5(str(path), combined_lfp, combined_unit, index_track_lfp, index_track_unit)
+    save_to_h5(str(path), combined_unit, index_track_unit)
     logger.debug(f"Saved {base_filename}.h5")
     return combined_lfp, combined_unit, index_track_lfp, index_track_unit
 
 
 def save_to_h5(filename: str,
-               lfp_dict: dict,
                unit_dict: dict,
-               idx_lfp: dict,
                idx_unit: dict
                ):
     """
@@ -113,38 +111,57 @@ def save_to_h5(filename: str,
 
         Args:
             filename (str): Path to the output HDF5 file.
-            lfp_dict (dict): Dictionary containing LFP data.
             unit_dict (dict): Dictionary containing unit data.
-            idx_lfp (dict): Dictionary containing LFP concatenation indices.
             idx_unit (dict): Dictionary containing unit concatenation indices.
     """
     with h5py.File(filename, 'w') as f:
-        # Save combined lfp waveform array
-        lfp_group = f.create_group('lfp')
-        for key, data in lfp_dict.items():
-            lfp_group.create_dataset(key, data=data)
-
         # Save combined unit waveform array
         unit_group = f.create_group('unit')
         for key, data in unit_dict.items():
             unit_group.create_dataset(key, data=data)
-
-        # Save index where lfp was concatenated
-        index_lfp_group = f.create_group('idx_lfp')
-        for key, index in idx_lfp.items():
-            index_lfp_group.create_dataset(key, data=index)
 
         # Save index where unit was concatenated
         index_unit_group = f.create_group('idx_unit')
         for key, index in idx_unit.items():
             index_unit_group.create_dataset(key, data=index)
 
+def read_group(group: h5py.Group) -> dict:
+    data = {}
+    # Read attributes
+    for attr_name, attr_value in group.attrs.items():
+        data[f"{attr_name}"] = attr_value
+    # Read datasets and subgroups
+    for key, item in group.items():
+        if isinstance(item, h5py.Group):
+            data[key] = read_group(item)
+        elif isinstance(item, h5py.Dataset):
+            # item[()] reads the entire dataset into memory, similar to slicing with [:]
+            data[key] = item[()]
+    return data
+
+def read_single_h5(filename: str | Path) -> dict:
+    """
+    Read a single HDF5 file and return a dictionary containing the data.
+
+    Args:
+    ----
+        filename (str | Path): Path to the HDF5 file.
+
+    Returns:
+    -------
+        dict: Dictionary containing the data from the HDF5 file.
+    """
+    with h5py.File(filename, "r") as f:
+        data = read_group(f)
+    return data
 
 if __name__ == "__main__":
+    datapath = Path().home() / "data"
     prepath = Path().home() / "data" / "smr"
     postpath = Path().home() / "data" / "combined"
     postpath.mkdir(exist_ok=True, parents=True)
-    files = get_files(prepath)
-    lfp, unit, lfp_idx, unit_idx = concatenate_spike_data(files[0], files[1])
-
+    filenames = [x for x in datapath.glob("*.h5")]
+    single_data = read_single_h5(filenames[0])
+    # files = get_files(prepath)
+    # unit, unit_idx = concatenate_spike_data(files[0], files[1])
     x = 5
