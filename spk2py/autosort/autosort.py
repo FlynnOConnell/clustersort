@@ -18,7 +18,7 @@ from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
-from .directory_manager import DirectoryManager
+from directory_manager import DirectoryManager
 from spk2py import autosort as clust
 from .utils import excepts
 
@@ -31,7 +31,6 @@ logger.addHandler(logging.StreamHandler())
 def run_spk_process(filename, data, params, dir_manager, chan_num):
     proc = ProcessChannel(filename, data, params, dir_manager, chan_num)
     proc.process_channel()
-
 
 def infofile(filename, path, sort_time, params):
     # dumps run info to a .info file
@@ -139,7 +138,6 @@ class ProcessChannel:
     def voltage_cutoff(self):
         return float(self.params['voltage_cutoff'])
 
-
     def process_continuous(self):
 
         filt_el = clust.filter_signal(
@@ -159,6 +157,7 @@ class ProcessChannel:
         breaches_per_sec = [
             len(np.where(test_el[i] > self.voltage_cutoff)[0]) for i in range(len(test_el))
         ]
+
         breaches_per_sec = np.array(breaches_per_sec)
         secs_above_cutoff = len(np.where(breaches_per_sec > 0)[0])
         if secs_above_cutoff == 0:

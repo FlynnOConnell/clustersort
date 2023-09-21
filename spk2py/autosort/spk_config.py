@@ -1,151 +1,193 @@
 from __future__ import annotations
+
 import configparser
 from pathlib import Path
 
 
-def set_config(path: Path | str = '', default=False) -> dict[str, str | int | float]:
-    if default:
-        path = Path().home() / 'autosort' / 'autosort_config.ini'
+class SpkConfig:
+    def __init__(self, cfg_path: Path | str = ""):
+        """
+        SpkConfig manages configurations for the AutoSort pipeline.
 
-    if not path.is_file() or default:
-        default_config(path)
-        print(f'Default configuration file has been created. You can find it in {path}')
-        return read_config(path)
-    else:
-        return read_config(path)
+        This class reads from an INI-style configuration file and provides methods
+        to access the configurations for different sections. These sections include
+        'run_configs', 'path_configs', 'cluster_configs', etc.
 
+        Due to the nature of INI files, all values are stored as strings. It is up to the user
+        to convert the values to the appropriate type.
 
-def default_config(path: Path, config_ver: int = 5) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    default_data_path = path.parent
-    default_run_path = default_data_path / 'to_run'
-    default_run_path.mkdir(parents=True, exist_ok=True)
-    default_results_path = default_data_path / 'results'
-    default_results_path.mkdir(parents=True, exist_ok=True)
-    default_completed_path = default_data_path / 'completed'
-    default_completed_path.mkdir(parents=True, exist_ok=True)
+        Parameters
+        ----------
+        cfg_path : str or Path
+            The path to the configuration file.
 
-    config = configparser.ConfigParser()
-    config['run-settings'] = {
-        'resort-limit': '3',
-        'cores-used': '8',
-        'weekday-run': '2',
-        'weekend-run': '8',
-        'run-type': 'Auto',
-        'manual-run': '2'
-    }
-    config['paths'] = {
-        'run-path': str(default_run_path),
-        'results-path': str(default_results_path),
-        'completed-path': str(default_completed_path),
-    }
-    config['clustering'] = {
-        'max-clusters': '7',
-        'max-iterations': '1000',
-        'convergence-criterion': '.0001',
-        'random-restarts': '10',
-        'l-ratio-cutoff': '.1'
-    }
-    config['signal'] = {
-        'disconnect-voltage': '1500',
-        'max-breach-rate': '.2',
-        'max-breach-count': '10',
-        'max-breach-avg': '20',
-        'intra-hpc_cluster-cutoff': '3'
-    }
-    config['filtering'] = {
-        'low-cutoff': '600',
-        'high-cutoff': '3000'
-    }
-    config['spike'] = {
-        'pre-time': '0.2',
-        'post-time': '0.6',
-        'sampling-rate': '20000'
-    }
-    config['std-dev'] = {
-        'spike-detection': '2.0',
-        'artifact-removal': '10.0'
-    }
-    config['pca'] = {
-        'variance-explained': '.95',
-        'use-percent-variance': '1',
-        'principal-component-n': '5'
-    }
-    config['post-process'] = {
-        'reanalyze': '0',
-        'simple-gmm': '1',
-        'image-size': '70',
-        'temporary-dir': str(Path.home() / 'tmp_python')
-    }
-    config['version'] = {
-        'config-version': str(config_ver)
-    }
+        Notes
+        ----------
+        The configuration file is an INI-style file with the following sections:
+        run : dict
+            Contains configurations related to runtime settings like 'resort-limit', 'cores-used'.
+        path : dict
+            Contains path settings like directories for 'run', 'results'.
+        cluster : dict
+            Contains clustering parameters like 'max-clusters', 'max-iterations'.
+        breach : dict
+            Contains breach analysis parameters like 'disconnect-voltage', 'max-breach-rate'.
+        filter : dict
+            Contains filter parameters like 'low-cutoff', 'high-cutoff'.
+        spike : dict
+            Contains spike-related settings like 'pre-time', 'post-time'.
 
-    with open(path, 'w') as configfile:
-        config.write(configfile)
+        Methods
+        -------
+        get_section(section: str)
+            Returns a dictionary containing key-value pairs for the given section.
+        get_all()
+            Returns a dictionary containing all key-value pairs from all sections.
 
+        Examples
+        --------
+        >>> cfg = SpkConfig()
 
-def read_config(path: Path, config_ver: int = 5):
-    config = configparser.ConfigParser()
-    config.read(path)
+        Accessing a whole section:
+        >>> run_configs = cfg.run
+        >>> type(run_configs)
+        >>> print(run_configs)
+        <class 'dict'>
+        {'resort-limit': '3', 'cores-used': '8', ...}
+        >>> type(resort_limit)
+        <class 'str'>
+        .. note:: All values are stored as strings. It is up to the user to convert the values to the appropriate type.
 
-    if 'config-version' not in config['version'] or int(config['version']['config-version']) != config_ver:
-        new_path = path.with_suffix(f'.{config["version"].get("config-version", "unknown")}.txt')
-        path.rename(new_path)
-        default_config(path, config_ver)
-        print(
-            f'Config version updated, config file reset to default, your original config file has been renamed.'
-            f' Find the new config file here: {path}'
-        )
+        Accessing all parameters as a dictionary:
+        >>> all_params = cfg.params
+        >>> print(all_params['resort-limit'])
+        '3'
+        """
+        if not cfg_path:
+            self.cfg_path = Path().home() / "autosort" / "autosort_config.ini"
+            self.set_default_config()
+        else:
+            self.cfg_path = cfg_path
+        self.config = self.read_config()
+        self.params = self.get_all()
+        self._validate_config()
+
+    def get_section(self, section: str):
+        return dict(self.config[section])
+
+    def get_all(self):
+        params = {}
+        for section in self.config.sections():
+            for key, value in self.config.items(section):
+                params[key] = value
+        return params
+
+    @property
+    def run(self):
+        return self.get_section('run_configs')
+
+    @property
+    def path(self):
+        return self.get_section('path_configs')
+
+    @property
+    def cluster(self):
+        return self.get_section('cluster_configs')
+
+    @property
+    def breach(self):
+        return self.get_section('breach_configs')
+
+    @property
+    def filter(self):
+        return self.get_section('filter_configs')
+
+    @property
+    def spike(self):
+        return self.get_section('spike_configs')
+
+    def read_config(self):
         config = configparser.ConfigParser()
-        config.read(path)
+        config.read(self.cfg_path)
+        return config
 
-    return get_config_params(config)
+    def set_config(self, default=False):
+        if default:
+            self.set_default_config()
+    
+        if not self.cfg_path.is_file() or default:
+            self.set_default_config()
+            print(f"Default configuration file has been created. You can find it in {self.cfg_path}")
 
+    def set_default_config(self) -> None:
+        assert self.cfg_path.parent.is_dir(), f"Parent directory {self.cfg_path.parent} does not exist"
+        self.cfg_path.parent.mkdir(parents=True, exist_ok=True)
+        default_data_path = self.cfg_path.parent
+        default_run_path = default_data_path / "to_run"
+        default_run_path.mkdir(parents=True, exist_ok=True)
+        default_results_path = default_data_path / "results"
+        default_results_path.mkdir(parents=True, exist_ok=True)
+        default_completed_path = default_data_path / "completed"
+        default_completed_path.mkdir(parents=True, exist_ok=True)
+    
+        config = configparser.ConfigParser()
+        config["run_configs"] = {
+            "resort-limit": "3",
+            "cores-used": "8",
+            "weekday-run": "2",
+            "weekend-run": "8",
+            "run-type": "Auto",
+            "manual-run": "2",
+        }
+    
+        config["path_configs"] = {
+            "run": str(default_run_path),
+            "results": str(default_results_path),
+            "completed": str(default_completed_path),
+        }
+    
+        config["cluster_configs"] = {
+            "max-clusters": "7",
+            "max-iterations": "1000",
+            "convergence-criterion": ".0001",
+            "random-restarts": "10",
+            "l-ratio-cutoff": ".1",
+            "intra-hpc_cluster-cutoff": "3",
+        }
+    
+        config["breach_configs"] = {
+            "disconnect-voltage": "1500",
+            "max-breach-rate": ".2",
+            "max-breach-count": "10",
+            "max-breach-avg": "20",
+        }
+    
+        config["filter_configs"] = {"low-cutoff": "600", "high-cutoff": "3000"}
+    
+        config["spike_configs"] = {"pre-time": "0.2", "post-time": "0.6",}
+    
+        config["detection_configs"] = {"spike-detection": "2.0", "artifact-removal": "10.0"}
+    
+        config["pca_configs"] = {
+            "variance-explained": ".95",
+            "use-percent-variance": "1",
+            "principal-component-n": "5",
+        }
+    
+        config["post_configs"] = {
+            "reanalyze": "0",
+            "simple-gmm": "1",
+            "image-size": "70",
+            "temporary-dir": str(Path.home() / "tmp_python"),
+        }
 
-def get_config_params(config: configparser.ConfigParser) -> dict[str, str | int | float]:
-    return {
-        "resort_limit": config.getint('run-settings', 'resort-limit'),
-        "cores_used": config.getint('run-settings', 'cores-used'),
-        "weekday_run": config.getint('run-settings', 'weekday-run'),
-        "weekend_run": config.getint('run-settings', 'weekend-run'),
-        "run_type": config.get('run-settings', 'run-type'),
-        "manual_run": config.getint('run-settings', 'manual-run'),
+        with open(self.cfg_path, "w") as configfile:
+            config.write(configfile)
 
-        "run_path": config.get('paths', 'run-path'),
-        "results_path": config.get('paths', 'results-path'),
-        "completed_path": config.get('paths', 'completed-path'),
+    def _validate_config(self):
+        assert(self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
+        assert(self.run["run-type"] in ["Auto", "Manual"]), f"Run type {self.run['run-type']} is not valid. Options are 'Auto' or 'Manual'"
 
-        "max_clusters": config.getint('clustering', 'max-clusters'),
-        "max_iterations": config.getint('clustering', 'max-iterations'),
-        "convergence_criterion": config.getfloat('clustering', 'convergence-criterion'),
-        "random_restarts": config.getint('clustering', 'random-restarts'),
-        "l_ratio_cutoff": config.getfloat('clustering', 'l-ratio-cutoff'),
-
-        "disconnect_voltage": config.getint('signal', 'disconnect-voltage'),
-        "max_breach_rate": config.getfloat('signal', 'max-breach-rate'),
-        "max_breach_count": config.getint('signal', 'max-breach-count'),
-        "max_breach_avg": config.getint('signal', 'max-breach-avg'),
-        "intra_cluster_cutoff": config.getint('signal', 'intra-hpc_cluster-cutoff'),
-
-        "low_cutoff": config.getint('filtering', 'low-cutoff'),
-        "high_cutoff": config.getint('filtering', 'high-cutoff'),
-
-        "pre_time": config.getfloat('spike', 'pre-time'),
-        "post_time": config.getfloat('spike', 'post-time'),
-        "sampling_rate": config.getint('spike', 'sampling-rate'),
-
-        "spike_detection": config.getfloat('std-dev', 'spike-detection'),
-        "artifact_removal": config.getfloat('std-dev', 'artifact-removal'),
-
-        "variance_explained": config.getfloat('pca', 'variance-explained'),
-        "use_percent_variance": config.getint('pca', 'use-percent-variance'),
-        "principal_component_n": config.getint('pca', 'principal-component-n'),
-
-        "reanalyze": config.getint('post-process', 'reanalyze'),
-        "simple_gmm": config.getint('post-process', 'simple-gmm'),
-        "image_size": config.getint('post-process', 'image-size'),
-        "temporary_dir": config.get('post-process', 'temporary-dir'),
-
-        "config_version": config.get('version', 'config-version'),
-    }
+if __name__ == '__main__':
+    test_cfg = SpkConfig()
+    x = 5

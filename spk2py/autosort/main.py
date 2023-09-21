@@ -22,20 +22,17 @@ def move_files(files, source, destination):
         logger.info(f"Moved {f} to {destination}")
 
 
-def main(default_config=False):
-    if default_config:
-        params = spk_config.set_config(default=True)
-    else:
-        params = spk_config.set_config()
-
+def main():
+    params = spk_config.SpkConfig()
+    run_params = params.run
     # If the script is being run automatically, on Fridays it will run a greater number of files
-    if params["run_type"] == "Auto":
+    if params.run["run_type"] == "Auto":
         if datetime.datetime.weekday(datetime.date.today()) == 4:
-            n_files = int(params["weekend_run"])
+            n_files = int(params.run["weekend_run"])
         else:
-            n_files = int(params["weekday_run"])
-    elif params["run_type"] == "Manual":
-        n_files = params["manual_run"]
+            n_files = int(params.run["weekday_run"])
+    elif params.run["run_type"] == "Manual":
+        n_files = params.run["manual_run"]
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
