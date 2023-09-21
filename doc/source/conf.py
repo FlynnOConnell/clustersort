@@ -6,24 +6,11 @@ import importlib
 # Minimum version, enforced by sphinx
 needs_sphinx = '4.3'
 
-
 # This is a nasty hack to use platform-agnostic names for types in the
 # documentation.
 
 # must be kept alive to hold the patched names
 _name_cache = {}
-
-def replace_scalar_type_names():
-    import numpy.core._add_newdocs_scalars
-
-replace_scalar_type_names()
-
-
-# As of NumPy 1.25, a deprecation of `str`/`bytes` attributes happens.
-# For some reasons, the doc build accesses these, so ignore them.
-import warnings
-warnings.filterwarnings("ignore", "In the future.*NumPy scalar", FutureWarning)
-
 
 # -----------------------------------------------------------------------------
 # General configuration
@@ -71,14 +58,7 @@ project = 'spk2py'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
-#
-# import numpy
-# # The short X.Y version (including .devXXXX, rcX, b1 suffixes if present)
-# version = re.sub(r'(\d+\.\d+)\.\d+(.*)', r'\1\2', numpy.__version__)
-# version = re.sub(r'(\.dev\d+).*?$', r'\1', version)
-# # The full version, including alpha/beta/rc tags.
-# release = numpy.__version__
-# print("%s %s" % (version, release))
+
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -110,14 +90,7 @@ add_function_parentheses = False
 def setup(app):
     # add a config value for `ifconfig` directives
     app.add_config_value('python_version_major', str(sys.version_info.major), 'env')
-    app.add_lexer('NumPyC', NumPyLexer)
 
-# While these objects do have type `module`, the names are aliases for modules
-# elsewhere. Sphinx does not support referring to modules by an aliases name,
-# so we make the alias look like a "real" module for it.
-# If we deemed it desirable, we could in future make these real modules, which
-# would make `from numpy.char import split` work.
-sys.modules['numpy.char'] = numpy.char
 
 # -----------------------------------------------------------------------------
 # HTML output
@@ -128,34 +101,15 @@ html_theme = 'pydata_sphinx_theme'
 # html_favicon = '_static/favicon/favicon.ico'
 
 # Set up the version switcher.  The versions.json is stored in the doc repo.
+version = "1.0"
 if os.environ.get('CIRCLE_JOB', False) and \
         os.environ.get('CIRCLE_BRANCH', '') != 'main':
     # For PR, name is set to its ref
     switcher_version = os.environ['CIRCLE_BRANCH']
-elif ".dev" in version:
-    switcher_version = "devdocs"
-else:
+try:
     switcher_version = f"{version}"
-
-html_theme_options = {
-  "logo": {
-      "image_light": "numpylogo.svg",
-      "image_dark": "numpylogo_dark.svg",
-  },
-  "github_url": "https://github.com/numpy/numpy",
-  "collapse_navigation": True,
-  "external_links": [
-      {"name": "Learn", "url": "https://numpy.org/numpy-tutorials/"},
-      {"name": "NEPs", "url": "https://numpy.org/neps"}
-      ],
-  "header_links_before_dropdown": 6,
-  # Add light/dark mode and documentation version switcher:
-  "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
-  "switcher": {
-      "version_match": switcher_version,
-      "json_url": "https://numpy.org/doc/_static/versions.json",
-  },
-}
+except Exception as e:
+    pass
 
 html_title = "%s v%s Manual" % (project, version)
 html_static_path = ['_static']
@@ -257,7 +211,6 @@ latex_elements['preamble'] = r'''
 \makeatletter
 \titleformat{\paragraph}{\normalsize\py@HeaderFamily}%
             {\py@TitleColor}{0em}{\py@TitleColor}{\py@NormalColor}
-\titlespacing*{\paragraph}{0pt}{1ex}{0pt}
 \makeatother
 
 % Fix footer/header
@@ -356,7 +309,6 @@ plot_rcparams = {
     'xtick.labelsize': 8,
     'ytick.labelsize': 8,
     'legend.fontsize': 8,
-    'figure.figsize': (3*phi, 3),
     'figure.subplot.bottom': 0.2,
     'figure.subplot.left': 0.2,
     'figure.subplot.right': 0.9,
@@ -364,7 +316,6 @@ plot_rcparams = {
     'figure.subplot.wspace': 0.4,
     'text.usetex': False,
 }
-
 
 # -----------------------------------------------------------------------------
 # Source code links
@@ -467,15 +418,6 @@ from pygments.lexers import CLexer
 from pygments.lexer import inherit, bygroups
 from pygments.token import Comment
 
-class spk2pyLexer(CLexer):
-    name = 'spk2pyLexer'
-
-    tokens = {
-        'statements': [
-            (r'@[a-zA-Z_]*@', Comment.Preproc, 'macro'),
-            inherit,
-        ],
-    }
 
 
 # -----------------------------------------------------------------------------
