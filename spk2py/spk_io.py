@@ -35,7 +35,6 @@ def load_from_h5(filename):
                     data=UnitData(slices=slices, times=times),
                 )
                 segments.append(segment)
-
             data_dict["unit"][title] = segments
 
     return data_dict

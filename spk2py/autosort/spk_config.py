@@ -141,9 +141,9 @@ class SpkConfig:
         }
     
         config["path_configs"] = {
-            "run": str(default_run_path),
-            "results": str(default_results_path),
-            "completed": str(default_completed_path),
+            "run": str(default_run_path),  # Path to directory containing files to be sorted
+            "results": str(default_results_path),  # Path to directory to store results
+            "completed": str(default_completed_path),  # Path to directory to store completed files
         }
     
         config["cluster_configs"] = {

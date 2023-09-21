@@ -153,8 +153,11 @@ class SpikeData:
             )
 
     def save_to_h5(self, filename):
-        logger.debug(f"Saving data to {filename}")
+
+        print("Save!")
         with h5py.File(filename, "w") as f:
+            logger.debug("Setting metadata...")
+            print("Setting meta")
             # All metadata we may need later
             metadata_grp = f.create_group("metadata")
             metadata_grp.attrs["bandpass_low"] = self.bandpass_low
@@ -185,22 +188,24 @@ class SpikeData:
                     # Save slices and times as datasets within the segment group
                     segment_grp.create_dataset("slices", data=segment.data.slices)
                     segment_grp.create_dataset("times", data=segment.data.times)
-                    logger.debug("Subgroups saved")
-        logger.debug(f"Saved data to {filename}")
+        logger.debug(f"Saved data successfull to {filename}")
 
     def save_data(self, savepath, overwrite=False):
         """Save the data to an HDF5 file."""
-        logger.debug(f"Saving data to {savepath}")
         path = Path(savepath)
         if not path.exists():
             path.mkdir(parents=True, exist_ok=True)
         savename = f"{savepath}/{self.filename.stem}.h5"
+        logger.debug(f"Saving data to {savename}")
         if Path(savename).exists() and overwrite:
             logger.debug(f"Overwriting {savename}")
             self.save_to_h5(savename)
         elif Path(savename).exists() and not overwrite:
             logger.debug(f"{savename} already exists, skipping.")
             return None
+        else:
+            logger.debug(f"Filename is fresh - saving {savename}")
+            self.save_to_h5(savename)
 
     @property
     def preinfusion(self):
@@ -375,10 +380,10 @@ class SpikeData:
 if __name__ == "__main__":
     path_test = Path().home() / "data"
     files = [f for f in path_test.glob("*.smr")]
-    file = files[0]
+    file = files[1]
     data = SpikeData(
         file,
         ("Respirat", "RefBrain", "Sniff"),
     )
-    data.save_data(path_test, overwrite=True)
+    data.save_data(path_test, overwrite=False)
     x = 5

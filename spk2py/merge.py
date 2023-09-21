@@ -162,6 +162,7 @@ if __name__ == "__main__":
     postpath.mkdir(exist_ok=True, parents=True)
     filenames = [x for x in datapath.glob("*.h5")]
     single_data = read_single_h5(filenames[0])
-    # files = get_files(prepath)
-    # unit, unit_idx = concatenate_spike_data(files[0], files[1])
+    second_data = read_single_h5(filenames[1])
+
+
     x = 5
