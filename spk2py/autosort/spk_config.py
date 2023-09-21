@@ -54,7 +54,7 @@ class SpkConfig:
         >>> print(run_configs)
         <class 'dict'>
         {'resort-limit': '3', 'cores-used': '8', ...}
-        >>> type(resort_limit)
+        >>> type(run_configs['resort_limit'])
         <class 'str'>
         .. note:: All values are stored as strings. It is up to the user to convert the values to the appropriate type.
 

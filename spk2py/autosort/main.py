@@ -24,7 +24,6 @@ def move_files(files, source, destination):
 
 def main():
     params = spk_config.SpkConfig()
-    run_params = params.run
     # If the script is being run automatically, on Fridays it will run a greater number of files
     if params.run["run_type"] == "Auto":
         if datetime.datetime.weekday(datetime.date.today()) == 4:
@@ -36,12 +35,10 @@ def main():
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
-    runpath = Path(params["run_path"])
-    runfiles = [f for f in runpath.glob("*.hdf5")][:n_files]
-
-    num_cpu = int(params["cores_used"])
-    resort_limit = int(params["resort_limit"])
-
+    runpath = Path(params.path["run_path"])
+    num_cpu = int(params.run["cores_used"])
+    resort_limit = int(params.run["resort_limit"])
+    runfiles = []
     for curr_file in runfiles:  # loop through each file
 
         # Create the necessary directories
