@@ -15,6 +15,6 @@ Welcome to spk2py's documentation!
 Indices and tables
 ==================
 
-* :ref:`genindex`
+* :ref:`install`
 * :ref:`modindex`
 * :ref:`search`
