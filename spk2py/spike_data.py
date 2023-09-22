@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import h5py
-import numpy as np
 import logging
 from collections import namedtuple
 from math import floor
 from pathlib import Path
+
+import h5py
+import numpy as np
 from sonpy import lib as sp
 
 from cluster import extract_waveforms, filter_signal
@@ -41,7 +42,6 @@ def load_from_h5(filename):
                 slices = np.array(segment_grp["slices"])
                 times = np.array(segment_grp["times"])
 
-                # Assuming Segment and UnitData are namedtuples
                 segment = Segment(
                     segment_number=int(segment_name.split("_")[1]),
                     data=UnitData(slices=slices, times=times),
@@ -53,8 +53,7 @@ def load_from_h5(filename):
     return data_dict
 
 class SpikeData:
-    UnitData = namedtuple("UnitData", ["slices", "times"])
-    Segment = namedtuple("Segment", ["segment_number", "data"])
+    UnitData = namedtuple("UnitData", ["spikes", "times"])
     """
     Container class for Spike2 data.
 
@@ -153,11 +152,8 @@ class SpikeData:
             )
 
     def save_to_h5(self, filename):
-
-        print("Save!")
         with h5py.File(filename, "w") as f:
             logger.debug("Setting metadata...")
-            print("Setting meta")
             # All metadata we may need later
             metadata_grp = f.create_group("metadata")
             metadata_grp.attrs["bandpass_low"] = self.bandpass_low
@@ -175,20 +171,16 @@ class SpikeData:
 
             # Create a group for unit data
             unit_grp = f.create_group("unit")
-            for title, segments in self.unit.items():
+
+            for title, unit_data in self.unit.items():
                 # Create a subgroup for each channel title
                 channel_grp = unit_grp.create_group(title)
 
-                for segment in segments:
-                    # Create a subgroup for each segment
-                    segment_grp = channel_grp.create_group(
-                        f"segment_{segment.segment_number}"
-                    )
+                # Save spikes and times as datasets within the channel group
+                channel_grp.create_dataset("spikes", data=unit_data.spikes)
+                channel_grp.create_dataset("times", data=unit_data.times)
 
-                    # Save slices and times as datasets within the segment group
-                    segment_grp.create_dataset("slices", data=segment.data.slices)
-                    segment_grp.create_dataset("times", data=segment.data.times)
-        logger.debug(f"Saved data successfull to {filename}")
+        logger.debug(f"Saved data successfully to {filename}")
 
     def save_data(self, savepath, overwrite=False):
         """Save the data to an HDF5 file."""
@@ -266,8 +258,12 @@ class SpikeData:
         """
         logger.debug(f"Extracting ADC channels from {self.filename.stem}")
         segment_ticks = int(segment_duration / self.time_base)
+        all_spikes = []
+        all_times = []
 
         for idx in range(self.max_channels):
+            all_spikes = []
+            all_times = []
             logger.debug(f"Max channels: {self.max_channels}")
             title = self.sonfile.GetChannelTitle(idx)
             if (
@@ -294,19 +290,31 @@ class SpikeData:
                         tUpto, total_ticks
                     )  # Ensure we don't exceed the channel's available ticks
 
+                    # Debugging statements
+
                     # Extract and filter waveforms for this chunk
                     waveforms = self.sonfile.ReadFloats(idx, int(2e9), tFrom, tUpto)
                     slices, spike_times = self.filter_extract(waveforms, sampling_rate)
 
-                    # Create a Segment instance and populate its data
-                    # There's an argument to make this a dictionary instead,
-                    # but a namedtuple is more readable and has less overhead
-                    segment = self.Segment(
-                        segment_number=segment_num,
-                        data=self.UnitData(slices=slices, times=spike_times),
+                    logger.debug(
+                        f"Shapes -- slices: {np.shape(slices)}, spike_times: {np.shape(spike_times)}"
                     )
-                    segments.append(segment)
-                self.unit[title] = segments
+                    logger.debug(f"Types -- slices: {type(slices)}, spike_times: {type(spike_times)}")
+
+                    # Accumulate slices and times
+                    all_spikes.append(slices)
+                    all_times.append(spike_times)
+
+                    # Flatten and concatenate all spikes and times into single 1D numpy arrays
+                final_spikes = np.concatenate(all_spikes).flatten()
+                final_times = np.concatenate(all_times).flatten()
+                final_times = np.round(final_times / sampling_rate, 3)
+
+                # Create a FinalUnitData namedtuple with the concatenated spikes and times
+                final_unit_data = self.UnitData(spikes=final_spikes, times=final_times)
+
+                # Store this namedtuple in the self.unit dictionary
+                self.unit[title] = final_unit_data
 
     def get_channel_interval(self, channel: int):
         """
@@ -380,10 +388,10 @@ class SpikeData:
 if __name__ == "__main__":
     path_test = Path().home() / "data"
     files = [f for f in path_test.glob("*.smr")]
-    file = files[1]
+    file = files[0]
     data = SpikeData(
         file,
         ("Respirat", "RefBrain", "Sniff"),
     )
-    data.save_data(path_test, overwrite=False)
+    data.save_data(path_test, overwrite=True)
     x = 5
