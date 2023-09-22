@@ -2,9 +2,11 @@
 
 Data analysis pipeline for electrophysiological data.
 
+[See documentation here.](https://flynnoconnell.github.io/spk2py/)
+
 ### Default File structure
 
-``` 
+```
 ~/
 ├── autosort
 │   ├── h5
@@ -122,7 +124,7 @@ default_config(path=Path('/path/to/your/config.ini'))
 ---
 
 ## Understanding the Spike2 Data Types
-We are working with data from an Analog-to-Digital Converter (ADC). A bit about what this all 
+We are working with data from an Analog-to-Digital Converter (ADC). A bit about what this all
 means:</p>
 <h3>ADC (Analog-to-Digital Converter)</h3>
 <p>An ADC converts continuous analog signals (like electrical voltage) into a digital representation.
