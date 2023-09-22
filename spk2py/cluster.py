@@ -59,10 +59,10 @@ def extract_waveforms(
     Parameters
     ----------
     signal : array-like
-        The filtered electrode signal as a 1-D array.
+        The (already bandpass-filtered) electrode signal as a 1-D array.
     spike_snapshot : list of float, optional
         The time range (in milliseconds) around each spike to extract, given as [pre_spike_time, post_spike_time].
-        Default is [0.2, 0.6].
+        Default is (0.2, 0.6).
     sampling_rate : float, optional
         The sampling rate of the signal in Hz. Default is 20000.0 Hz.
     STD : float, optional

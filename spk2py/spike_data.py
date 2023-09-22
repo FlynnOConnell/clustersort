@@ -207,43 +207,6 @@ class SpikeData:
     def postinfusion(self):
         return "post" in self.filename.stem
 
-    def filter_extract(self, waveforms, sampling_rate: int | float, overlap=0.5):
-        # Ensure the Nyquist-Shannon sampling theorem is satisfied
-        if self.time_base > 1 / (2 * self.bandpass_high):
-            raise ValueError(
-                "Sampling rate is too low for the given bandpass filter frequencies."
-            )
-
-        segment_points = len(waveforms)
-        overlap_points = int(overlap * segment_points)
-
-        all_slices = []
-        all_spike_times = []
-
-        # Initialize start and end points for segmentation
-        start, end = 0, segment_points
-
-        while end <= len(waveforms):
-            segment = waveforms[start:end]
-            filtered_segment = filter_signal(
-                segment, (self.bandpass_low, self.bandpass_high), sampling_rate
-            )
-
-            slices, spike_times = extract_waveforms(
-                filtered_segment,
-                sampling_rate,
-            )
-            spike_times = [time + start for time in spike_times]
-
-            all_slices.extend(slices)
-            all_spike_times.extend(spike_times)
-
-            # Move the start and end for the next segment
-            start = end - overlap_points
-            end = start + segment_points
-
-        return np.array(all_slices), all_spike_times
-
     def process_units(self, segment_duration: int = 300):
         """
         Extracts unit data from the Spike2 file.
@@ -258,8 +221,6 @@ class SpikeData:
         """
         logger.debug(f"Extracting ADC channels from {self.filename.stem}")
         segment_ticks = int(segment_duration / self.time_base)
-        all_spikes = []
-        all_times = []
 
         for idx in range(self.max_channels):
             all_spikes = []
@@ -278,34 +239,42 @@ class SpikeData:
                 total_ticks = self.sonfile.ChannelMaxTime(idx)
                 num_segments = int(total_ticks / segment_ticks)
 
-                # Initialize list to hold all segments for this channel
-                segments = []
-
                 # Chunk the channel into segments
                 for segment_num in range(num_segments):
                     logger.debug(f"Processing segment {segment_num} of {num_segments}")
-                    tFrom = int(segment_num * segment_ticks)
-                    tUpto = int(tFrom + segment_ticks)
-                    tUpto = min(
-                        tUpto, total_ticks
-                    )  # Ensure we don't exceed the channel's available ticks
+                    seg_time_start = int(segment_num * segment_ticks)
+                    seg_time_end = int(seg_time_start + segment_ticks)
 
-                    # Debugging statements
+                    # Ensure we don't exceed the channel's available ticks
+                    seg_time_end = min(
+                        seg_time_end, total_ticks
+                    )
 
                     # Extract and filter waveforms for this chunk
-                    waveforms = self.sonfile.ReadFloats(idx, int(2e9), tFrom, tUpto)
-                    slices, spike_times = self.filter_extract(waveforms, sampling_rate)
+                    waveforms = self.sonfile.ReadFloats(idx, int(2e9), seg_time_start, seg_time_end)
 
-                    logger.debug(
-                        f"Shapes -- slices: {np.shape(slices)}, spike_times: {np.shape(spike_times)}"
+                    # Ensure the Nyquist-Shannon sampling theorem is satisfied
+                    if self.time_base > 1 / (2 * self.bandpass_high):
+                        raise ValueError(
+                            "Sampling rate is too low for the given bandpass filter frequencies."
+                        )
+
+                    # Low/high bandpass filter
+                    filtered_segment = filter_signal(
+                        waveforms, (self.bandpass_low, self.bandpass_high), sampling_rate
                     )
-                    logger.debug(f"Types -- slices: {type(slices)}, spike_times: {type(spike_times)}")
 
-                    # Accumulate slices and times
+                    # Extract spikes and times from the filtered segment
+                    slices, spike_times = extract_waveforms(
+                        filtered_segment,
+                        sampling_rate,
+                    )
+                    spike_times = [time + (segment_num * segment_ticks * sampling_rate) for time in spike_times]
+
                     all_spikes.append(slices)
                     all_times.append(spike_times)
 
-                    # Flatten and concatenate all spikes and times into single 1D numpy arrays
+                # Flatten and concatenate all spikes and times into single 1D numpy arrays
                 final_spikes = np.concatenate(all_spikes).flatten()
                 final_times = np.concatenate(all_times).flatten()
                 final_times = np.round(final_times / sampling_rate, 3)
