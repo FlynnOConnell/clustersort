@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 from scipy import linalg
 from scipy.interpolate import interp1d
@@ -51,7 +53,7 @@ def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
 
 @jit(nopython=True)
 def extract_waveforms(
-    signal: np.ndarray, sampling_rate: int, spike_snapshot: tuple=(0.2, 0.6), STD=2.0, cutoff_std=10.0
+    signal: np.ndarray, sampling_rate: int | float, spike_snapshot: tuple=(0.2, 0.6), STD=2.0, cutoff_std=10.0
 ):
     """
     Extract individual spike waveforms from the filtered electrode signal.
@@ -60,11 +62,11 @@ def extract_waveforms(
     ----------
     signal : array-like
         The (already bandpass-filtered) electrode signal as a 1-D array.
-    spike_snapshot : list of float, optional
-        The time range (in milliseconds) around each spike to extract, given as [pre_spike_time, post_spike_time].
-        Default is (0.2, 0.6).
-    sampling_rate : float, optional
+    sampling_rate : float
         The sampling rate of the signal in Hz. Default is 20000.0 Hz.
+    spike_snapshot : tuple of float, optional
+        The time range (in milliseconds) around each spike to extract, given as (pre_spike_time, post_spike_time).
+        Default is (0.2, 0.6).
     STD : float, optional
         The number of standard deviations to use for the spike detection threshold. Default is 2.0.
     cutoff_std : float, optional
@@ -113,8 +115,7 @@ def extract_waveforms(
     return slices, spike_times
 
 
-@jit(nopython=True)
-def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000.0):
+def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6),):
     """
     Adjust the alignment of extracted spike waveforms to minimize jitter.
 
@@ -124,10 +125,10 @@ def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000
         List of extracted spike waveforms, each as a 1-D array.
     spike_times : list of int
         List of indices indicating the positions of the extracted spikes in the input array.
+    sampling_rate : float
+        The sampling rate of the signal in Hz.
     spike_snapshot : tuple of float, optional
         The time range (in milliseconds) around each spike to extract, given as (pre_spike_time, post_spike_time).
-    sampling_rate : float, optional
-        The sampling rate of the signal in Hz. Default is 20000.0 Hz.
 
     Returns
     -------
@@ -152,8 +153,7 @@ def dejitter(slices, spike_times, spike_snapshot=(0.2, 0.6), sampling_rate=40000
         minimum = np.where(ynew == np.min(ynew))[0][0]
         # Only accept spikes if the interpolated minimum has shifted by less than 1/10th of a ms (4 samples for a
         # 40kHz recording, 40 samples after interpolation) If minimum hasn't shifted at all, then minimum - 5ms
-        # should be equal to zero (because we sliced 5 ms before the minimum in extract_waveforms()) We use this
-        # property in the if statement below
+        # should be equal to zero (because we sliced 5 ms before the minimum in extract_waveforms())
         if np.abs(
             minimum - int((spike_snapshot[0] + 0.1) * (sampling_rate / 100.0))
         ) < int(10.0 * (sampling_rate / 10000.0)):

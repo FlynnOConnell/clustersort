@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import logging
+import math
 from collections import namedtuple
-from math import floor
 from pathlib import Path
 
 import h5py
 import numpy as np
 from sonpy import lib as sp
 
-from cluster import extract_waveforms, filter_signal
+from cluster import extract_waveforms, filter_signal, dejitter
 from spk_logging.logger_config import configure_logger
 
 logfile = Path().home() / "data" / "spike_data.log"
@@ -159,7 +159,7 @@ class SpikeData:
             metadata_grp.attrs["bandpass_low"] = self.bandpass_low
             metadata_grp.attrs["bandpass_high"] = self.bandpass_high
             metadata_grp.attrs["time_base"] = self.time_base
-            metadata_grp.attrs["max_time"] = self.max_time
+            metadata_grp.attrs["max_time"] = self.max_ticks
             metadata_grp.attrs["max_channels"] = self.max_channels
             metadata_grp.attrs["bitrate"] = self.bitrate
             metadata_grp.attrs["recording_length"] = self.recording_length
@@ -232,12 +232,14 @@ class SpikeData:
                 and title not in self.exclude
                 and "LFP" not in title
             ):
+
                 logger.debug(f"Processing {title}")
                 sampling_rate = np.round(
                     1 / (self.sonfile.ChannelDivide(idx) * self.time_base), 2
                 )
-                total_ticks = self.sonfile.ChannelMaxTime(idx)
-                num_segments = int(total_ticks / segment_ticks)
+
+                num_segments = math.ceil(self.channel_max_ticks(idx) / segment_ticks)  # Number of segments, rounded up
+                accumulated_offset = 0
 
                 # Chunk the channel into segments
                 for segment_num in range(num_segments):
@@ -247,14 +249,14 @@ class SpikeData:
 
                     # Ensure we don't exceed the channel's available ticks
                     seg_time_end = min(
-                        seg_time_end, total_ticks
+                        seg_time_end, self.channel_max_ticks(idx)
                     )
 
                     # Extract and filter waveforms for this chunk
                     waveforms = self.sonfile.ReadFloats(idx, int(2e9), seg_time_start, seg_time_end)
 
                     # Ensure the Nyquist-Shannon sampling theorem is satisfied
-                    if self.time_base > 1 / (2 * self.bandpass_high):
+                    if sampling_rate < (2 * self.bandpass_high):
                         raise ValueError(
                             "Sampling rate is too low for the given bandpass filter frequencies."
                         )
@@ -269,15 +271,20 @@ class SpikeData:
                         filtered_segment,
                         sampling_rate,
                     )
-                    spike_times = [time + (segment_num * segment_ticks * sampling_rate) for time in spike_times]
+
+                    # Adjust spike alignment to minimize jitter
+                    slices, spike_times = dejitter(slices, spike_times, sampling_rate)
+
+                    # Adjust spike times to account for chunking
+                    spike_times = [time + accumulated_offset for time in spike_times]
+                    accumulated_offset += len(waveforms)
 
                     all_spikes.append(slices)
                     all_times.append(spike_times)
 
-                # Flatten and concatenate all spikes and times into single 1D numpy arrays
-                final_spikes = np.concatenate(all_spikes).flatten()
-                final_times = np.concatenate(all_times).flatten()
-                final_times = np.round(final_times / sampling_rate, 3)
+                # Concatenate all spikes and times into single arrays
+                final_spikes = np.concatenate(all_spikes)
+                final_times = np.concatenate(all_times)
 
                 # Create a FinalUnitData namedtuple with the concatenated spikes and times
                 final_unit_data = self.UnitData(spikes=final_spikes, times=final_times)
@@ -285,28 +292,34 @@ class SpikeData:
                 # Store this namedtuple in the self.unit dictionary
                 self.unit[title] = final_unit_data
 
-    def get_channel_interval(self, channel: int):
+    def channel_interval(self, channel: int):
         """
         Get the waveform sample interval, in clock ticks. Used by channels that sample
         equal interval waveforms and = the number of file clock ticks per second.
         """
         return self.sonfile.ChannelDivide(channel)
 
-    def get_channel_period(self, channel: int):
+    def channel_sample_period(self, channel: int):
         """Get the waveform sample period, in seconds."""
-        return self.get_channel_interval(channel) / self.time_base
+        return self.channel_interval(channel) / self.time_base
 
-    def num_ticks(self, channel: int):
+    def channel_num_ticks(self, channel: int):
         """The total number of clock ticks for this channel."""
-        return floor(self.recording_length / self.get_channel_period(channel))
+        return self.recording_length / self.channel_sample_period(channel)
 
-    def channel_max_time(self, channel: int):
+    def channel_max_ticks(self, channel: int):
         """The last time-point in the array, in ticks."""
         return self.sonfile.ChannelMaxTime(channel)
+
+    def channel_max_time(self, channel: int):
+        """The last time-point in the array, in seconds."""
+        return self.channel_max_ticks(channel) * self.time_base
 
     @property
     def time_base(self):
         """
+        The number of seconds per clock tick.
+
         Everything in the file is quantified by the underlying clock tick (64-bit).
         All values in the file are stored, set and returned in ticks.
         You need to read this value to interpret times in seconds.
@@ -319,7 +332,7 @@ class SpikeData:
         return self.sonfile.GetTimeBase()
 
     @property
-    def max_time(self):
+    def max_ticks(self):
         """The last time-point in the array, in ticks."""
         return self.sonfile.MaxTime()
 
@@ -331,7 +344,7 @@ class SpikeData:
     @property
     def recording_length(self):
         """The total recording length, in seconds."""
-        return self.max_time * self.time_base
+        return self.max_ticks * self.time_base
 
     @property
     def bandpass_low(self):
