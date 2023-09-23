@@ -12,6 +12,22 @@ from spike_data import SpikeData
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def get_base_filename(name_data: SpikeData | dict, ) -> str:
+    """
+        Extract the base filename from a SpikeData object.
+
+        Removes the `_preinfusion` and `_postinfusion` suffixes from the filename stem.
+
+        Args:
+            name_data (SpikeData | dict): SpikeData object or dict containing the filename metadata.
+
+        Returns:
+            str: Base filename without the infusion-related suffixes.
+        """
+    if isinstance(name_data, SpikeData):
+        return name_data.filename.stem.replace("_preinfusion", "").replace("_postinfusion", "")
+    elif isinstance(name_data, dict):
+        return name_data['metadata']['filename'].replace("_preinfusion", "").replace("_postinfusion", "")
 
 def save_to_h5(filename, data):
     with h5py.File(filename, "w") as f:
@@ -40,23 +56,6 @@ def save_to_h5(filename, data):
 
     logger.debug(f"Saved data successfully to {filename}")
 
-
-def get_base_filename(name_data: SpikeData | dict, ) -> str:
-    """
-        Extract the base filename from a SpikeData object.
-
-        Removes the `_preinfusion` and `_postinfusion` suffixes from the filename stem.
-
-        Args:
-            name_data (SpikeData | dict): SpikeData object or dict containing the filename metadata.
-
-        Returns:
-            str: Base filename without the infusion-related suffixes.
-        """
-    if isinstance(name_data, SpikeData):
-        return name_data.filename.stem.replace("_preinfusion", "").replace("_postinfusion", "")
-    elif isinstance(name_data, dict):
-        return name_data['metadata']['filename'].replace("_preinfusion", "").replace("_postinfusion", "")
 
 
 def get_files(filepath: Path | str) -> tuple[SpikeData, ...]:

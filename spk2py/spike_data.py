@@ -17,6 +17,22 @@ logger = configure_logger(__name__, logfile, level=logging.DEBUG)
 
 UnitData = namedtuple("UnitData", ["spikes", "times"])
 
+
+def get_base_filename(name_data: SpikeData | dict, ) -> str:
+    """
+        Extract the base filename from a SpikeData object.
+
+        Removes the `_preinfusion` and `_postinfusion` suffixes from the filename stem.
+
+        Args:
+            name_data (SpikeData | dict): SpikeData object or dict containing the filename metadata.
+
+        Returns:
+            str: Base filename without the infusion-related suffixes.
+    """
+    return name_data['metadata']['filename'].replace("_preinfusion", "").replace("_postinfusion", "")
+
+
 def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
     with h5py.File(filename, "w") as f:
         metadata_grp = f.create_group("metadata")
@@ -58,7 +74,6 @@ def merge_spike_data(spike_data1, spike_data2):
         merged_times = np.concatenate([times1, times2])
 
         merged_spike_data["unit"][channel] = UnitData(merged_spikes, merged_times)
-
     return merged_spike_data
 
 def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
@@ -85,6 +100,19 @@ def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
         merged_spike_data['unit'][channel] = UnitData(merged_spikes, merged_times)
 
     return merged_spike_data
+
+def save_merged_spike_data_to_h5(merged_spike_data: dict, filename: str | Path):
+    with h5py.File(filename, "w") as f:
+        metadata_grp = f.create_group("metadata")
+        for key, value in merged_spike_data['metadata'].items():
+            metadata_grp.attrs[key] = value
+
+        unit_grp = f.create_group("unit")
+        for channel, unit_data in merged_spike_data['unit'].items():
+            channel_grp = unit_grp.create_group(channel)
+            channel_grp.create_dataset("spikes", data=unit_data.spikes)
+            channel_grp.create_dataset("times", data=unit_data.times)
+    logger.debug(f"Saved merged data successfully to {filename}")
 
 class SpikeData:
 
@@ -361,6 +389,8 @@ class SpikeData:
 
 if __name__ == "__main__":
     path_test = Path().home() / "data" / "smr"
+    path_combined = Path().home() / "data" / "combined"
+    path_combined.mkdir(exist_ok=True, parents=True)
     files = [f for f in path_test.glob("*.h5")]
     # load the h5
     data = []
@@ -369,6 +399,11 @@ if __name__ == "__main__":
 
     # merge the data
     merged_data = merge_spike_data_from_dicts(data[0], data[1])
+
+    # save the merged data
+    basename = get_base_filename(merged_data)
+    filename = path_combined / (basename + ".h5")
+    save_merged_spike_data_to_h5(merged_data, filename)
     # for file in files:
     #     data = SpikeData(
     #         file,
