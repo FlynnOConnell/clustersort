@@ -9,6 +9,7 @@ import shutil
 from pathlib import Path
 
 import spk_config
+from spk2py.spk_io import read_h5
 from autosort import run_spk_process
 from directory_manager import DirectoryManager
 
@@ -22,22 +23,24 @@ def move_files(files, source, destination):
         logger.info(f"Moved {f} to {destination}")
 
 
-def main():
-    params = spk_config.SpkConfig()
+def main(params: spk_config.SpkConfig):
+    if not params:
+        params = spk_config.SpkConfig()
+    else:
+        params = params
     # If the script is being run automatically, on Fridays it will run a greater number of files
-    if params.run["run_type"] == "Auto":
+    if params.run["run-type"] == "Auto":
         if datetime.datetime.weekday(datetime.date.today()) == 4:
-            n_files = int(params.run["weekend_run"])
+            n_files = int(params.run["weekend-run"])
         else:
-            n_files = int(params.run["weekday_run"])
-    elif params.run["run_type"] == "Manual":
-        n_files = params.run["manual_run"]
+            n_files = int(params.run["weekday-run"])
+    elif params.run["run-type"] == "Manual":
+        n_files = params.run["manual-run"]
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
-    runpath = Path(params.path["run_path"])
-    num_cpu = int(params.run["cores_used"])
-    resort_limit = int(params.run["resort_limit"])
+    runpath = Path(params.path["run"])
+    num_cpu = int(params.run["cores-used"])
     runfiles = []
     for curr_file in runfiles:  # loop through each file
 
@@ -46,7 +49,7 @@ def main():
         dir_manager.flush_directories()
         dir_manager.create_base_directories()
 
-        h5file = spk_io.h5.read_h5(curr_file)
+        h5file = read_h5(curr_file)
         num_chan = len(h5file.keys())
         dir_manager.create_channel_directories(num_chan)
 
@@ -73,4 +76,6 @@ def main():
                 p.join()
 
 if __name__ == "__main__":
-    main(default_config=True)
+    main_params = spk_config.SpkConfig()
+    main_params.set("path_configs", "run", Path.home() / "data" / "combined")
+    main(main_params)

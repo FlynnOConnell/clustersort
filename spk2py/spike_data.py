@@ -9,8 +9,8 @@ import h5py
 import numpy as np
 from sonpy import lib as sp
 
-from cluster import extract_waveforms, filter_signal, dejitter
-from spk_logging.logger_config import configure_logger
+from .cluster import extract_waveforms, filter_signal, dejitter
+from .spk_logging.logger_config import configure_logger
 
 logfile = Path().home() / "data" / "spike_data.log"
 logger = configure_logger(__name__, logfile, level=logging.DEBUG)

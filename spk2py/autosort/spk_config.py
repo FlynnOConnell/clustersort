@@ -48,18 +48,21 @@ class SpkConfig:
         --------
         >>> cfg = SpkConfig()
 
-        Accessing a whole section:
-        >>> run_configs = cfg.run
-        >>> type(run_configs)
-        >>> print(run_configs)
+        >>> run = cfg.run
+        >>> type(run)
+        >>> print(run)
         <class 'dict'>
         {'resort-limit': '3', 'cores-used': '8', ...}
-        >>> type(run_configs['resort_limit'])
+        >>> type(run['resort_limit'])
         <class 'str'>
         .. note:: All values are stored as strings. It is up to the user to convert the values to the appropriate type.
+        >>> # set a config programmatically
+        >>> cfg.set('run', 'resort-limit', 5)
+        >>> print(cfg.run['resort-limit'])
+        '5'
 
-        Accessing all parameters as a dictionary:
-        >>> all_params = cfg.params
+        >>> # get all parameters
+        >>> all_params = cfg.main_params
         >>> print(all_params['resort-limit'])
         '3'
         """
@@ -75,6 +78,11 @@ class SpkConfig:
     def get_section(self, section: str):
         return dict(self.config[section])
 
+    def set(self, section, key, value):
+        if section not in self.config:
+            self.config.add_section(section)
+        self.config.set(section, key, str(value))
+
     def get_all(self):
         params = {}
         for section in self.config.sections():
@@ -84,27 +92,39 @@ class SpkConfig:
 
     @property
     def run(self):
-        return self.get_section('run_configs')
+        return self.get_section('run')
 
     @property
     def path(self):
-        return self.get_section('path_configs')
+        return self.get_section('path')
 
     @property
     def cluster(self):
-        return self.get_section('cluster_configs')
+        return self.get_section('cluster')
 
     @property
     def breach(self):
-        return self.get_section('breach_configs')
+        return self.get_section('breach')
 
     @property
     def filter(self):
-        return self.get_section('filter_configs')
+        return self.get_section('filter')
 
     @property
     def spike(self):
-        return self.get_section('spike_configs')
+        return self.get_section('spike')
+
+    @property
+    def detection(self):
+        return self.get_section('detection')
+
+    @property
+    def pca(self):
+        return self.get_section('pca')
+
+    @property
+    def postprocess(self):
+        return self.get_section('postprocess')
 
     def read_config(self):
         config = configparser.ConfigParser()
@@ -131,7 +151,7 @@ class SpkConfig:
         default_completed_path.mkdir(parents=True, exist_ok=True)
     
         config = configparser.ConfigParser()
-        config["run_configs"] = {
+        config["run"] = {
             "resort-limit": "3",
             "cores-used": "8",
             "weekday-run": "2",
@@ -140,13 +160,13 @@ class SpkConfig:
             "manual-run": "2",
         }
     
-        config["path_configs"] = {
+        config["path"] = {
             "run": str(default_run_path),  # Path to directory containing files to be sorted
             "results": str(default_results_path),  # Path to directory to store results
             "completed": str(default_completed_path),  # Path to directory to store completed files
         }
     
-        config["cluster_configs"] = {
+        config["cluster"] = {
             "max-clusters": "7",
             "max-iterations": "1000",
             "convergence-criterion": ".0001",
@@ -155,26 +175,26 @@ class SpkConfig:
             "intra-hpc_cluster-cutoff": "3",
         }
     
-        config["breach_configs"] = {
+        config["breach"] = {
             "disconnect-voltage": "1500",
             "max-breach-rate": ".2",
             "max-breach-count": "10",
             "max-breach-avg": "20",
         }
     
-        config["filter_configs"] = {"low-cutoff": "600", "high-cutoff": "3000"}
+        config["filter"] = {"low-cutoff": "600", "high-cutoff": "3000"}
     
-        config["spike_configs"] = {"pre-time": "0.2", "post-time": "0.6",}
+        config["spike"] = {"pre-time": "0.2", "post-time": "0.6",}
     
-        config["detection_configs"] = {"spike-detection": "2.0", "artifact-removal": "10.0"}
+        config["detection"] = {"spike-detection": "2.0", "artifact-removal": "10.0"}
     
-        config["pca_configs"] = {
+        config["pca"] = {
             "variance-explained": ".95",
             "use-percent-variance": "1",
             "principal-component-n": "5",
         }
     
-        config["post_configs"] = {
+        config["postprocess"] = {
             "reanalyze": "0",
             "simple-gmm": "1",
             "image-size": "70",

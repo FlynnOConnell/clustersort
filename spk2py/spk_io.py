@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import h5py
 
-def save_to_h5(filename: str,
+def write_h5(filename: str,
                unit_dict: dict,
                ):
     """
@@ -33,7 +33,7 @@ def read_group(group: h5py.Group) -> dict:
             data[key] = item[()]
     return data
 
-def read_single_h5(filename: str | Path) -> dict:
+def read_h5(filename: str | Path) -> dict:
     """
     Read a single HDF5 file and return a dictionary containing the data.
 

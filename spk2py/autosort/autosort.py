@@ -20,7 +20,6 @@ from scipy.spatial.distance import mahalanobis
 
 from directory_manager import DirectoryManager
 from spk2py import autosort as clust
-from .utils import excepts
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"
