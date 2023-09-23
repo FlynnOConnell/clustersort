@@ -15,12 +15,106 @@ from spk_logging.logger_config import configure_logger
 logfile = Path().home() / "data" / "spike_data.log"
 logger = configure_logger(__name__, logfile, level=logging.DEBUG)
 
-Segment = namedtuple("Segment", ["segment_number", "data"])
-UnitData = namedtuple("UnitData", ["slices", "times"])
+UnitData = namedtuple("UnitData", ["spikes", "times"])
 
+def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
+    with h5py.File(filename, "w") as f:
+        metadata_grp = f.create_group("metadata")
+        for key, value in spike_data.metadata.items():
+            metadata_grp.attrs[key] = value
+
+        unit_grp = f.create_group("unit")
+        for channel, unit_data in spike_data.unit.items():
+            channel_grp = unit_grp.create_group(channel)
+            channel_grp.create_dataset("spikes", data=unit_data.spikes)
+            channel_grp.create_dataset("times", data=unit_data.times)
+    logger.debug(f"Saved data successfully to {filename}")
+
+
+# Function to load a SpikeData instance from a h5 file
+def load_spike_data_from_h5(filename):
+    spike_data = {"metadata": {}, "unit": {}}
+    with h5py.File(filename, "r") as f:
+        for key, value in f["metadata"].attrs.items():
+            spike_data["metadata"][key] = value
+
+        for channel in f["unit"].keys():
+            spikes = np.array(f["unit"][channel]["spikes"])
+            times = np.array(f["unit"][channel]["times"])
+            spike_data["unit"][channel] = UnitData(spikes, times)
+    return spike_data
+
+
+# Function to merge two SpikeData instances
+def merge_spike_data(spike_data1, spike_data2):
+    merged_spike_data = {"metadata": spike_data1["metadata"], "unit": {}}
+
+    # Merge unit data
+    for channel in spike_data1["unit"].keys():
+        spikes1, times1 = spike_data1["unit"][channel]
+        spikes2, times2 = spike_data2["unit"][channel]
+
+        merged_spikes = np.concatenate([spikes1, spikes2])
+        merged_times = np.concatenate([times1, times2])
+
+        merged_spike_data["unit"][channel] = UnitData(merged_spikes, merged_times)
+
+    return merged_spike_data
+
+def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
+    merged_spike_data = {'metadata': spike_data_dict1['metadata'], 'unit': {}}
+
+    # find which spikedata has preinfusion data
+    if spike_data_dict1['metadata']['infusion'] == 'pre':
+        spike_data_pre = spike_data_dict1
+        spike_data_post = spike_data_dict2
+    else:
+        spike_data_pre = spike_data_dict2
+        spike_data_post = spike_data_dict1
+
+    # Merge unit data
+    for channel in spike_data_pre['unit'].keys():
+        spikes1 = spike_data_pre['unit'][channel].spikes
+        times1 = spike_data_pre['unit'][channel].times
+        spikes2 = spike_data_post['unit'][channel].spikes
+        times2 = spike_data_post['unit'][channel].times
+
+        merged_spikes = np.concatenate([spikes1, spikes2])
+        merged_times = np.concatenate([times1, times2])
+
+        merged_spike_data['unit'][channel] = UnitData(merged_spikes, merged_times)
+
+    return merged_spike_data
 
 class SpikeData:
-    UnitData = namedtuple("UnitData", ["spikes", "times"])
+
+    @classmethod
+    def merge(cls, instance_1, instance_2, filename):
+        if not cls.validate_same_metadata(instance_1.metadata, instance_2.metadata):
+            raise ValueError("Metadata mismatch.")
+    
+        merged = cls(filename)
+        merged.metadata = instance_1.metadata
+    
+        # Merge unit data
+        for title in instance_1.unit.keys():
+            merged.unit[title].spikes = np.concatenate(
+                [instance_1.unit[title].spikes, instance_2.unit[title].spikes]
+            )
+            merged.unit[title].times = np.concatenate(
+                [instance_1.unit[title].times, instance_2.unit[title].times]
+            )
+    
+        return merged
+    
+    @staticmethod
+    def validate_same_metadata(meta1, meta2):
+        for key in meta1:
+            if key not in ["filename", "infusion", "max_time", "recording_length"]:
+                if meta1[key] != meta2[key]:
+                    return False
+        return True
+
     """
     Container class for Spike2 data.
 
@@ -84,8 +178,8 @@ class SpikeData:
         self.filename = Path(filepath)
         self.sonfile = sp.SonFile(str(self.filename), True)
         self.bitrate = 32 if self.sonfile.is32file() else 64
-        self.lfp = {}
         self.unit = {}
+        self.metadata = self.bundle_metadata()
         self.process_units()
         self._validate()
 
@@ -100,9 +194,7 @@ class SpikeData:
         return self.empty
 
     def __getitem__(self, key):
-        if key in self.lfp:
-            return self.lfp[key]
-        elif key in self.unit:
+        if key in self.unit:
             return self.unit[key]
         else:
             raise KeyError(f"{key} not found in SpikeData object.")
@@ -117,50 +209,6 @@ class SpikeData:
             raise ValueError(
                 f"File {self.filename.stem} does not contain a pre- or post-infusion filename."
             )
-
-    def save_to_h5(self, filename):
-        with h5py.File(filename, "w") as f:
-            logger.debug("Setting metadata...")
-            # All metadata we may need later
-            metadata_grp = f.create_group("metadata")
-            metadata_grp.attrs["bandpass"] = [self.bandpass_low, self.bandpass_high]
-            metadata_grp.attrs["time_base"] = self.time_base
-            metadata_grp.attrs["max_time"] = self.max_ticks
-            metadata_grp.attrs["recording_length"] = self.recording_length
-            metadata_grp.attrs["infusion"] = "pre" if self.preinfusion else "post"
-            metadata_grp.attrs["filename"] = self.filename.stem
-            metadata_grp.attrs["exclude"] = self.exclude
-            logger.debug(f"Saved metadata to {filename}")
-
-            # Create a group for unit data
-            unit_grp = f.create_group("unit")
-
-            for title, unit_data in self.unit.items():
-                # Create a subgroup for each channel title
-                channel_grp = unit_grp.create_group(title)
-
-                # Save spikes and times as datasets within the channel group
-                channel_grp.create_dataset("spikes", data=unit_data.spikes)
-                channel_grp.create_dataset("times", data=unit_data.times)
-
-        logger.debug(f"Saved data successfully to {filename}")
-
-    def save_data(self, savepath, overwrite=False):
-        """Save the data to an HDF5 file."""
-        path = Path(savepath)
-        if not path.exists():
-            path.mkdir(parents=True, exist_ok=True)
-        savename = f"{savepath}/{self.filename.stem}.h5"
-        logger.debug(f"Saving data to {savename}")
-        if Path(savename).exists() and overwrite:
-            logger.debug(f"Overwriting {savename}")
-            self.save_to_h5(savename)
-        elif Path(savename).exists() and not overwrite:
-            logger.debug(f"{savename} already exists, skipping.")
-            return None
-        else:
-            logger.debug(f"Filename is fresh - saving {savename}")
-            self.save_to_h5(savename)
 
     @property
     def preinfusion(self):
@@ -183,11 +231,8 @@ class SpikeData:
             None
         """
         logger.debug(f"Extracting ADC channels from {self.filename.stem}")
-        segment_ticks = int(segment_duration / self.time_base)
 
         for idx in range(self.max_channels):
-
-            logger.debug(f"Max channels: {self.max_channels}")
             title = self.sonfile.GetChannelTitle(idx)
             if (
                 self.sonfile.ChannelType(idx) == sp.DataType.Adc
@@ -224,7 +269,7 @@ class SpikeData:
                 # slices, spike_times = dejitter(spike_times, sampling_rate, sampling_rate)
 
                 # Create a FinalUnitData namedtuple with the concatenated spikes and times
-                final_unit_data = self.UnitData(spikes=slices, times=spike_times)
+                final_unit_data = UnitData(spikes=slices, times=spike_times)
 
                 # Store this namedtuple in the self.unit dictionary
                 self.unit[title] = final_unit_data
@@ -303,14 +348,32 @@ class SpikeData:
         """Set the upper bound of the bandpass filter."""
         self._bandpass_high = value
 
+    def bundle_metadata(self):
+        return {
+            "bandpass": [self.bandpass_low, self.bandpass_high],
+            "time_base": self.time_base,
+            "max_time": self.max_ticks,
+            "recording_length": self.recording_length,
+            "infusion": "pre" if self.preinfusion else "post",
+            "filename": self.filename.stem,
+            "exclude": self.exclude,
+        }
 
 if __name__ == "__main__":
-    path_test = Path().home() / "data"
-    files = [f for f in path_test.glob("*.smr")]
+    path_test = Path().home() / "data" / "smr"
+    files = [f for f in path_test.glob("*.h5")]
+    # load the h5
+    data = []
     for file in files:
-        data = SpikeData(
-            file,
-            ("Respirat", "RefBrain", "Sniff"),
-        )
-        data.save_data(path_test, overwrite=True)
+        data.append(load_spike_data_from_h5(file))
+
+    # merge the data
+    merged_data = merge_spike_data_from_dicts(data[0], data[1])
+    # for file in files:
+    #     data = SpikeData(
+    #         file,
+    #         ("Respirat", "RefBrain", "Sniff"),
+    #     )
+    #     save_spike_data_to_h5(data, file.with_suffix(".h5"))
+    #     data.save_data(path_test, overwrite=True)
     x = 5
