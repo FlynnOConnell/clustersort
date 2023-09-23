@@ -1,12 +1,7 @@
 from __future__ import annotations
 
-from collections import namedtuple
 from pathlib import Path
-
 import h5py
-
-Segment = namedtuple("Segment", ["segment_number", "data"])
-UnitData = namedtuple("UnitData", ["slices", "times"])
 
 def save_to_h5(filename: str,
                unit_dict: dict,

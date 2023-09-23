@@ -18,39 +18,6 @@ logger = configure_logger(__name__, logfile, level=logging.DEBUG)
 Segment = namedtuple("Segment", ["segment_number", "data"])
 UnitData = namedtuple("UnitData", ["slices", "times"])
 
-def load_from_h5(filename):
-    # Dictionary to hold the loaded data
-    data_dict = {}
-    with h5py.File(filename, "r") as f:
-        # Load metadata
-        metadata_grp = f["metadata"]
-        data_dict["metadata"] = {
-            attr: metadata_grp.attrs[attr] for attr in metadata_grp.attrs
-        }
-
-        # Load unit data
-        unit_grp = f["unit"]
-        data_dict["unit"] = {}
-
-        for title in unit_grp.keys():
-            channel_grp = unit_grp[title]
-            segments = []
-
-            for segment_name in channel_grp.keys():
-                segment_grp = channel_grp[segment_name]
-
-                slices = np.array(segment_grp["slices"])
-                times = np.array(segment_grp["times"])
-
-                segment = Segment(
-                    segment_number=int(segment_name.split("_")[1]),
-                    data=UnitData(slices=slices, times=times),
-                )
-                segments.append(segment)
-
-            data_dict["unit"][title] = segments
-
-    return data_dict
 
 class SpikeData:
     UnitData = namedtuple("UnitData", ["spikes", "times"])
@@ -156,16 +123,12 @@ class SpikeData:
             logger.debug("Setting metadata...")
             # All metadata we may need later
             metadata_grp = f.create_group("metadata")
-            metadata_grp.attrs["bandpass_low"] = self.bandpass_low
-            metadata_grp.attrs["bandpass_high"] = self.bandpass_high
+            metadata_grp.attrs["bandpass"] = [self.bandpass_low, self.bandpass_high]
             metadata_grp.attrs["time_base"] = self.time_base
             metadata_grp.attrs["max_time"] = self.max_ticks
-            metadata_grp.attrs["max_channels"] = self.max_channels
-            metadata_grp.attrs["bitrate"] = self.bitrate
             metadata_grp.attrs["recording_length"] = self.recording_length
             metadata_grp.attrs["infusion"] = "pre" if self.preinfusion else "post"
             metadata_grp.attrs["filename"] = self.filename.stem
-            metadata_grp.attrs["empty"] = self.empty
             metadata_grp.attrs["exclude"] = self.exclude
             logger.debug(f"Saved metadata to {filename}")
 
@@ -223,8 +186,7 @@ class SpikeData:
         segment_ticks = int(segment_duration / self.time_base)
 
         for idx in range(self.max_channels):
-            all_spikes = []
-            all_times = []
+
             logger.debug(f"Max channels: {self.max_channels}")
             title = self.sonfile.GetChannelTitle(idx)
             if (
@@ -238,56 +200,31 @@ class SpikeData:
                     1 / (self.sonfile.ChannelDivide(idx) * self.time_base), 2
                 )
 
-                num_segments = math.ceil(self.channel_max_ticks(idx) / segment_ticks)  # Number of segments, rounded up
-                accumulated_offset = 0
+                # Extract and filter waveforms for this chunk
+                waveforms = self.sonfile.ReadFloats(idx, int(2e9), 0)
 
-                # Chunk the channel into segments
-                for segment_num in range(num_segments):
-                    logger.debug(f"Processing segment {segment_num} of {num_segments}")
-                    seg_time_start = int(segment_num * segment_ticks)
-                    seg_time_end = int(seg_time_start + segment_ticks)
-
-                    # Ensure we don't exceed the channel's available ticks
-                    seg_time_end = min(
-                        seg_time_end, self.channel_max_ticks(idx)
+                # Ensure the Nyquist-Shannon sampling theorem is satisfied
+                if sampling_rate < (2 * self.bandpass_high):
+                    raise ValueError(
+                        "Sampling rate is too low for the given bandpass filter frequencies."
                     )
 
-                    # Extract and filter waveforms for this chunk
-                    waveforms = self.sonfile.ReadFloats(idx, int(2e9), seg_time_start, seg_time_end)
+                # Low/high bandpass filter
+                filtered_segment = filter_signal(
+                    waveforms, (self.bandpass_low, self.bandpass_high), sampling_rate
+                )
 
-                    # Ensure the Nyquist-Shannon sampling theorem is satisfied
-                    if sampling_rate < (2 * self.bandpass_high):
-                        raise ValueError(
-                            "Sampling rate is too low for the given bandpass filter frequencies."
-                        )
+                # Extract spikes and times from the filtered segment
+                slices, spike_times = extract_waveforms(
+                    filtered_segment,
+                    sampling_rate,
+                )
 
-                    # Low/high bandpass filter
-                    filtered_segment = filter_signal(
-                        waveforms, (self.bandpass_low, self.bandpass_high), sampling_rate
-                    )
-
-                    # Extract spikes and times from the filtered segment
-                    slices, spike_times = extract_waveforms(
-                        filtered_segment,
-                        sampling_rate,
-                    )
-
-                    # Adjust spike alignment to minimize jitter
-                    slices, spike_times = dejitter(slices, spike_times, sampling_rate)
-
-                    # Adjust spike times to account for chunking
-                    spike_times = [time + accumulated_offset for time in spike_times]
-                    accumulated_offset += len(waveforms)
-
-                    all_spikes.append(slices)
-                    all_times.append(spike_times)
-
-                # Concatenate all spikes and times into single arrays
-                final_spikes = np.concatenate(all_spikes)
-                final_times = np.concatenate(all_times)
+                # Dejitter the spike times
+                # slices, spike_times = dejitter(spike_times, sampling_rate, sampling_rate)
 
                 # Create a FinalUnitData namedtuple with the concatenated spikes and times
-                final_unit_data = self.UnitData(spikes=final_spikes, times=final_times)
+                final_unit_data = self.UnitData(spikes=slices, times=spike_times)
 
                 # Store this namedtuple in the self.unit dictionary
                 self.unit[title] = final_unit_data
@@ -370,10 +307,10 @@ class SpikeData:
 if __name__ == "__main__":
     path_test = Path().home() / "data"
     files = [f for f in path_test.glob("*.smr")]
-    file = files[0]
-    data = SpikeData(
-        file,
-        ("Respirat", "RefBrain", "Sniff"),
-    )
-    data.save_data(path_test, overwrite=True)
+    for file in files:
+        data = SpikeData(
+            file,
+            ("Respirat", "RefBrain", "Sniff"),
+        )
+        data.save_data(path_test, overwrite=True)
     x = 5

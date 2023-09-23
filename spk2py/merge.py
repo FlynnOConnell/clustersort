@@ -6,11 +6,35 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from spk_io import save_to_h5, read_single_h5, read_single_h5
-from spike_data import SpikeData, load_from_h5
+from spk_io import read_single_h5, read_single_h5
+from spike_data import SpikeData
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def save_to_h5(filename, data):
+    with h5py.File(filename, "w") as f:
+        logger.debug("Setting metadata...")
+        # All metadata we may need later
+        metadata_grp = f.create_group("metadata")
+        metadata_grp.attrs["bandpass"] = data['metadata']["bandpass"]
+        metadata_grp.attrs["time_base"] = data['metadata']["time_base"]
+        metadata_grp.attrs["max_time"] = data['metadata']["max_time"]
+        metadata_grp.attrs["recording_length"] = data['metadata']["recording_length"]
+
+        # Create a group for unit data
+        unit_grp = f.create_group("unit")
+
+        for title, unit_data in data["unit"].items():
+            # Create a subgroup for each channel title
+            channel_grp = unit_grp.create_group(title)
+
+            # Save spikes and times as datasets within the channel group
+            channel_grp.create_dataset("spikes", data=unit_data.spikes)
+            channel_grp.create_dataset("times", data=unit_data.times)
+
+    logger.debug(f"Saved data successfully to {filename}")
 
 
 def get_base_filename(name_data: SpikeData | dict, ) -> str:
@@ -69,14 +93,15 @@ def concatenate_spike_data(file_1: str | Path, file_2: str | Path):
     combined_metadata = data1['metadata']
 
     combined_spikes = {}
+    combined_times = {}
     # Concatenate segments
     for key in data1['unit']:
         combined_spikes[key] = np.concatenate([data1['unit'][key]["spikes"], data2['unit'][key]["spikes"]])
-        combined_times = np.concatenate([data1['unit'][key]["times"], data2['unit'][key]["times"]])
+        combined_times[key] = np.concatenate([data1['unit'][key]["times"], data2['unit'][key]["times"]])
 
     # Save combined data
     base_filename = get_base_filename(data1)
-    combined_file = {'metadata': combined_metadata, 'data': combined_spikes}
+    combined_file = {'metadata': combined_metadata, 'data': [combined_spikes, combined_times]}
     path = Path().home() / "data" / "combined" / f"{base_filename}.h5"
     save_to_h5(str(path), combined_file)
     logger.debug(f"Saved {base_filename}.h5")
