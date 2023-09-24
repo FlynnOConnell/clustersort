@@ -8,46 +8,23 @@ Welcome to spk2py's Documentation
 Overview
 ========
 
-* Introduction
-* Features
-* Installation
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Getting Started
    :name: gettingstarted
 
    install
 
-
 Core Modules
 ============
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Core Modules
 
-Auto Sort
----------
-
-.. automodule:: spk2py
-   :members:
-
-
-Auto Sort
----------
-.. automodule:: spk2py.autosort
-   :members:
-
-
-Logging
--------
-.. automodule:: spk2py.spk_logging
-   :members:
-
-
-Tests
--------
-.. automodule:: spk2py.tests
-   :members:
-
+   spk2py
+   spk2py.autosort
+   spk2py.spk_logging
 
 Technical Explanation
 =====================
@@ -67,4 +44,3 @@ Indices and Tables
 .. toctree::
    :maxdepth: 2
    :caption: Additional Resources
-

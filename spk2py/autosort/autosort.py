@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+AutoSort: A Python package for automated spike sorting of extracellular recordings.
+"""
 from __future__ import annotations
 
 import configparser
-from collections import namedtuple
 import logging
 import os
 import shutil
@@ -19,8 +21,7 @@ from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
-from spk2py.autosort.directory_manager import DirectoryManager
-from spk2py.autosort.utils.wf_shader import waveforms_datashader
+from spk2py.autosort.wf_shader import waveforms_datashader
 from spk2py.cluster import clusterGMM, get_Lratios, scale_waveforms, implement_pca
 
 logger = logging.getLogger(__name__)
@@ -32,10 +33,27 @@ logger.addHandler(logging.StreamHandler())
 # Factory
 def run_spk_process(filename, data, params, dir_manager, chan_num):
     """
+    Factory method for running the spike sorting process on a single channel.
+
+    . .note::
     Data can be in several formats:
     1) Dictionary with keys 'spikes' and 'times'
     2) Named tuple with fields 'spikes' and 'times'
+
     # TODO: Add support for pandas DataFrame and other input methods
+
+    Parameters
+    ----------
+    filename : str
+        Name of the file to be sorted
+    data : dict
+        Dictionary containing the data to be sorted
+    params : SpkConfig
+        Configuration parameters for the spike sorting process
+    dir_manager : DirectoryManager
+        DirectoryManager object for managing the output directories
+    chan_num : int
+        Channel number to be sorted
     """
     input_data = {}
     if isinstance(data, dict):
@@ -49,7 +67,20 @@ def run_spk_process(filename, data, params, dir_manager, chan_num):
 
 
 def infofile(filename, path, sort_time, params):
-    # dumps run info to a .info file
+    """
+    Dumps run info to a .info file
+
+    Parameters
+    ----------
+    filename
+    path
+    sort_time
+    params
+
+    Returns
+    -------
+    None
+    """
     config = configparser.ConfigParser()
     config["METADATA"] = {
         "h5 File": filename,
@@ -64,7 +95,20 @@ def infofile(filename, path, sort_time, params):
 
 
 class ProcessChannel:
+    """
+    Class for running the spike sorting process on a single channel.
+    """
     def __init__(self, filename, data, params, dir_manager, chan_num):
+        """
+
+        Parameters
+        ----------
+        filename
+        data
+        params
+        dir_manager
+        chan_num
+        """
         self.filename = filename
         self.data = data
         # self.metadata = metadata
@@ -75,81 +119,142 @@ class ProcessChannel:
 
     @property
     def pvar(self):
+        """
+        Returns the percent variance explained by the principal components.
+        """
         return float(self.params.pca["variance-explained"])
 
     @property
     def usepvar(self):
+        """
+        Returns whether to use the percent variance explained by the principal components.
+        """
         return int(self.params.pca["use-percent-variance"])
 
     @property
     def userpc(self):
+        """
+        Returns the number of principal components to use.
+        """
         return int(self.params.pca["principal-component-n"])
 
     @property
     def max_clusters(self):
+        """
+        The total number of clusters to be sorted.
+        """
         return int(self.params.cluster["max-clusters"])
 
     @property
     def max_iterations(self):
+        """
+        The maximum number of iterations to run the GMM.
+        """
         return int(self.params.cluster["max-iterations"])
 
     @property
     def thresh(self):
+        """
+        The convergence criterion for the GMM.
+        """
         return float(self.params.cluster["convergence-criterion"])
 
     @property
     def num_restarts(self):
+        """
+        The number of random restarts to run the GMM.
+        """
         return int(self.params.cluster["random-restarts"])
 
     @property
     def wf_amplitude_sd_cutoff(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.cluster["intra-cluster-cutoff"])
 
     @property
     def artifact_removal(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.cluster["artifact-removal"])
 
     @property
     def pre_time(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.spike["pre_time"])
 
     @property
     def post_time(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.spike["post_time"])
 
     @property
     def bandpass(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.filter["low-cutoff"]), float(
             self.params.filter["high-cutoff"]
         )
 
     @property
     def spike_detection(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return int(self.params["spike-detection"])
 
     @property
     def STD(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return int(self.params.detection["spike-detection"])
 
     @property
     def max_breach_rate(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.breach["max-breach-rate"])
 
     @property
     def max_breach_count(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.breach["max-breach-count"])
 
     @property
     def max_breach_avg(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.breach["max-breach-avg"])
 
     @property
     def voltage_cutoff(self):
+        """
+        The number of standard deviations above the mean to reject waveforms.
+        """
         return float(self.params.breach["voltage-cutoff"])
 
     def process_channel(
         self,
     ):
+        """
+        Runs the spike sorting process on a single channel.
+
+        Returns
+        -------
+        None
+        """
         while True:
             if self.data["spikes"].size == 0:
                 (
@@ -252,6 +357,20 @@ class ProcessChannel:
             break
 
     def spk_gmm(self, data, times_final, n_pc, amplitudes):
+        """
+        Runs the Gaussian Mixture Model clustering algorithm on the data.
+
+        Parameters
+        ----------
+        data
+        times_final
+        n_pc
+        amplitudes
+
+        Returns
+        -------
+        None
+        """
         for i in range(self.max_clusters - 2):
             try:
                 model, predictions, bic = clusterGMM(
@@ -574,6 +693,19 @@ class ProcessChannel:
             f.write("Congratulations, this channel was sorted successfully")
 
     def superplots(self, maxclust):
+        """
+        Creates superplots for each channel.
+
+        Conglomerates all the plots into a single plot.
+
+        Parameters
+        ----------
+        maxclust
+
+        Returns
+        -------
+        None
+        """
         path = self.dir_manager.plots / f"channel_{self.chan_num + 1}"
         outpath = self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "superplots"
         if outpath.exists():
@@ -659,6 +791,14 @@ class ProcessChannel:
                 )
 
     def compile_isoi(self, maxclust=7, Lrat_cutoff=0.1):
+        """
+        Compiles the ISI data for each channel.
+
+        Parameters
+        ----------
+        maxclust
+        Lrat_cutoff
+        """
         path = self.dir_manager.reports / "clusters"
         file_isoi = pd.DataFrame()
         errorfiles = pd.DataFrame(columns=["channel", "solution", "file"])
