@@ -6,6 +6,9 @@ from pathlib import Path
 
 repo = Path().home() / 'repos' / "spk2py"
 sys.path.insert(0, str(repo))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../'))
+
 
 # Minimum version, enforced by sphinx
 needs_sphinx = '4.3'
