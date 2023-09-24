@@ -1,13 +1,38 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
-import pytz
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+import pytz
+
 
 class ESTFormatter(logging.Formatter):
+    """
+    Formatter for logging timestamps in the US Eastern Time zone.
+
+    Methods
+    -------
+    formatTime(record, datefmt=None)
+        Format the time for the log record.
+    """
     def formatTime(self, record, datefmt=None):
+        """
+        Format the time for the log record.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            The log record.
+        datefmt : str, optional
+            The date format, by default None
+
+        Returns
+        -------
+        str
+            The formatted time string.
+        """
         dt = datetime.fromtimestamp(record.created, pytz.timezone('US/Eastern'))
         if datefmt:
             return dt.strftime(datefmt)
@@ -15,6 +40,19 @@ class ESTFormatter(logging.Formatter):
             return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 class ColoredFormatter(logging.Formatter):
+    """
+    Formatter for logging with colored output.
+
+    Attributes
+    ----------
+    COLORS : dict
+        Mapping of log levels to terminal colors.
+
+    Methods
+    -------
+    format(record)
+        Format the log record with colors.
+    """
     COLORS = {
         'DEBUG': '\033[33m',  # Orange
         'INFO': '\033[34m',   # Blue
@@ -24,10 +62,40 @@ class ColoredFormatter(logging.Formatter):
     }
 
     def format(self, record):
+        """
+        Format the log record with colors.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            The log record to be formatted.
+
+        Returns
+        -------
+        str
+            The formatted log message.
+        """
         log_message = super().format(record)
         return f"{self.COLORS.get(record.levelname, '')}{log_message}\033[0m"
 
 def configure_logger(name, log_file: Path | str, level=logging.INFO):
+    """
+    Configure a logger with file and stream handlers.
+
+    Parameters
+    ----------
+    name : str
+        Name of the logger.
+    log_file : Path | str
+        Path to the log file.
+    level : int, optional
+        Logging level, by default logging.INFO
+
+    Returns
+    -------
+    logging.Logger
+        Configured logger object.
+    """
     # Create a logger
     logger = logging.getLogger(name)
     logger.setLevel(level)

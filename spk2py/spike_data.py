@@ -121,15 +121,6 @@ def save_merged_spike_data_to_h5(merged_spike_data: dict, filename: str | Path):
     logger.debug(f"Saved merged data successfully to {filename}")
 
 class SpikeData:
-
-    @staticmethod
-    def validate_same_metadata(meta1, meta2):
-        for key in meta1:
-            if key not in ["filename", "infusion", "max_time", "recording_length"]:
-                if meta1[key] != meta2[key]:
-                    return False
-        return True
-
     """
     Container class for Spike2 data.
 
@@ -139,6 +130,26 @@ class SpikeData:
     - A boolean, where True means the file is empty and False means it is not.
     - A string, where the string is the filename stem.
     """
+
+    @staticmethod
+    def validate_same_metadata(meta1, meta2):
+        """
+        Check if two metadata dictionaries are the same.
+
+        Parameters:
+        -----------
+        meta1 : dict
+            The first metadata dictionary.
+        meta2 : dict
+            The second metadata dictionary.
+        """
+
+        for key in meta1:
+            if key not in ["filename", "infusion", "max_time", "recording_length"]:
+                if meta1[key] != meta2[key]:
+                    return False
+        return True
+
     def __init__(
         self,
         filepath: Path | str,
@@ -228,19 +239,30 @@ class SpikeData:
 
     @property
     def preinfusion(self):
+        """
+        Check if the filename contains the pre-infusion suffix.
+
+        Returns:
+        --------
+            bool: True if the filename contains the pre-infusion suffix, False otherwise.
+        """
         return "pre" in self.filename.stem
 
     @property
     def postinfusion(self):
+        """
+        Check if the filename contains the post-infusion suffix.
+
+        Returns
+        -------
+            bool: True if the filename contains the post-infusion suffix, False otherwise.
+        """
         return "post" in self.filename.stem
 
-    def process_units(self, segment_duration: int = 300):
+
+    def process_units(self,):
         """
         Extracts unit data from the Spike2 file.
-
-        Args:
-        -----
-            segment_duration (int): The duration of each segment, in seconds.
 
         Returns:
         --------
@@ -295,23 +317,72 @@ class SpikeData:
         """
         Get the waveform sample interval, in clock ticks. Used by channels that sample
         equal interval waveforms and = the number of file clock ticks per second.
+
+        Parameters:
+        -----------
+        channel : int
+            The channel number.
+
+        Returns:
+        --------
+            int: The waveform sample interval, in clock ticks.
         """
         return self.sonfile.ChannelDivide(channel)
 
     def channel_sample_period(self, channel: int):
-        """Get the waveform sample period, in seconds."""
+        """
+        Get the waveform sample period, in seconds. Used by channels that sample
+
+        Parameters
+        ----------
+        channel
+
+        Returns
+        -------
+        float: The waveform sample interval, in seconds.
+        """
         return self.channel_interval(channel) / self.time_base
 
     def channel_num_ticks(self, channel: int):
-        """The total number of clock ticks for this channel."""
+        """
+        Get the number of clock ticks in the channel.
+
+        Parameters
+        ----------
+        channel
+
+        Returns
+        -------
+        int: The number of clock ticks in the channel.
+        """
         return self.recording_length / self.channel_sample_period(channel)
 
     def channel_max_ticks(self, channel: int):
-        """The last time-point in the array, in ticks."""
+        """
+        Get the last time-point in the array, in ticks.
+
+        Parameters
+        ----------
+        channel
+
+        Returns
+        -------
+        int: The last time-point in the array, in ticks.
+        """
         return self.sonfile.ChannelMaxTime(channel)
 
     def channel_max_time(self, channel: int):
-        """The last time-point in the array, in seconds."""
+        """
+        Get the last time-point in the channel-array, in seconds.
+
+        Parameters
+        ----------
+        channel
+
+        Returns
+        -------
+        float: The last time-point in the channel-array, in seconds.
+        """
         return self.channel_max_ticks(channel) * self.time_base
 
     @property
@@ -332,40 +403,100 @@ class SpikeData:
 
     @property
     def max_ticks(self):
-        """The last time-point in the array, in ticks."""
+        """
+        The total number of clock ticks in the file.
+
+        Returns
+        -------
+            int: The total number of clock ticks in the file.
+        """
         return self.sonfile.MaxTime()
 
     @property
     def max_channels(self):
-        """The number of channels in the file."""
+        """
+        The number of channels in the file.
+
+        Returns
+        -------
+            int: The number of channels in the file.
+        """
         return self.sonfile.MaxChannels()
 
     @property
     def recording_length(self):
-        """The total recording length, in seconds."""
+        """
+        The total recording length, in seconds.
+
+        Returns
+        -------
+            float: The total recording length, in seconds.
+        """
         return self.max_ticks * self.time_base
 
     @property
     def bandpass_low(self):
-        """The lower bound of the bandpass filter."""
+        """
+        The lower bound of the bandpass filter.
+
+        Returns
+        -------
+            int: The lower bound of the bandpass filter.
+        """
         return self._bandpass_low
 
     @bandpass_low.setter
     def bandpass_low(self, value):
-        """Set the lower bound of the bandpass filter."""
+        """
+        Set the lower bound of the bandpass filter.
+
+        Parameters
+        ----------
+        value: int
+            The lower bound of the bandpass filter.
+
+        Returns
+        -------
+            None
+        """
         self._bandpass_low = value
 
     @property
     def bandpass_high(self):
-        """The upper bound of the bandpass filter."""
+        """
+        The upper bound of the bandpass filter.
+
+        Returns
+        -------
+            int: The upper bound of the bandpass filter.
+
+        """
         return self._bandpass_high
 
     @bandpass_high.setter
     def bandpass_high(self, value):
-        """Set the upper bound of the bandpass filter."""
+        """
+        Set the upper bound of the bandpass filter.
+
+        Parameters
+        ----------
+        value: int
+            The upper bound of the bandpass filter.
+
+        Returns
+        -------
+            None
+        """
         self._bandpass_high = value
 
     def bundle_metadata(self):
+        """
+        Bundle the metadata into a dictionary.
+
+        Returns
+        -------
+            dict: A dictionary containing the metadata.
+        """
         return {
             "bandpass": [self.bandpass_low, self.bandpass_high],
             "time_base": self.time_base,
