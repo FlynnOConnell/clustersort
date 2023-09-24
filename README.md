@@ -2,10 +2,9 @@
 
 Data analysis pipeline for electrophysiological data.
 
-[See documentation here.](https://flynnoconnell.github.io/spk2py/)
+[![Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](https://flynnoconnell.github.io/spk2py/index.html# "Go to project documentation")
 
 ### Default File structure
-
 ```
 ~/
 ├── autosort
