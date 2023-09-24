@@ -8,53 +8,28 @@ on:
 permissions:
   contents: read
   pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
       - name: Install dependencies
         run: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design sphinx_rtd_theme IPython
-      - name: Sphinx build
+
+      - name: Build documentation
         run: sphinx-build -b html doc/source doc/build
-      - name: Commit files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          touch doc/build/.nojekyll
-          git add -f doc/build/  # Notice the -f here
-          git commit -m "Add changes" || echo "No changes to commit"
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: github-pages
-          path: doc/build/
-      - name: Debug - List files
-        run: ls -la doc/build/
-
-      - name: Download artifact for inspection
-        uses: actions/download-artifact@v2
-        with:
-          name: github-pages
-          path: downloaded-artifact
-
-      - name: Debug - List downloaded files
-        run: ls -la downloaded-artifact
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          path: ./doc/build
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./doc/build
+
