@@ -671,10 +671,10 @@ class ProcessChannel:
                     fill=(0, 0, 0, 255),
                     spacing=50,
                     align="left",
-                )  # draw the text
+                )
                 draw.multiline_text(
                     (380, 100), text2, fill=(0, 0, 0, 255), spacing=50
-                )  # draw the text
+                )
                 isoimg = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
                 temp_filename = str(
                     self.dir_manager.plots
