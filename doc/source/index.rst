@@ -61,5 +61,4 @@ Indices and Tables
    :maxdepth: 2
    :caption: Additional Resources
 
-   modindex
    search
