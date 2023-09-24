@@ -2,7 +2,7 @@
 import shutil
 from functools import partial
 
-import autosort.datashader as ds
+import datashader as ds
 import datashader.transfer_functions as tf
 import matplotlib.pyplot as plt
 import numpy as np

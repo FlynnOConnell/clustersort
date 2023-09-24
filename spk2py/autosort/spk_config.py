@@ -172,7 +172,7 @@ class SpkConfig:
             "convergence-criterion": ".0001",
             "random-restarts": "10",
             "l-ratio-cutoff": ".1",
-            "intra-hpc_cluster-cutoff": "3",
+            "intra-cluster-cutoff": "3",
         }
     
         config["breach"] = {
@@ -182,7 +182,7 @@ class SpkConfig:
             "max-breach-avg": "20",
         }
     
-        config["filter"] = {"low-cutoff": "600", "high-cutoff": "3000"}
+        config["filter"] = {"low-cutoff": "300", "high-cutoff": "3000"}
     
         config["spike"] = {"pre-time": "0.2", "post-time": "0.6",}
     

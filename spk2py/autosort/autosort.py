@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import configparser
+from collections import namedtuple
 import logging
 import os
 import shutil
@@ -19,17 +20,33 @@ from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
 from directory_manager import DirectoryManager
-from spk2py import autosort as clust
+from spk2py.autosort.utils.wf_shader import waveforms_datashader
+from spk2py.cluster import clusterGMM, get_Lratios, scale_waveforms, implement_pca
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"
 logging.basicConfig(filename=logpath, level=logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
+
 # Factory
 def run_spk_process(filename, data, params, dir_manager, chan_num):
-    proc = ProcessChannel(filename, data, params, dir_manager, chan_num)
+    """
+    Data can be in several formats:
+    1) Dictionary with keys 'spikes' and 'times'
+    2) Named tuple with fields 'spikes' and 'times'
+    # TODO: Add support for pandas DataFrame and other input methods
+    """
+    input_data = {}
+    if isinstance(data, dict):
+        input_data["spikes"] = data["spikes"]
+        input_data["times"] = data["times"]
+    else:
+        raise TypeError("Data must be a dictionary with keys 'spikes' and 'times'")
+
+    proc = ProcessChannel(filename, input_data, params, dir_manager, chan_num)
     proc.process_channel()
+
 
 def infofile(filename, path, sort_time, params):
     # dumps run info to a .info file
@@ -45,185 +62,100 @@ def infofile(filename, path, sort_time, params):
     ) as info_file:
         config.write(info_file)
 
+
 class ProcessChannel:
     def __init__(self, filename, data, params, dir_manager, chan_num):
         self.filename = filename
         self.data = data
+        # self.metadata = metadata
         self.params = params
+        self.sampling_rate = 18518.52  # TODO: Get this from metadata
         self.chan_num = chan_num
         self.dir_manager = dir_manager
 
     @property
     def pvar(self):
-        return self.params['variance_explained']
+        return float(self.params.pca["variance-explained"])
 
     @property
     def usepvar(self):
-        return int(self.params['use_percent_variance'])
+        return int(self.params.pca["use-percent-variance"])
 
     @property
     def userpc(self):
-        return int(self.params['principal_component_n'])
+        return int(self.params.pca["principal-component-n"])
 
     @property
     def max_clusters(self):
-        return int(self.params['max_clusters'])
+        return int(self.params.cluster["max-clusters"])
 
     @property
     def max_iterations(self):
-        return int(self.params['max_iterations'])
+        return int(self.params.cluster["max-iterations"])
 
     @property
     def thresh(self):
-        return float(self.params['convergence_criterion'])
+        return float(self.params.cluster["convergence-criterion"])
 
     @property
     def num_restarts(self):
-        return int(self.params['random_restarts'])
+        return int(self.params.cluster["random-restarts"])
 
     @property
     def wf_amplitude_sd_cutoff(self):
-        return float(self.params['intra_cluster_cutoff'])
-
-    @property
-    def sampling_rate(self):
-        return float(self.params['sampling_rate'])
+        return float(self.params.cluster["intra-cluster-cutoff"])
 
     @property
     def artifact_removal(self):
-        return float(self.params['artifact_removal'])
+        return float(self.params.cluster["artifact-removal"])
 
     @property
     def pre_time(self):
-        return float(self.params['pre_time'])
+        return float(self.params.spike["pre_time"])
 
     @property
     def post_time(self):
-        return float(self.params['post_time'])
+        return float(self.params.spike["post_time"])
 
     @property
     def bandpass(self):
-        return float(self.params['low_cutoff']), float(self.params['high_cutoff'])
+        return float(self.params.filter["low-cutoff"]), float(
+            self.params.filter["high-cutoff"]
+        )
 
     @property
     def spike_detection(self):
-        return int(self.params['spike_detection'])
+        return int(self.params["spike-detection"])
 
     @property
     def STD(self):
-        return int(self.params['spike_detection'])
-
-    @property
-    def cutoff_std(self):
-        return float(self.params['artifact_removal'])
+        return int(self.params.detection["spike-detection"])
 
     @property
     def max_breach_rate(self):
-        return float(self.params['max_breach_rate'])
+        return float(self.params.breach["max-breach-rate"])
 
     @property
     def max_breach_count(self):
-        return float(self.params['max_breach_count'])
+        return float(self.params.breach["max-breach-count"])
 
     @property
     def max_breach_avg(self):
-        return float(self.params['max_breach_avg'])
-
-    @property
-    def intra_cluster_cutoff(self):
-        return float(self.params['intra_cluster_cutoff'])
+        return float(self.params.breach["max-breach-avg"])
 
     @property
     def voltage_cutoff(self):
-        return float(self.params['voltage_cutoff'])
-
-    def process_continuous(self):
-
-        filt_el = clust.filter_signal(
-            self.data['wavedata'],
-            freq=(self.bandpass[0], self.bandpass[1]),
-            sampling_rate=self.sampling_rate,
-        )
-        breach_rate = float(
-            len(np.where(filt_el > self.voltage_cutoff)[0]) * int(self.sampling_rate)
-        ) / len(filt_el)
-
-        test_el = np.reshape(
-            filt_el[: int(self.sampling_rate) * int(len(filt_el) / self.sampling_rate)],
-            (-1, int(self.sampling_rate)),
-        )
-
-        breaches_per_sec = [
-            len(np.where(test_el[i] > self.voltage_cutoff)[0]) for i in range(len(test_el))
-        ]
-
-        breaches_per_sec = np.array(breaches_per_sec)
-        secs_above_cutoff = len(np.where(breaches_per_sec > 0)[0])
-        if secs_above_cutoff == 0:
-            mean_breach_rate_persec = 0
-        else:
-            mean_breach_rate_persec = np.mean(
-                breaches_per_sec[np.where(breaches_per_sec > 0)[0]]
-            )
-
-        if (
-                breach_rate >= self.max_breach_rate
-                and secs_above_cutoff >= self.max_breach_count
-                and mean_breach_rate_persec >= self.max_breach_avg
-        ):
-            recording_cutoff = np.where(breaches_per_sec > self.max_breach_avg)[0][0]
-
-            # Then cut the recording accordingly
-            filt_el = filt_el[: recording_cutoff * int(self.sampling_rate)]
-
-        if len(filt_el) == 0:
-            slices, spike_times = [], []
-        else:
-            slices, spike_times = clust.extract_waveforms(
-                filt_el,
-                spike_snapshot=[self.pre_time, self.post_time],
-                sampling_rate=self.sampling_rate,
-                STD=self.STD,
-                cutoff_std=self.cutoff_std,
-            )
-
-        if len(slices) == 0 or len(spike_times) == 0:
-            with open(
-                    self.dir_manager.temp_path / "/Plots/" + str(self.chan_num + 1) + "/" + "no_spikes.txt", "w"
-            ) as txt:
-                txt.write(
-                    "No spikes were found on channel {}. The most likely cause is an early recording cutoff. RIP".format(
-                        self.chan_num + 1
-                    )
-                )
-                warnings.warn(
-                    "No spikes were found on channel {}. The most likely cause is an early recording cutoff. RIP".format(
-                        self.chan_num + 1
-                    )
-                )
-                with open(
-                    self.dir_manager / "clustering_results" / f"channel_{self.chan_num + 1}" / "success.txt", "w+"
-                ) as f:
-                    f.write("Sorting finished. No spikes found")
-                return None
-
-        slices, times = clust.dejitter(
-            slices,
-            spike_times,
-            spike_snapshot=(self.pre_time, self.post_time),
-            sampling_rate=self.sampling_rate,
-        )
-
-        return slices, times
-
+        return float(self.params.breach["voltage-cutoff"])
 
     def process_channel(
         self,
     ):
         while True:
-            if self.data['wavedata'].size == 0:
+            if self.data["spikes"].size == 0:
                 (
-                    self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "no_spikes.txt"
+                    self.dir_manager.reports
+                    / f"channel_{self.chan_num + 1}"
+                    / "no_spikes.txt"
                 ).write_text(
                     "No spikes were found on this channel."
                     " The most likely cause is an early recording cutoff."
@@ -232,29 +164,31 @@ class ProcessChannel:
                     "No spikes were found on this channel. The most likely cause is an early recording cutoff."
                 )
                 (
-                    self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "success.txt"
+                    self.dir_manager.reports
+                    / f"channel_{self.chan_num + 1}"
+                    / "success.txt"
                 ).write_text("Sorting finished. No spikes found")
                 return
-            else:
-                spikes_final, times_final = self.process_continuous()
 
             # Dejitter these spike waveforms, and get their maximum amplitudes
-            amplitudes = np.min(spikes_final, axis=1)
+            amplitudes = np.min(self.data["spikes"], axis=1)
 
             np.save(
                 self.dir_manager.intermediate
                 / f"channel_{self.chan_num + 1}"
                 / "spike_waveforms.npy",
-                spikes_final,
+                self.data["spikes"],
             )
             np.save(
-                self.dir_manager.intermediate / f"channel_{self.chan_num + 1}" / "spike_times.npy",
-                times_final,
+                self.dir_manager.intermediate
+                / f"channel_{self.chan_num + 1}"
+                / "spike_times.npy",
+                self.data["times"],
             )
 
             # Scale the dejittered spikes by the energy of the waveforms and perform PCA
-            scaled_slices, energy = clust.scale_waveforms(spikes_final)
-            pca_slices, explained_variance_ratio = clust.implement_pca(scaled_slices)
+            scaled_slices, energy = scale_waveforms(self.data["spikes"])
+            pca_slices, explained_variance_ratio = implement_pca(scaled_slices)
             cumulvar = np.cumsum(explained_variance_ratio)
             graphvar = list(cumulvar[0 : np.where(cumulvar > 0.999)[0][0] + 1])
 
@@ -267,11 +201,13 @@ class ProcessChannel:
                 self.dir_manager.intermediate
                 / f"channel_{self.chan_num + 1}"
                 / "spike_waveforms.npy",
-                spikes_final,
+                scaled_slices,
             )
             np.save(
-                self.dir_manager.intermediate / f"channel_{self.chan_num + 1}" / "spike_times.npy",
-                times_final,
+                self.dir_manager.intermediate
+                / f"channel_{self.chan_num + 1}"
+                / "spike_times.npy",
+                self.data["times"],
             )
             np.save(
                 self.dir_manager.intermediate
@@ -281,7 +217,9 @@ class ProcessChannel:
             )
 
             # explained variance
-            var = float(cumulvar[n_pc - 1])  # mainly to avoid type checking issues in the annotation below
+            var = float(
+                cumulvar[n_pc - 1]
+            )  # mainly to avoid type checking issues in the annotation below
             fig = plt.figure()
             x = np.arange(0, len(graphvar) + 1)
             graphvar.insert(0, 0)
@@ -298,7 +236,9 @@ class ProcessChannel:
             plt.xlabel("PC #")
             plt.ylabel("Explained variance ratio")
             fig.savefig(
-                self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "pca_variance.png",
+                self.dir_manager.plots
+                / f"channel_{self.chan_num + 1}"
+                / "pca_variance.png",
                 bbox_inches="tight",
             )
             plt.close("all")
@@ -308,13 +248,13 @@ class ProcessChannel:
             data[:, 2:] = pca_slices[:, :n_pc]
             data[:, 0] = energy[:] / np.max(energy)
             data[:, 1] = np.abs(amplitudes) / np.max(np.abs(amplitudes))
+            self.spk_gmm(data, self.data["times"], n_pc, amplitudes)
             break
-
 
     def spk_gmm(self, data, times_final, n_pc, amplitudes):
         for i in range(self.max_clusters - 2):
             try:
-                model, predictions, bic = clust.clusterGMM(
+                model, predictions, bic = clusterGMM(
                     data,
                     n_clusters=i + 3,
                     n_iter=self.max_iterations,
@@ -322,7 +262,7 @@ class ProcessChannel:
                     threshold=self.thresh,
                 )
             except Exception as e:
-                logger.debug("Error in clusterGMM", exc_info=True)
+                logger.warning("Error in clusterGMM", exc_info=True)
                 continue
 
             if np.any(
@@ -336,18 +276,27 @@ class ProcessChannel:
                     / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
                 )
                 plots_waveforms_ISIs_path.mkdir(parents=True, exist_ok=True)
-        
+
                 # Create and write to the invalid_sort.txt files
                 with open(
-                    self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "invalid_sort.txt", "w+"
+                    self.dir_manager.plots
+                    / f"channel_{self.chan_num + 1}"
+                    / "invalid_sort.txt",
+                    "w+",
                 ) as f:
-                    f.write("There are too few waveforms to properly sort this clustering")
-        
+                    f.write(
+                        "There are too few waveforms to properly sort this clustering"
+                    )
+
                 with open(
-                    self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "invalid_sort.txt", "w+"
+                    self.dir_manager.plots
+                    / f"channel_{self.chan_num + 1}"
+                    / "invalid_sort.txt",
+                    "w+",
                 ) as f:
-                    f.write("There are too few waveforms to properly sort this clustering")
-        
+                    f.write(
+                        "There are too few waveforms to properly sort this clustering"
+                    )
                 continue
             # Sometimes large amplitude noise waveforms hpc_cluster with the spike waveforms because the amplitude has
             # been factored out of the scaled spikes. Run through the clusters and find the waveforms that are more than
@@ -360,23 +309,27 @@ class ProcessChannel:
                 cluster_amplitude_sd = np.std(cluster_amplitudes)
                 reject_wf = np.where(
                     cluster_amplitudes
-                    <= cluster_amplitude_mean - self.wf_amplitude_sd_cutoff * cluster_amplitude_sd
+                    <= cluster_amplitude_mean
+                    - self.wf_amplitude_sd_cutoff * cluster_amplitude_sd
                 )[0]
                 this_cluster[reject_wf] = -1
                 predictions[cluster_points] = this_cluster
-        
+
                 # Make folder for results of i+2 clusters, and store results there
                 clusters_path = (
                     self.dir_manager.plots
                     / f"clustering_results/channel_{self.chan_num + 1}/clusters{i + 3}"
                 )
                 clusters_path.mkdir(parents=True, exist_ok=True)
-        
+
                 np.save(clusters_path / "predictions.npy", predictions)
                 np.save(clusters_path / "bic.npy", bic)
-        
+
                 # Plot the graphs, for this set of clusters, in the directory made for this channel
-                plots_path = self.dir_manager.plots / f"channel_{self.chan_num + 1}/{i + 3}_clusters"
+                plots_path = (
+                    self.dir_manager.plots
+                    / f"channel_{self.chan_num + 1}/{i + 3}_clusters"
+                )
                 plots_path.mkdir(parents=True, exist_ok=True)
 
             # Ignore cm.rainbow type checking because the dynamic __init__.py isn't recognized
@@ -397,7 +350,7 @@ class ProcessChannel:
                                     s=0.8,
                                 )
                             )
-        
+
                         plt.xlabel("Feature %i" % feature1)
                         plt.ylabel("Feature %i" % feature2)
                         # Produce figure legend
@@ -415,7 +368,7 @@ class ProcessChannel:
                             / f"channel_{self.chan_num + 1}/{i + 3}_clusters/feature{feature2}vs{feature1}.png",
                         )
                         plt.close("all")
-        
+
             for ref_cluster in range(i + 3):
                 fig = plt.figure()
                 ref_mean = np.mean(data[np.where(predictions == ref_cluster)], axis=0)
@@ -431,10 +384,12 @@ class ProcessChannel:
                     # Plot histogram of Mahalanobis distances
                     y, binEdges = np.histogram(mahalanobis_dist, bins=25)
                     bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
-                    plt.plot(bincenters, y, label="Dist from hpc_cluster %i" % other_cluster)
+                    plt.plot(
+                        bincenters, y, label="Dist from hpc_cluster %i" % other_cluster
+                    )
                     if other_cluster == ref_cluster:
                         xsave = bincenters
-        
+
                 plt.xlim([0, max(xsave) + 5])
                 plt.xlabel("Mahalanobis distance")
                 plt.ylabel("Frequency")
@@ -448,7 +403,7 @@ class ProcessChannel:
                     / f"channel_{self.chan_num + 1}/{i + 3}_clusters/Mahalonobis_cluster{ref_cluster}.png",
                 )
                 plt.close("all")
-        
+
             # Create file, and plot spike waveforms for the different clusters. Plot 10 times downsampled
             # dejittered/smoothed waveforms. Plot the ISI distribution of each hpc_cluster
             for cluster in range(i + 3):
@@ -457,17 +412,24 @@ class ProcessChannel:
                     / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
                 )
                 clust_path.mkdir(parents=True, exist_ok=True)
-        
+
+            x = np.arange(len(self.data["spikes"][0]) / 10) + 1
             ISIList = []
             for cluster in range(i + 3):
                 cluster_points = np.where(predictions[:] == cluster)[0]
                 fig, ax = plt.subplots()
-                # fig, ax = waveforms_datashader(
-                #     spikes_final[cluster_points, :],
-                #     x,
-                #     self.dir_manager.filename + "_datashader_temp_el" + str(self.chan_num + 1),
-                # )
-                ax.set_xlabel("Sample ({:d} samples per ms)".format(int(self.sampling_rate / 1000)))
+                fig, ax = waveforms_datashader(
+                    self.data["spikes"][cluster_points, :],
+                    x,
+                    self.dir_manager.filename
+                    + "_datashader_temp_el"
+                    + str(self.chan_num + 1),
+                )
+                ax.set_xlabel(
+                    "Sample ({:d} samples per ms)".format(
+                        int(self.sampling_rate / 1000)
+                    )
+                )
                 ax.set_ylabel("Voltage (microvolts)")
                 ax.set_title("Cluster%i" % cluster)
                 fig.savefig(
@@ -475,7 +437,7 @@ class ProcessChannel:
                     / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_waveforms"
                 )
                 plt.close("all")
-        
+
                 fig = plt.figure()
                 cluster_times = times_final[cluster_points]
                 ISIs = np.ediff1d(np.sort(cluster_times))
@@ -501,7 +463,10 @@ class ProcessChannel:
                 plt.title(
                     "2ms ISI violations = %.1f percent (%i/%i)"
                     % (
-                        (float(len(np.where(ISIs < 2.0)[0])) / float(len(cluster_times)))
+                        (
+                            float(len(np.where(ISIs < 2.0)[0]))
+                            / float(len(cluster_times))
+                        )
                         * 100.0,
                         len(np.where(ISIs < 2.0)[0]),
                         len(cluster_times),
@@ -509,7 +474,10 @@ class ProcessChannel:
                     + "\n"
                     + "1ms ISI violations = %.1f percent (%i/%i)"
                     % (
-                        (float(len(np.where(ISIs < 1.0)[0])) / float(len(cluster_times)))
+                        (
+                            float(len(np.where(ISIs < 1.0)[0]))
+                            / float(len(cluster_times))
+                        )
                         * 100.0,
                         len(np.where(ISIs < 1.0)[0]),
                         len(cluster_times),
@@ -523,14 +491,17 @@ class ProcessChannel:
                 ISIList.append(
                     "%.1f"
                     % (
-                        (float(len(np.where(ISIs < 1.0)[0])) / float(len(cluster_times)))
+                        (
+                            float(len(np.where(ISIs < 1.0)[0]))
+                            / float(len(cluster_times))
+                        )
                         * 100.0
                     )
                 )
-        
+
             # Get isolation statistics for each solution
-            Lrats = clust.get_Lratios(data, predictions)
-        
+            Lrats = get_Lratios(data, predictions)
+
             isodf = pd.DataFrame(
                 {
                     "IsoRating": "TBD",
@@ -539,13 +510,18 @@ class ProcessChannel:
                     "Solution": i + 3,
                     "Cluster": range(i + 3),
                     "wf count": [
-                        len(np.where(predictions[:] == cluster)[0]) for cluster in range(i + 3)
+                        len(np.where(predictions[:] == cluster)[0])
+                        for cluster in range(i + 3)
                     ],
                     "ISIs (%)": ISIList,
                     "L-Ratio": [round(Lrats[cl], 3) for cl in range(i + 3)],
                 }
             )
-            cluster_path = self.dir_manager.reports / f"channel_{self.chan_num + 1}" / f"clusters_{i + 3}"
+            cluster_path = (
+                self.dir_manager.reports
+                / f"channel_{self.chan_num + 1}"
+                / f"clusters_{i + 3}"
+            )
             cluster_path.mkdir(parents=True, exist_ok=True)
             isodf.to_csv(
                 cluster_path / "isoinfo.csv",
@@ -553,13 +529,17 @@ class ProcessChannel:
             )
             # output this all in a plot in the plots folder and replace the ISI plot in superplots
             for cluster in range(i + 3):
-                text = "wf count: \n1 ms ISIs: \nL-Ratio: "  # package text to be plotted
+                text = (
+                    "wf count: \n1 ms ISIs: \nL-Ratio: "  # package text to be plotted
+                )
                 text2 = "{}\n{}%\n{}".format(
                     isodf["wf count"][cluster],
                     isodf["ISIs (%)"][cluster],
                     isodf["L-Ratio"][cluster],
                 )
-                blank = np.ones((480, 640, 3), np.uint8) * 255  # initialize empty white image
+                blank = (
+                    np.ones((480, 640, 3), np.uint8) * 255
+                )  # initialize empty white image
 
                 cv2_im_rgb = cv2.cvtColor(
                     blank, cv2.COLOR_BGR2RGB
@@ -576,35 +556,38 @@ class ProcessChannel:
                 draw.multiline_text(
                     (380, 100), text2, fill=(0, 0, 0, 255), spacing=50
                 )  # draw the text
-                isoimg = cv2.cvtColor(
-                    np.array(pil_im), cv2.COLOR_RGB2BGR
-                )
-                cv2.imwrite(
+                isoimg = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
+                temp_filename = str(
                     self.dir_manager.plots
                     / f"channel_{self.chan_num + 1}"
                     / f"clusters_{i + 3}"
-                    / f"cluser_{cluster}_isoimg.png",
+                    / f"cluser_{cluster}_isoimg.png"
+                )
+                cv2.imwrite(
+                    temp_filename,
                     isoimg,
                 )  # save the image
-        with open(self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "success.txt", "w+") as f:
+        with open(
+            self.dir_manager.reports / f"channel_{self.chan_num + 1}" / "success.txt",
+            "w+",
+        ) as f:
             f.write("Congratulations, this channel was sorted successfully")
 
-
     def superplots(self, maxclust):
-        path = (
-            self.dir_manager.plots / f"channel_{self.chan_num + 1}"
-        )
-        outpath = (
-            self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "superplots"
-        )
+        path = self.dir_manager.plots / f"channel_{self.chan_num + 1}"
+        outpath = self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "superplots"
         if outpath.exists():
             shutil.rmtree(outpath)
         outpath.mkdir(parents=True, exist_ok=True)
         for channel in outpath.glob("*"):
             try:
                 currentpath = path + "/" + channel
-                os.mkdir(outpath + "/" + channel)  # create an output path for each channel
-                for soln in range(3, maxclust + 1):  # for each number hpc_cluster solution
+                os.mkdir(
+                    outpath + "/" + channel
+                )  # create an output path for each channel
+                for soln in range(
+                    3, maxclust + 1
+                ):  # for each number hpc_cluster solution
                     finalpath = outpath + "/" + channel + "/" + str(soln) + "_clusters"
                     os.mkdir(finalpath)  # create output folders
                     for cluster in range(0, soln):  # for each hpc_cluster
@@ -639,15 +622,15 @@ class ProcessChannel:
                         if not np.shape(isi)[0:2] == (480, 640):
                             isi = cv2.resize(isi, (640, 480))
                         blank = (
-                                np.ones((240, 640, 3), np.uint8) * 255
+                            np.ones((240, 640, 3), np.uint8) * 255
                         )  # make whitespace for info
                         text = (
-                                "Electrode: "
-                                + channel
-                                + "\nSolution: "
-                                + str(soln)
-                                + "\nCluster: "
-                                + str(cluster)
+                            "Electrode: "
+                            + channel
+                            + "\nSolution: "
+                            + str(soln)
+                            + "\nCluster: "
+                            + str(cluster)
                         )  # text to output to whitespace (hpc_cluster, channel, and solution numbers)
                         cv2_im_rgb = cv2.cvtColor(
                             blank, cv2.COLOR_BGR2RGB
@@ -661,9 +644,7 @@ class ProcessChannel:
                             (170, 40), text, font=font, fill=(0, 0, 0, 255), spacing=10
                         )  # draw the text
 
-                        info = cv2.cvtColor(
-                            np.array(pil_im), cv2.COLOR_RGB2BGR
-                        )
+                        info = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
                         im_v = cv2.vconcat([info, mah, isi])
                         im_all = cv2.hconcat([wf, im_v])
                         cv2.imwrite(
@@ -677,9 +658,7 @@ class ProcessChannel:
                     + str(e)
                 )
 
-
     def compile_isoi(self, maxclust=7, Lrat_cutoff=0.1):
-
         path = self.dir_manager.reports / "clusters"
         file_isoi = pd.DataFrame()
         errorfiles = pd.DataFrame(columns=["channel", "solution", "file"])
@@ -692,9 +671,7 @@ class ProcessChannel:
                             path + "/{}/clusters{}/isoinfo.csv".format(channel, soln)
                         )
                     )
-                except (
-                        Exception
-                ) as e:
+                except Exception as e:
                     print(e)
                     errorfiles = errorfiles.append(
                         [
@@ -716,12 +693,12 @@ class ProcessChannel:
             except:
                 pass
         with pd.ExcelWriter(
-                os.path.split(path)[0] + f"/{os.path.split(path)[-1]}_compiled_isoi.xlsx",
-                engine="xlsxwriter",
+            os.path.split(path)[0] + f"/{os.path.split(path)[-1]}_compiled_isoi.xlsx",
+            engine="xlsxwriter",
         ) as outwrite:
             file_isoi.to_excel(outwrite, sheet_name="iso_data", index=False)
             if (
-                    errorfiles.size == 0
+                errorfiles.size == 0
             ):  # if there are no error csv's add some nans and output to the Excel
                 errorfiles = errorfiles.append(
                     [{"channel": "nan", "solution": "nan", "file": "nan"}]

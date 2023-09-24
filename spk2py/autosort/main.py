@@ -23,7 +23,7 @@ def move_files(files, source, destination):
         logger.info(f"Moved {f} to {destination}")
 
 
-def main(params: spk_config.SpkConfig):
+def main(params: spk_config.SpkConfig, parallel: bool = True):
     if not params:
         params = spk_config.SpkConfig()
     else:
@@ -40,8 +40,8 @@ def main(params: spk_config.SpkConfig):
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
     runpath = Path(params.path["run"])
-    num_cpu = int(params.run["cores-used"])
-    runfiles = []
+    num_cpu = int(params.run["cores-used"]) if parallel else 1
+    runfiles = [f for f in runpath.iterdir() if f.is_file()][:n_files]
     for curr_file in runfiles:  # loop through each file
 
         # Create the necessary directories
@@ -50,7 +50,8 @@ def main(params: spk_config.SpkConfig):
         dir_manager.create_base_directories()
 
         h5file = read_h5(curr_file)
-        num_chan = len(h5file.keys())
+        unit_data = h5file["unit"]
+        num_chan = len(unit_data)
         dir_manager.create_channel_directories(num_chan)
 
         runs = math.ceil(num_chan / num_cpu)
@@ -63,19 +64,27 @@ def main(params: spk_config.SpkConfig):
             if chan_end > num_chan:
                 chan_end = num_chan
 
-            processes = []
-            for i in range(chan_start, chan_end):
-                this_chan = h5file[list(h5file.keys())[i]]
-                dir_manager.idx = i
-                p = multiprocessing.Process(
-                    target=run_spk_process, args=(this_chan, dir_manager, i, params)
-                )
-                p.start()
-                processes.append(p)
-            for p in processes:
-                p.join()
+            if parallel:
+                processes = []
+                for i in range(chan_start, chan_end):
+                    chan_name = [list(h5file['unit'].keys())[i]][0]
+                    chan_data = h5file['unit'][chan_name]
+                    dir_manager.idx = i
+                    p = multiprocessing.Process(
+                        target=run_spk_process, args=(curr_file, chan_data, params, dir_manager, i)
+                    )
+                    p.start()
+                    processes.append(p)
+                for p in processes:
+                    p.join()
+            else:
+                for i in range(chan_start, chan_end):
+                    chan_name = [list(h5file['unit'].keys())[i]][0]
+                    chan_data = h5file['unit'][chan_name]
+                    dir_manager.idx = i
+                    run_spk_process(curr_file, chan_data, params, dir_manager, i)
 
 if __name__ == "__main__":
     main_params = spk_config.SpkConfig()
-    main_params.set("path_configs", "run", Path.home() / "data" / "combined")
-    main(main_params)
+    main_params.set("path", "run", Path.home() / "data" / "combined")
+    main(main_params, parallel=False)

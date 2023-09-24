@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import math
 from collections import namedtuple
 from pathlib import Path
 
@@ -9,8 +8,8 @@ import h5py
 import numpy as np
 from sonpy import lib as sp
 
-from .cluster import extract_waveforms, filter_signal, dejitter
-from .spk_logging.logger_config import configure_logger
+from spk2py.cluster import extract_waveforms, filter_signal
+from spk2py.spk_logging.logger_config import configure_logger
 
 logfile = Path().home() / "data" / "spike_data.log"
 logger = configure_logger(__name__, logfile, level=logging.DEBUG)
@@ -39,6 +38,10 @@ def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
         for key, value in spike_data.metadata.items():
             metadata_grp.attrs[key] = value
 
+        sampling_rate_group = f.create_group("sampling_rates")
+        for channel, sample_rate in spike_data.sampling_rates.items():
+            sampling_rate_group.attrs[channel] = sample_rate
+
         unit_grp = f.create_group("unit")
         for channel, unit_data in spike_data.unit.items():
             channel_grp = unit_grp.create_group(channel)
@@ -49,10 +52,13 @@ def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
 
 # Function to load a SpikeData instance from a h5 file
 def load_spike_data_from_h5(filename):
-    spike_data = {"metadata": {}, "unit": {}}
+    spike_data = {"metadata": {}, 'sampling_rates': {}, "unit": {}}
     with h5py.File(filename, "r") as f:
         for key, value in f["metadata"].attrs.items():
             spike_data["metadata"][key] = value
+
+        for key, value in f["sampling_rates"].attrs.items():
+            spike_data["sampling_rates"][key] = value
 
         for channel in f["unit"].keys():
             spikes = np.array(f["unit"][channel]["spikes"])
@@ -77,7 +83,7 @@ def merge_spike_data(spike_data1, spike_data2):
     return merged_spike_data
 
 def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
-    merged_spike_data = {'metadata': spike_data_dict1['metadata'], 'unit': {}}
+    merged_spike_data = {'metadata': spike_data_dict1['metadata'],'sampling_rates': spike_data_dict1['sampling_rates'], 'unit': {}}
 
     # find which spikedata has preinfusion data
     if spike_data_dict1['metadata']['infusion'] == 'pre':
@@ -116,25 +122,6 @@ def save_merged_spike_data_to_h5(merged_spike_data: dict, filename: str | Path):
 
 class SpikeData:
 
-    @classmethod
-    def merge(cls, instance_1, instance_2, filename):
-        if not cls.validate_same_metadata(instance_1.metadata, instance_2.metadata):
-            raise ValueError("Metadata mismatch.")
-    
-        merged = cls(filename)
-        merged.metadata = instance_1.metadata
-    
-        # Merge unit data
-        for title in instance_1.unit.keys():
-            merged.unit[title].spikes = np.concatenate(
-                [instance_1.unit[title].spikes, instance_2.unit[title].spikes]
-            )
-            merged.unit[title].times = np.concatenate(
-                [instance_1.unit[title].times, instance_2.unit[title].times]
-            )
-    
-        return merged
-    
     @staticmethod
     def validate_same_metadata(meta1, meta2):
         for key in meta1:
@@ -207,6 +194,7 @@ class SpikeData:
         self.sonfile = sp.SonFile(str(self.filename), True)
         self.bitrate = 32 if self.sonfile.is32file() else 64
         self.unit = {}
+        self.sampling_rates = {}
         self.metadata = self.bundle_metadata()
         self.process_units()
         self._validate()
@@ -272,6 +260,7 @@ class SpikeData:
                 sampling_rate = np.round(
                     1 / (self.sonfile.ChannelDivide(idx) * self.time_base), 2
                 )
+                self.sampling_rates[title] = sampling_rate
 
                 # Extract and filter waveforms for this chunk
                 waveforms = self.sonfile.ReadFloats(idx, int(2e9), 0)
@@ -392,7 +381,8 @@ if __name__ == "__main__":
     path_combined = Path().home() / "data" / "combined"
     path_combined.mkdir(exist_ok=True, parents=True)
     files = [f for f in path_test.glob("*.h5")]
-    # load the h5
+
+    # # load the h5
     data = []
     for file in files:
         data.append(load_spike_data_from_h5(file))
@@ -410,5 +400,4 @@ if __name__ == "__main__":
     #         ("Respirat", "RefBrain", "Sniff"),
     #     )
     #     save_spike_data_to_h5(data, file.with_suffix(".h5"))
-    #     data.save_data(path_test, overwrite=True)
     x = 5

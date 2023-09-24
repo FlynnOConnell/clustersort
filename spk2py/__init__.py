@@ -1,4 +1,5 @@
 # from autosort import *
 from . import spike_data
+from .cluster import *
 
-# __all__ = ["autosort"]
+__all__ = ["scale_waveforms", "clusterGMM", "get_Lratios"]
