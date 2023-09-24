@@ -10,9 +10,6 @@ sys.path.insert(0, str(repo))
 # Minimum version, enforced by sphinx
 needs_sphinx = '4.3'
 
-# This is a nasty hack to use platform-agnostic names for types in the
-# documentation.
-
 # must be kept alive to hold the patched names
 _name_cache = {}
 
@@ -29,11 +26,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'numpydoc',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.autosummary',
-    'sphinx.ext.graphviz',
-    'sphinx.ext.ifconfig',
     'matplotlib.sphinxext.plot_directive',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
@@ -59,9 +53,6 @@ source_suffix = '.rst'
 
 # General substitutions.
 project = 'spk2py'
-
-# The default replacements for |version| and |release|, also used in various
-# other places throughout the built documents.
 
 
 # There are two options for replacing |today|: either, you set today to some
@@ -139,12 +130,6 @@ plot_html_show_source_link = False
 # -----------------------------------------------------------------------------
 # LaTeX output
 # -----------------------------------------------------------------------------
-
-# The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
-
-# The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
 
 # XeLaTeX for better support of unicode characters
 latex_engine = 'xelatex'
