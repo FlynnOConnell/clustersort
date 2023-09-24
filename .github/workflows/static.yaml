@@ -32,7 +32,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           touch doc/build/.nojekyll
-          git add doc/build/
+          git add -f doc/build/  # Notice the -f here
           git commit -m "Add changes" || echo "No changes to commit"
       - name: Upload artifact
         uses: actions/upload-artifact@v2
