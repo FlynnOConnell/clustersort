@@ -1,6 +1,6 @@
-===========================
+=================================
 Welcome to spk2py's Documentation
-===========================
+=================================
 
 .. note::
    This project, spk2py, aims to provide a Python-based framework for processing and analyzing electrophysiological spike data. It includes capabilities for reading HDF5 files, parallel processing, and configurable runs through an external configuration setup.
@@ -23,57 +23,29 @@ Overview
 Core Modules
 ============
 
+
 Auto Sort
 ---------
-.. automodule:: spk2py.autosort.autosort
+
+.. automodule:: spk2py
    :members:
 
-.. automodule:: spk2py.autosort.autosort_post
+
+Auto Sort
+---------
+.. automodule:: spk2py.autosort
    :members:
 
-.. automodule:: spk2py.autosort.directory_manager
-   :members:
-
-.. automodule:: spk2py.autosort.main
-   :members:
-
-.. automodule:: spk2py.autosort.spk_config
-   :members:
-
-Cluster
--------
-.. automodule:: spk2py.cluster
-   :members:
-
-Merge
------
-.. automodule:: merge
-   :members:
-
-Spike Data
-----------
-.. automodule:: spike_data
-   :members:
-
-I/O Operations
---------------
-.. automodule:: spk_io
-   :members:
 
 Logging
 -------
-.. automodule:: spk_logging.logger_config
+.. automodule:: spk2py.spk_logging
    :members:
+
 
 Tests
------
-.. automodule:: tests.merge
-   :members:
-
-.. automodule:: tests.signal
-   :members:
-
-.. automodule:: tests.sort
+-------
+.. automodule:: spk2py.tests
    :members:
 
 

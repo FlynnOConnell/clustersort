@@ -19,7 +19,7 @@ from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
-from directory_manager import DirectoryManager
+from spk2py.autosort.directory_manager import DirectoryManager
 from spk2py.autosort.utils.wf_shader import waveforms_datashader
 from spk2py.cluster import clusterGMM, get_Lratios, scale_waveforms, implement_pca
 
