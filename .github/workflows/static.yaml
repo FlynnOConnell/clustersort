@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
       - name: Install dependencies
-        run: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design sphinx_rtd_theme
+        run: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design sphinx_rtd_theme IPython
       - name: Sphinx build
         run: sphinx-build -b html doc/source doc/build
       - name: Commit files
