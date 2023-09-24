@@ -1,20 +1,65 @@
-.. spk2py documentation master file, created by
-   sphinx-quickstart on Thu Sep 21 17:21:47 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+===========================
+Welcome to spk2py's Documentation
+===========================
 
-Welcome to spk2py's documentation!
-==================================
+.. note::
+   This project, spk2py, aims to provide a Python-based framework for processing and analyzing electrophysiological spike data. It includes capabilities for reading HDF5 files, parallel processing, and configurable runs through an external configuration setup.
+
+Overview
+========
+
+* Introduction
+* Features
+* Installation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started
+   :name: gettingstarted
 
+   install
 
+Core Modules
+============
 
-Indices and tables
+Spike Data Management
+----------------------
+.. automodule:: spk2py.spike_data
+   :members:
+
+File Handling
+----------------------
+.. automodule:: spk2py.file_handling
+   :members:
+
+Configuration
+----------------------
+.. automodule:: spk2py.config
+   :members:
+
+Parallel Processing
+----------------------
+.. automodule:: spk2py.parallel
+   :members:
+
+Technical Explanation
+=====================
+
+* Spike Waveform Samples
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Technical Explanation
+   :name: technical
+
+   spike_waveform_samples_explanation
+
+Indices and Tables
 ==================
 
-* :ref:`install`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+   :caption: Additional Resources
+
+   modindex
+   search
