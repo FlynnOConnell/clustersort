@@ -2,6 +2,10 @@ import os
 import re
 import sys
 import importlib
+from pathlib import Path
+
+repo = Path().home() / 'repos' / "spk2py"
+sys.path.insert(0, str(repo))
 
 # Minimum version, enforced by sphinx
 needs_sphinx = '4.3'

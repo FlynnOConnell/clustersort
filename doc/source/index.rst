@@ -19,28 +19,63 @@ Overview
 
    install
 
+
 Core Modules
 ============
 
-Spike Data Management
-----------------------
-.. automodule:: spk2py.spike_data
+Auto Sort
+---------
+.. automodule:: autosort.autosort
    :members:
 
-File Handling
-----------------------
-.. automodule:: spk2py.file_handling
+.. automodule:: autosort.autosort_post
    :members:
 
-Configuration
-----------------------
-.. automodule:: spk2py.config
+.. automodule:: autosort.directory_manager
    :members:
 
-Parallel Processing
-----------------------
-.. automodule:: spk2py.parallel
+.. automodule:: autosort.main
    :members:
+
+.. automodule:: autosort.spk_config
+   :members:
+
+Cluster
+-------
+.. automodule:: cluster
+   :members:
+
+Merge
+-----
+.. automodule:: merge
+   :members:
+
+Spike Data
+----------
+.. automodule:: spike_data
+   :members:
+
+I/O Operations
+--------------
+.. automodule:: spk_io
+   :members:
+
+Logging
+-------
+.. automodule:: spk_logging.logger_config
+   :members:
+
+Tests
+-----
+.. automodule:: tests.merge
+   :members:
+
+.. automodule:: tests.signal
+   :members:
+
+.. automodule:: tests.sort
+   :members:
+
 
 Technical Explanation
 =====================
