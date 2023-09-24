@@ -56,8 +56,6 @@ def save_to_h5(filename, data):
 
     logger.debug(f"Saved data successfully to {filename}")
 
-
-
 def get_files(filepath: Path | str) -> tuple[SpikeData, ...]:
     """
         Retrieve SpikeData objects for all `.smr` files in the specified directory.
@@ -77,7 +75,6 @@ def get_files(filepath: Path | str) -> tuple[SpikeData, ...]:
             f"Less than two files found in {filepath}"
         )
     return tuple(SpikeData(f) for f in file_list)
-
 
 def concatenate_spike_data(file_1: str | Path, file_2: str | Path):
     file_1 = Path(file_1)
@@ -115,7 +112,6 @@ def concatenate_spike_data(file_1: str | Path, file_2: str | Path):
         logger.error(f"Failed to save combined file: {e}")
 
     return combined_file
-
 
 def validate_same_metadata(data1: dict, data2: dict):
     for key in data1['metadata']:

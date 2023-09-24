@@ -10,6 +10,16 @@ Subpackages
    spk2py.autosort
    spk2py.spk_logging
 
+Modules
+=======
+
+.. autosummary::
+   :toctree: modules
+
+   foobar.foo
+   foobar.bar
+   foobar.bar.baz
+
 Submodules
 ----------
 

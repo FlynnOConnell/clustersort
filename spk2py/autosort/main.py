@@ -24,6 +24,19 @@ def move_files(files, source, destination):
 
 
 def main(params: spk_config.SpkConfig, parallel: bool = True):
+    """
+    Entry point for the autosort package.
+    Optionally include a SpkConfig object to override the default parameters.
+
+    Parameters
+    ----------
+    params
+    parallel
+
+    Returns
+    -------
+    None
+    """
     if not params:
         params = spk_config.SpkConfig()
     else:
