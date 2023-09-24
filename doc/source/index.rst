@@ -25,24 +25,24 @@ Core Modules
 
 Auto Sort
 ---------
-.. automodule:: autosort.autosort
+.. automodule:: spk2py.autosort.autosort
    :members:
 
-.. automodule:: autosort.autosort_post
+.. automodule:: spk2py.autosort.autosort_post
    :members:
 
-.. automodule:: autosort.directory_manager
+.. automodule:: spk2py.autosort.directory_manager
    :members:
 
-.. automodule:: autosort.main
+.. automodule:: spk2py.autosort.main
    :members:
 
-.. automodule:: autosort.spk_config
+.. automodule:: spk2py.autosort.spk_config
    :members:
 
 Cluster
 -------
-.. automodule:: cluster
+.. automodule:: spk2py.cluster
    :members:
 
 Merge
