@@ -1,5 +1,10 @@
 """
-file: spk2py/spike_data.py - Functions and class for handling Spike2 electrophysiological data.
+=========
+SpikeData
+=========
+
+.. currentmodule:: spk2py
+
 """
 from __future__ import annotations
 
@@ -22,20 +27,24 @@ UnitData = namedtuple("UnitData", ["spikes", "times"])
 
 def get_base_filename(name_data: SpikeData | dict, ) -> str:
     """
-        Extract the base filename from a SpikeData object.
-
-        Removes the `_preinfusion` and `_postinfusion` suffixes from the filename stem.
-
-        Args:
-            name_data (SpikeData | dict): SpikeData object or dict containing the filename metadata.
-
-        Returns:
-            str: Base filename without the infusion-related suffixes.
+    Extract the base filename from a SpikeData object.
     """
     return name_data['metadata']['filename'].replace("_preinfusion", "").replace("_postinfusion", "")
 
 
 def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
+    """
+    Save data to h5 file.
+
+    Parameters
+    ----------
+    spike_data
+    filename
+
+    Returns
+    -------
+    None
+    """
     with h5py.File(filename, "w") as f:
         metadata_grp = f.create_group("metadata")
         for key, value in spike_data.metadata.items():
@@ -54,7 +63,10 @@ def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
 
 
 # Function to load a SpikeData instance from a h5 file
-def load_spike_data_from_h5(filename):
+def load_spike_data_from_h5(filename: str | Path):
+    """
+    Load data from h5.
+    """
     spike_data = {"metadata": {}, 'sampling_rates': {}, "unit": {}}
     with h5py.File(filename, "r") as f:
         for key, value in f["metadata"].attrs.items():
@@ -72,6 +84,10 @@ def load_spike_data_from_h5(filename):
 
 # Function to merge two SpikeData instances
 def merge_spike_data(spike_data1, spike_data2):
+    """
+    Merge spike data.
+
+    """
     merged_spike_data = {"metadata": spike_data1["metadata"], "unit": {}}
 
     # Merge unit data
@@ -86,6 +102,10 @@ def merge_spike_data(spike_data1, spike_data2):
     return merged_spike_data
 
 def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
+    """
+    Merge data from dicts.
+
+    """
     merged_spike_data = {'metadata': spike_data_dict1['metadata'],'sampling_rates': spike_data_dict1['sampling_rates'], 'unit': {}}
 
     # find which spikedata has preinfusion data
@@ -111,6 +131,10 @@ def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
     return merged_spike_data
 
 def save_merged_spike_data_to_h5(merged_spike_data: dict, filename: str | Path):
+    """
+    Save to h5 merge.
+
+    """
     with h5py.File(filename, "w") as f:
         metadata_grp = f.create_group("metadata")
         for key, value in merged_spike_data['metadata'].items():
@@ -132,21 +156,11 @@ class SpikeData:
     - A list, where the elements are the channel names.
     - A boolean, where True means the file is empty and False means it is not.
     - A string, where the string is the filename stem.
+
     """
 
     @staticmethod
-    def validate_same_metadata(meta1, meta2):
-        """
-        Check if two metadata dictionaries are the same.
-
-        Parameters:
-        -----------
-        meta1 : dict
-            The first metadata dictionary.
-        meta2 : dict
-            The second metadata dictionary.
-        """
-
+    def __validate_same_metadata__(meta1, meta2):
         for key in meta1:
             if key not in ["filename", "infusion", "max_time", "recording_length"]:
                 if meta1[key] != meta2[key]:
@@ -160,6 +174,9 @@ class SpikeData:
     ):
         """
         Class for reading and storing data from a Spike2 file.
+
+        .. versionchanged:: 1.16.0
+        Non-scalar `start` and `stop` are now supported.
 
         Parameters:
         -----------
@@ -198,6 +215,7 @@ class SpikeData:
             Whether the file is 32bit (old) or 64bit (new).
         recording_length : float
             The total recording length, in seconds.
+
         """
         self._bandpass_low = 300
         self._bandpass_high = 3000
@@ -244,10 +262,6 @@ class SpikeData:
     def preinfusion(self):
         """
         Check if the filename contains the pre-infusion suffix.
-
-        Returns:
-        --------
-            bool: True if the filename contains the pre-infusion suffix, False otherwise.
         """
         return "pre" in self.filename.stem
 
@@ -255,10 +269,6 @@ class SpikeData:
     def postinfusion(self):
         """
         Check if the filename contains the post-infusion suffix.
-
-        Returns
-        -------
-            bool: True if the filename contains the post-infusion suffix, False otherwise.
         """
         return "post" in self.filename.stem
 
@@ -266,10 +276,6 @@ class SpikeData:
     def process_units(self,):
         """
         Extracts unit data from the Spike2 file.
-
-        Returns:
-        --------
-            None
         """
         logger.debug(f"Extracting ADC channels from {self.filename.stem}")
 
@@ -318,17 +324,9 @@ class SpikeData:
 
     def channel_interval(self, channel: int):
         """
-        Get the waveform sample interval, in clock ticks. Used by channels that sample
-        equal interval waveforms and = the number of file clock ticks per second.
+        Get the waveform sample interval, in clock ticks.
+        Used by channels that sample equal interval waveforms and equal to the number of file clock ticks per second.
 
-        Parameters:
-        -----------
-        channel : int
-            The channel number.
-
-        Returns:
-        --------
-            int: The waveform sample interval, in clock ticks.
         """
         return self.sonfile.ChannelDivide(channel)
 
@@ -338,11 +336,14 @@ class SpikeData:
 
         Parameters
         ----------
-        channel
+        channel : int
+            The channel number.
 
         Returns
         -------
-        float: The waveform sample interval, in seconds.
+        sample : float
+            The waveform sample interval, in seconds.
+
         """
         return self.channel_interval(channel) / self.time_base
 
@@ -352,11 +353,14 @@ class SpikeData:
 
         Parameters
         ----------
-        channel
+        channel : int
+            The channel number.
 
         Returns
         -------
-        int: The number of clock ticks in the channel.
+        ticks : float
+            The number of clock ticks.
+
         """
         return self.recording_length / self.channel_sample_period(channel)
 
@@ -366,11 +370,14 @@ class SpikeData:
 
         Parameters
         ----------
-        channel
+        channel : int
+            The channel number.
 
         Returns
         -------
-        int: The last time-point in the array, in ticks.
+        last_time : float
+            The last time point, in ticks.
+
         """
         return self.sonfile.ChannelMaxTime(channel)
 
@@ -378,13 +385,6 @@ class SpikeData:
         """
         Get the last time-point in the channel-array, in seconds.
 
-        Parameters
-        ----------
-        channel
-
-        Returns
-        -------
-        float: The last time-point in the channel-array, in seconds.
         """
         return self.channel_max_ticks(channel) * self.time_base
 
@@ -409,9 +409,6 @@ class SpikeData:
         """
         The total number of clock ticks in the file.
 
-        Returns
-        -------
-            int: The total number of clock ticks in the file.
         """
         return self.sonfile.MaxTime()
 
@@ -420,9 +417,6 @@ class SpikeData:
         """
         The number of channels in the file.
 
-        Returns
-        -------
-            int: The number of channels in the file.
         """
         return self.sonfile.MaxChannels()
 
@@ -431,9 +425,6 @@ class SpikeData:
         """
         The total recording length, in seconds.
 
-        Returns
-        -------
-            float: The total recording length, in seconds.
         """
         return self.max_ticks * self.time_base
 
@@ -441,10 +432,6 @@ class SpikeData:
     def bandpass_low(self):
         """
         The lower bound of the bandpass filter.
-
-        Returns
-        -------
-            int: The lower bound of the bandpass filter.
         """
         return self._bandpass_low
 
@@ -455,7 +442,7 @@ class SpikeData:
 
         Parameters
         ----------
-        value: int
+        value : int
             The lower bound of the bandpass filter.
 
         Returns
@@ -471,7 +458,7 @@ class SpikeData:
 
         Returns
         -------
-            int: The upper bound of the bandpass filter.
+            int : The upper bound of the bandpass filter.
 
         """
         return self._bandpass_high
@@ -488,7 +475,7 @@ class SpikeData:
 
         Returns
         -------
-            None
+        None
         """
         self._bandpass_high = value
 
@@ -498,7 +485,9 @@ class SpikeData:
 
         Returns
         -------
-            dict: A dictionary containing the metadata.
+        metadata : dict
+            A dictionary containing the metadata.
+
         """
         return {
             "bandpass": [self.bandpass_low, self.bandpass_high],
