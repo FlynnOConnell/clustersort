@@ -28,6 +28,7 @@ jobs:
           paths: html
 
   docs-deploy:
+    <<: *defaults
     steps:
       - checkout
       - attach_workspace:
