@@ -1,11 +1,8 @@
-===============
-Getting started
-===============
-
+============
 Installation
 ============
 
-This extension requires Python 3.9+, and numpy <= 1.3.5 to comply with numba restrictions.
+This pipeline requires Python 3.9+, and numpy <= 1.3.5 to comply with numba restrictions.
 
 * `spk2py on GitHub <https://github.com/FlynnOConnell/spk2py/>`_
 
@@ -13,9 +10,6 @@ It is recommended to install using `mambaforge <https://mamba.readthedocs.io/en/
 
 Mamba Installation
 ==================
-
-Fresh install (recommended)
-***************************
 
 We recommend that you start with the `Mambaforge distribution <https://github.com/conda-forge/miniforge#mambaforge>`_.
 Mambaforge comes with the popular ``conda-forge`` channel preconfigured, but you can modify the configuration to use any channel you like.
