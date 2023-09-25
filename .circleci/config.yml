@@ -51,14 +51,14 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: |
-            git fetch origin
-            git branch -f gh-pages origin/gh-pages || git checkout --orphan gh-pages 
-            git reset
-            git clean -fdx
-            rsync -a doc/build/html/ .
-            git add .
-            git commit -m "[skip ci] Updates"
-            git push --force origin gh-pages
+            ls -la
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages 
+            git rm -rf * 
+            rsync -av doc/build/html/ . 
+            git add . 
+            git commit -m "[skip ci] Updates" 
+            git push origin gh-pages
 
 workflows:
   version: 2
