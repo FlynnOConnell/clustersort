@@ -25,7 +25,7 @@ logger = configure_logger(__name__, logfile, level=logging.DEBUG)
 UnitData = namedtuple("UnitData", ["spikes", "times"])
 
 
-def get_base_filename(name_data: SpikeData | dict, ) -> str:
+def __get_base_filename__(name_data: SpikeData | dict, ) -> str:
     """
     Extract the base filename from a SpikeData object.
     """
@@ -476,6 +476,7 @@ class SpikeData:
         Returns
         -------
         None
+
         """
         self._bandpass_high = value
 
@@ -514,7 +515,7 @@ if __name__ == "__main__":
     merged_data = merge_spike_data_from_dicts(data[0], data[1])
 
     # save the merged data
-    basename = get_base_filename(merged_data)
+    basename = __get_base_filename__(merged_data)
     filename = path_combined / (basename + ".h5")
     save_merged_spike_data_to_h5(merged_data, filename)
     # for file in files:

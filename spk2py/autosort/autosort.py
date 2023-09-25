@@ -23,8 +23,8 @@ from scipy.spatial.distance import mahalanobis
 
 from spk2py.autosort.wf_shader import waveforms_datashader
 from spk2py.cluster import cluster_gmm, get_lratios, scale_waveforms, implement_pca
-from spk2py.autosort.spk_config import SpkConfig
 from spk2py.autosort.directory_manager import DirectoryManager
+from spk2py.autosort.spk_config import SpkConfig
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"
@@ -187,16 +187,20 @@ class ProcessChannel:
 
         Parameters
         ----------
-        filename
-        data
-        params
-        dir_manager
-        chan_num
+        filename : str
+            Name of the file to be processed.
+        data : ndarray
+            Raw data array.
+        params : SpkConfig
+            SpkConfig instance of processing parameters.
+        dir_manager : DirectoryManager
+            Directory manager object.
+        chan_num : int
+            Channel number to be processed.
 
         """
         self.filename = filename
         self.data = data
-        # self.metadata = metadata
         self.params = params
         self.sampling_rate = 18518.52  # TODO: Get this from metadata
         self.chan_num = chan_num
