@@ -37,11 +37,13 @@ jobs:
           name: Install Node.js and npm
           command: |
             sudo apt-get update
-            sudo apt-get install -y nodejs npm
+            sudo apt-get install -y curl
+            curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+            sudo apt-get install -y nodejs
       - run:
           name: Install and configure dependencies
           command: |
-            npm install -g gh-pages 
+            sudo npm install -g gh-pages 
             git config --global user.email "FlynnOConnell@gmail.com"
             git config --global user.name "Flynn OConnell"
       - run:
