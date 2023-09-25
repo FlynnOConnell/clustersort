@@ -35,6 +35,9 @@ jobs:
       - attach_workspace:
           at: doc/build
       - run:
+          name: Install system deps
+          command: sudo apt-get update && sudo apt-get install -y rsync
+      - run:
           name: Configure git
           command: |
             git config --global user.email "FlynnOConnell@gmail.com"
