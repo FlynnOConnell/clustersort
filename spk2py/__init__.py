@@ -1,4 +1,3 @@
-# from autosort import *
 from . import spike_data
 from .cluster import *
 

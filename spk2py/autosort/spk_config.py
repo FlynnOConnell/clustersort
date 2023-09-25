@@ -1,3 +1,8 @@
+"""
+Configurations managed by the SpkConfig class for the AutoSort pipeline.
+
+See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
+"""
 from __future__ import annotations
 
 import configparser
@@ -7,64 +12,48 @@ from pathlib import Path
 class SpkConfig:
     def __init__(self, cfg_path: Path | str = ""):
         """
-        SpkConfig manages configurations for the AutoSort pipeline.
+        Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
 
         This class reads from an INI-style configuration file and provides methods
         to access the configurations for different sections. These sections include
-        'run_configs', 'path_configs', 'cluster_configs', etc.
-
-        Due to the nature of INI files, all values are stored as strings. It is up to the user
-        to convert the values to the appropriate type.
+        'run', 'path', 'cluster', and so on.
 
         Parameters
         ----------
-        cfg_path : str or Path
-            The path to the configuration file.
+        cfg_path : str or Path, optional
+            The path to the configuration file. Defaults to a pre-defined location.
 
         Notes
-        ----------
+        -----
         The configuration file is an INI-style file with the following sections:
-        run : dict
+
+        - run : dict
             Contains configurations related to runtime settings like 'resort-limit', 'cores-used'.
-        path : dict
+        - path : dict
             Contains path settings like directories for 'run', 'results'.
-        cluster : dict
+        - cluster : dict
             Contains clustering parameters like 'max-clusters', 'max-iterations'.
-        breach : dict
+        - breach : dict
             Contains breach analysis parameters like 'disconnect-voltage', 'max-breach-rate'.
-        filter : dict
+        - filter : dict
             Contains filter parameters like 'low-cutoff', 'high-cutoff'.
-        spike : dict
+        - spike : dict
             Contains spike-related settings like 'pre-time', 'post-time'.
 
-        Methods
-        -------
-        get_section(section: str)
-            Returns a dictionary containing key-value pairs for the given section.
-        get_all()
-            Returns a dictionary containing all key-value pairs from all sections.
+        .. note::
+           Due to the nature of INI files, all values are stored as strings. It is up to the user
+           to convert the values to the appropriate type.
 
         Examples
         --------
         >>> cfg = SpkConfig()
-
         >>> run = cfg.run
-        >>> type(run)
-        >>> print(run)
-        <class 'dict'>
-        {'resort-limit': '3', 'cores-used': '8', ...}
-        >>> type(run['resort_limit'])
-        <class 'str'>
-        .. note:: All values are stored as strings. It is up to the user to convert the values to the appropriate type.
-        >>> # set a config programmatically
+        >>> print(type(run), run)
+        <class 'dict'> {'resort-limit': '3', 'cores-used': '8', ...}
+
         >>> cfg.set('run', 'resort-limit', 5)
         >>> print(cfg.run['resort-limit'])
         '5'
-
-        >>> # get all parameters
-        >>> all_params = cfg.main_params
-        >>> print(all_params['resort-limit'])
-        '3'
         """
         if not cfg_path:
             self.cfg_path = Path().home() / "autosort" / "autosort_config.ini"
@@ -76,9 +65,32 @@ class SpkConfig:
         self._validate_config()
 
     def get_section(self, section: str):
+        """
+            Returns a dictionary containing key-value pairs for the given section.
+
+            Parameters
+            ----------
+            section : str
+                The name of the section in the config file.
+
+            Returns
+            -------
+            dict
+                Dictionary containing the section's key-value pairs.
+            """
         return dict(self.config[section])
 
     def set(self, section, key, value):
+        """
+        
+        Args:
+            section:
+            key:
+            value:
+
+        Returns:
+
+        """
         if section not in self.config:
             self.config.add_section(section)
         self.config.set(section, key, str(value))
@@ -206,7 +218,8 @@ class SpkConfig:
 
     def _validate_config(self):
         assert(self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
-        assert(self.run["run-type"] in ["Auto", "Manual"]), f"Run type {self.run['run-type']} is not valid. Options are 'Auto' or 'Manual'"
+        assert(self.run["run-type"] in ["Auto", "Manual"]), (f"Run type {self.run['run-type']} is not valid. Options "
+                                                             f"are 'Auto' or 'Manual'")
 
 if __name__ == '__main__':
     test_cfg = SpkConfig()
