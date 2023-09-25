@@ -21,18 +21,16 @@ Overview
 
    install
 
-Core Modules
-============
+
+Configuration
+=============
 
 .. toctree::
    :maxdepth: 2
-   :caption: Core Modules
-   :name: core
+   :caption: Configuration Guide
+   :name: configuration
 
-
-   spk2py
-   spk2py.autosort
-   spk2py.spk_logging
+   configuration_guide
 
 Technical Explanation
 =====================
