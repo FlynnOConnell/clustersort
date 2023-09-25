@@ -25,16 +25,16 @@ jobs:
             make html
 
       - persist_to_workspace:
-          root: /doc/build
+          root: ~/repo
           paths:
-            - html
+            - doc/build/html
 
   docs-deploy:
     <<: *defaults
     steps:
       - checkout
       - attach_workspace:
-          at: /doc/build
+          at: ~/repo
       - run:
           name: Install system deps
           command: sudo apt-get update && sudo apt-get install -y rsync
@@ -55,8 +55,7 @@ jobs:
             ls -la
             git fetch origin gh-pages:gh-pages 
             git checkout gh-pages 
-            git rm -rf * 
-            rsync -av /workspace/html/ . 
+            rsync -av ~/repo/doc/build/html/ . 
             git add . 
             git commit -m "[skip ci] Updates" 
             git push origin gh-pages
