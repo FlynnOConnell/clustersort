@@ -48,15 +48,8 @@ API Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Documentation
+   :caption: API
    :name: api
 
-   api/spike_data
+   spike_data
 
-
-Indices and Tables
-==================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Additional Resources
