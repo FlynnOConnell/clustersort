@@ -19,11 +19,11 @@ jobs:
       - run:
           name: Build docs
           command: |
-            sphinx-build -b html doc/source doc/build/
+              sphinx-build -b html doc/source doc/build/
       - persist_to_workspace:
-        root: .
-        paths:
-          - doc/build
+          root: .
+          paths:
+              - doc/build
 
   deploy:
     <<: *defaults
