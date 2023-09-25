@@ -34,6 +34,8 @@ jobs:
       - run:
           name: Deploy to GitHub Pages
           command: |
+            pwd
+            ls -la
             git config --global user.email "FlynnOConnell@gmail.com"
             git config --global user.name "Flynn OConnell"
             git clone --branch gh-pages https://github.com/flynnoconnell/spk2py.git gh-pages
