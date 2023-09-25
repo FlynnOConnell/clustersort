@@ -24,12 +24,22 @@ jobs:
       - name: Install dependencies
         run: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design sphinx_rtd_theme IPython
 
+      - name: Show environment info
+        run: |
+          python --version
+          pip freeze
+
+      - name: Clear Sphinx build cache
+        run: rm -rf doc/build
+
       - name: Build documentation
         run: sphinx-build -b html doc/source doc/build
+
+      - name: Disable Jekyll
+        run: touch doc/build/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc/build
-
