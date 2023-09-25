@@ -19,11 +19,11 @@ jobs:
       - run:
           name: Build docs
           command: |
-            pwd  # Print the current working directory
-            sphinx-build -b html doc/source doc/build
-            ls -la doc/build  # Show files here to check
-      - store_artifacts:
-          path: doc/build/html
+            sphinx-build -b html doc/source doc/build/
+      - persist_to_workspace:
+        root: .
+        paths:
+          - doc/build
 
   deploy:
     <<: *defaults
@@ -37,7 +37,7 @@ jobs:
             git config --global user.email "FlynnOConnell@gmail.com"
             git config --global user.name "Flynn OConnell"
             git clone --branch gh-pages https://github.com/flynnoconnell/spk2py.git gh-pages
-            cp -a ~/repo/doc/build/html/* gh-pages
+            cp -a ~/repo/doc/build/* gh-pages
             cd gh-pages
             touch .nojekyll
             git add -A
