@@ -28,16 +28,13 @@ jobs:
           paths: html
 
   docs-deploy:
-    docker:
-        - image: cimg/node:16.20
     steps:
       - checkout
       - attach_workspace:
           at: doc/build
       - run:
-          name: Install and configure dependencies
+          name: Configure git
           command: |
-            sudo npm install -g gh-pages 
             git config --global user.email "FlynnOConnell@gmail.com"
             git config --global user.name "Flynn OConnell"
       - run:
@@ -46,8 +43,12 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: |
-            ls -la
-            gh-pages --message "[skip ci] Updates" -d doc/build/html
+            git checkout -b gh-pages
+            cp -r doc/build/html/* .
+            git add .
+            # Tell CI not to rerun on this commit
+            git commit -m "[skip ci] Updates"
+            git push --force origin gh-pages
 
 workflows:
   version: 2
