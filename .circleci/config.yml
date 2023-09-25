@@ -48,10 +48,12 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: |
-            git checkout -b gh-pages
-            cp -r doc/build/html/* .
+            git fetch origin
+            git branch -f gh-pages origin/gh-pages || git checkout --orphan gh-pages 
+            git reset
+            git clean -fdx
+            rsync -a doc/build/html/ .
             git add .
-            # Tell CI not to rerun on this commit
             git commit -m "[skip ci] Updates"
             git push --force origin gh-pages
 
