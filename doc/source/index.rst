@@ -51,8 +51,7 @@ API Documentation
    :caption: API Documentation
    :name: api
 
-   api/modules
-
+   api/spike_data
 
 
 Indices and Tables
