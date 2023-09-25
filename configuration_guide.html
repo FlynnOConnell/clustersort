@@ -1,0 +1,571 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Configuration Guide &#8212; spk2py Docs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="_static/spk2py.css?v=6840086e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+
+    <script src="_static/documentation_options.js?v=8a448e45"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=36754332"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'configuration_guide';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Spike Waveform Samples Explanation" href="spike_waveform_samples_explanation.html" />
+    <link rel="prev" title="Installation" href="install.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="Sep 25, 2023"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="dark">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">spk2py Docs</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Configuration Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="spike_waveform_samples_explanation.html">
+                        Spike Waveform Samples Explanation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="spike_data.html">
+                        Spike Data Documentation
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Configuration Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="spike_waveform_samples_explanation.html">
+                        Spike Waveform Samples Explanation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="spike_data.html">
+                        Spike Data Documentation
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Configuration Guide</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="configuration-guide">
+<h1>Configuration Guide<a class="headerlink" href="#configuration-guide" title="Link to this heading">#</a></h1>
+<section id="function-default-config">
+<h2>Function: <code class="docutils literal notranslate"><span class="pre">default_config</span></code><a class="headerlink" href="#function-default-config" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">default_config</span></code> function initializes a configuration file with default settings and creates necessary directories for the run.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path:</span> <span class="pre">Path</span></code>: The path where the configuration file will be saved.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config_ver:</span> <span class="pre">int</span></code>: The version of the configuration to be used. Default is 5.</p></li>
+</ul>
+</section>
+<section id="configuration-sections-and-parameters">
+<h2>Configuration Sections and Parameters<a class="headerlink" href="#configuration-sections-and-parameters" title="Link to this heading">#</a></h2>
+<section id="run-settings">
+<h3>run-settings<a class="headerlink" href="#run-settings" title="Link to this heading">#</a></h3>
+<p>Parameters defining the software and hardware configurations.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">resort-limit</span></code>: Default is ‘3’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cores-used</span></code>: Default is ‘8’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weekday-run</span></code>: Default is ‘2’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weekend-run</span></code>: Default is ‘8’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run-type</span></code>: Default is ‘Auto’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manual-run</span></code>: Default is ‘2’.</p></li>
+</ul>
+</section>
+<section id="paths">
+<h3>paths<a class="headerlink" href="#paths" title="Link to this heading">#</a></h3>
+<p>Defines various paths necessary for the script.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run-path</span></code>: Path to directory for files to be processed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">results-path</span></code>: Path to directory for results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">completed-path</span></code>: Path where completed files will be moved.</p></li>
+</ul>
+</section>
+<section id="clustering">
+<h3>clustering<a class="headerlink" href="#clustering" title="Link to this heading">#</a></h3>
+<p>Parameters defining the clustering process.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">max-clusters</span></code>: Default is ‘7’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max-iterations</span></code>: Default is ‘1000’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convergence-criterion</span></code>: Default is ‘.0001’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">random-restarts</span></code>: Default is ‘10’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">l-ratio-cutoff</span></code>: Default is ‘.1’.</p></li>
+</ul>
+</section>
+<section id="signal">
+<h3>signal<a class="headerlink" href="#signal" title="Link to this heading">#</a></h3>
+<p>Parameters for signal preprocessing and spike detection.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">disconnect-voltage</span></code>: Default is ‘1500’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max-breach-rate</span></code>: Default is ‘.2’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max-breach-count</span></code>: Default is ‘10’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max-breach-avg</span></code>: Default is ‘20’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">intra-hpc_cluster-cutoff</span></code>: Default is ‘3’.</p></li>
+</ul>
+</section>
+<section id="filtering">
+<h3>filtering<a class="headerlink" href="#filtering" title="Link to this heading">#</a></h3>
+<p>Filtering parameters to isolate the frequency range of interest.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">low-cutoff</span></code>: Default is ‘600’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">high-cutoff</span></code>: Default is ‘3000’.</p></li>
+</ul>
+</section>
+<section id="spike">
+<h3>spike<a class="headerlink" href="#spike" title="Link to this heading">#</a></h3>
+<p>Spike detection and extraction parameters.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pre-time</span></code>: Default is ‘.2’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">post-time</span></code>: Default is ‘.6’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sampling-rate</span></code>: Default is ‘20000’.</p></li>
+</ul>
+</section>
+<section id="std-dev">
+<h3>std-dev<a class="headerlink" href="#std-dev" title="Link to this heading">#</a></h3>
+<p>Standard deviation parameters for spike detection and artifact removal.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">spike-detection</span></code>: Default is ‘2.0’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifact-removal</span></code>: Default is ‘10.0’.</p></li>
+</ul>
+</section>
+<section id="pca">
+<h3>pca<a class="headerlink" href="#pca" title="Link to this heading">#</a></h3>
+<p>Parameters for principal component analysis (PCA).</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">variance-explained</span></code>: Default is ‘.95’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use-percent-variance</span></code>: Default is ‘1’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">principal-component-n</span></code>: Default is ‘5’.</p></li>
+</ul>
+</section>
+<section id="post-process">
+<h3>post-process<a class="headerlink" href="#post-process" title="Link to this heading">#</a></h3>
+<p>Post-processing parameters.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reanalyze</span></code>: Default is ‘0’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simple-gmm</span></code>: Default is ‘1’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">image-size</span></code>: Default is ‘70’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">temporary-dir</span></code>: Default is user’s home directory followed by ‘/tmp_python’.</p></li>
+</ul>
+</section>
+<section id="version">
+<h3>version<a class="headerlink" href="#version" title="Link to this heading">#</a></h3>
+<p>Version control parameters.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">config-version</span></code>: Default is determined by the <code class="docutils literal notranslate"><span class="pre">config_ver</span></code> parameter passed to the <code class="docutils literal notranslate"><span class="pre">default_config</span></code> function.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="install.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="spike_waveform_samples_explanation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Spike Waveform Samples Explanation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#function-default-config">Function: <code class="docutils literal notranslate"><span class="pre">default_config</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-sections-and-parameters">Configuration Sections and Parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-settings">run-settings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#paths">paths</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clustering">clustering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#signal">signal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtering">filtering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spike">spike</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#std-dev">std-dev</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pca">pca</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-process">post-process</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#version">version</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="_sources/configuration_guide.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
