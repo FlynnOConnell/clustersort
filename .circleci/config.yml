@@ -3,10 +3,15 @@ version: 2.1
 orbs:
   python: circleci/python@2.1.1
 
+# Aliases to reuse
+_defaults: &defaults
+  docker:
+    - image: cimg/python:3.9
+  working_directory: ~/repo
+
 jobs:
   build:
-    docker:
-      - image: cimg/python:3.9
+    <<: *defaults
     steps:
       - checkout
       - run:
@@ -15,25 +20,26 @@ jobs:
       - run:
           name: Build docs
           command: sphinx-build -b html doc/source doc/build
+      - store_artifacts:
+          path: doc/build/html/
       - persist_to_workspace:
-          root: .
+          root: ~/repo
           paths:
-            - doc/build
+            - doc/build/html
 
   deploy:
-    docker:
-      - image: cimg/python:3.9
+    <<: *defaults
     steps:
       - checkout
       - attach_workspace:
-          at: /spk2py
+          at: ~/repo
       - run:
           name: Deploy to GitHub Pages
           command: |
             git config --global user.email "FlynnOConnell@gmail.com"
             git config --global user.name "Flynn OConnell"
             git clone --branch gh-pages https://github.com/flynnoconnell/spk2py.git gh-pages
-            cp -a /spk2py/doc/build/* gh-pages
+            cp -a ~/repo/doc/build/html/* gh-pages
             cd gh-pages
             touch .nojekyll
             git add -A
@@ -51,4 +57,3 @@ workflows:
           filters:
             branches:
               only: master
-
