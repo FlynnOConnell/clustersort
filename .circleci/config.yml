@@ -19,8 +19,9 @@ jobs:
       - run:
           name: Build docs
           command: |
+            pwd  # Print the current working directory
             sphinx-build -b html doc/source doc/build
-            ls -la ~/repo/doc/build/html
+            ls -la doc/build  # Show files here to check
       - store_artifacts:
           path: ~/repo/doc/build/html/
 
