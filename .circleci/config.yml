@@ -6,7 +6,6 @@ orbs:
 _defaults: &defaults
   docker:
     - image: cimg/python:3.9
-    - image: cimg/node:20.7.0
   working_directory: ~/repo
 
 jobs:
@@ -29,7 +28,8 @@ jobs:
           paths: html
 
   docs-deploy:
-    <<: *defaults
+    docker:
+        - image: cimg/node:16.20
     steps:
       - checkout
       - attach_workspace:
@@ -45,7 +45,7 @@ jobs:
           command: touch doc/build/html/.nojekyll
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist "~/repo/doc/build/html"
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist "doc/build/html"
 
 workflows:
   version: 2
