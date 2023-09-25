@@ -2,9 +2,9 @@
 Configuration Guide
 ===================
 
----------------------------
+----------------------------
 Function: ``default_config``
----------------------------
+----------------------------
 
 The ``default_config`` function initializes a configuration file with default settings and creates necessary directories for the run.
 
@@ -13,9 +13,9 @@ The ``default_config`` function initializes a configuration file with default se
 - ``path: Path``: The path where the configuration file will be saved.
 - ``config_ver: int``: The version of the configuration to be used. Default is 5.
 
---------------------------------
+-------------------------------------
 Configuration Sections and Parameters
---------------------------------
+-------------------------------------
 
 run-settings
 ============

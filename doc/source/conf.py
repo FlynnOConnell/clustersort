@@ -1,13 +1,15 @@
 import os
-import re
 import sys
 import importlib
 from pathlib import Path
 
 repo = Path().home() / 'repos' / "spk2py"
-sys.path.insert(0, str(repo))
+spk = repo / "spk2py"
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, str(repo.absolute()))
+sys.path.insert(0, str(spk.absolute()))
 sys.path.insert(0, os.path.abspath('../'))
+os.environ['PYTHONPATH'] = str(repo) + ':' + os.environ.get('PYTHONPATH', '')
 
 
 # Minimum version, enforced by sphinx
@@ -57,15 +59,14 @@ source_suffix = '.rst'
 # General substitutions.
 project = 'spk2py'
 
-
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
-#today = ''
+# today = ''
 # Else, today_fmt is used as the format for a strftime call.
 today_fmt = '%B %d, %Y'
 
 # List of documents that shouldn't be included in the build.
-#unused_docs = []
+# unused_docs = []
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 default_role = "autolink"
@@ -77,13 +78,14 @@ exclude_dirs = []
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = False
 
+
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+# add_module_names = True
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
-#show_authors = False
+# show_authors = False
 
 def setup(app):
     # add a config value for `ifconfig` directives
@@ -141,19 +143,19 @@ latex_engine = 'xelatex'
 # (source start file, target name, title, author, document class [howto/manual]).
 _stdauthor = 'Flynn OConnell'
 latex_documents = [
-  ('reference/index', 'spk2py-ref.tex', 'spk2py Reference',
-   _stdauthor, 'manual'),
-  ('user/index', 'spk2py-user.tex', 'spk2py User Guide',
-   _stdauthor, 'manual'),
+    ('reference/index', 'spk2py-ref.tex', 'spk2py Reference',
+     _stdauthor, 'manual'),
+    ('user/index', 'spk2py-user.tex', 'spk2py User Guide',
+     _stdauthor, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+# latex_logo = None
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-#latex_use_parts = False
+# latex_use_parts = False
 
 latex_elements = {
 }
@@ -211,23 +213,21 @@ latex_elements['preamble'] = r'''
 '''
 
 # Documents to append as an appendix to all manuals.
-#latex_appendices = []
+# latex_appendices = []
 
 # If false, no module index is generated.
 latex_use_modindex = False
-
 
 # -----------------------------------------------------------------------------
 # Texinfo output
 # -----------------------------------------------------------------------------
 
 texinfo_documents = [
-  ("contents", 'spk2py', 'spk2py Documentation', _stdauthor, 'spk2py',
-   "spk2py: array processing for numbers, strings, records, and objects.",
-   'Programming',
-   1),
+    ("contents", 'spk2py', 'spk2py Documentation', _stdauthor, 'spk2py',
+     "spk2py: array processing for numbers, strings, records, and objects.",
+     'Programming',
+     1),
 ]
-
 
 # -----------------------------------------------------------------------------
 # Intersphinx configuration
@@ -246,7 +246,6 @@ intersphinx_mapping = {
     'numpydoc': ('https://numpydoc.readthedocs.io/en/latest', None),
     'dlpack': ('https://dmlc.github.io/dlpack/latest', None)
 }
-
 
 # -----------------------------------------------------------------------------
 # spk2py extensions
@@ -276,11 +275,6 @@ coverage_ignore_functions = r"""
 coverage_ignore_classes = r"""
     """.split()
 
-coverage_c_path = []
-coverage_c_regexes = {}
-coverage_ignore_c_items = {}
-
-
 # -----------------------------------------------------------------------------
 # Plots
 # -----------------------------------------------------------------------------
@@ -290,9 +284,6 @@ np.random.seed(0)
 """
 plot_include_source = True
 plot_formats = [('png', 100), 'pdf']
-
-import math
-phi = (math.sqrt(5) + 1)/2
 
 plot_rcparams = {
     'font.size': 8,
@@ -308,113 +299,3 @@ plot_rcparams = {
     'figure.subplot.wspace': 0.4,
     'text.usetex': False,
 }
-
-# -----------------------------------------------------------------------------
-# Source code links
-# -----------------------------------------------------------------------------
-
-import inspect
-from os.path import relpath, dirname
-
-for name in ['sphinx.ext.linkcode', 'numpydoc.linkcode']:
-    try:
-        __import__(name)
-        extensions.append(name)
-        break
-    except ImportError:
-        pass
-else:
-    print("NOTE: linkcode extension not found -- no links to source generated")
-
-
-def _get_c_source_file(obj):
-    if issubclass(obj, numpy.generic):
-        return r"core/src/multiarray/scalartypes.c.src"
-    elif obj is numpy.ndarray:
-        return r"core/src/multiarray/arrayobject.c"
-    else:
-        # todo: come up with a better way to generate these
-        return None
-
-
-def linkcode_resolve(domain, info):
-    """
-    Determine the URL corresponding to Python object
-    """
-    if domain != 'py':
-        return None
-
-    modname = info['module']
-    fullname = info['fullname']
-
-    submod = sys.modules.get(modname)
-    if submod is None:
-        return None
-
-    obj = submod
-    for part in fullname.split('.'):
-        try:
-            obj = getattr(obj, part)
-        except Exception:
-            return None
-
-    # strip decorators, which would resolve to the source of the decorator
-    # possibly an upstream bug in getsourcefile, bpo-1764286
-    try:
-        unwrap = inspect.unwrap
-    except AttributeError:
-        pass
-    else:
-        obj = unwrap(obj)
-
-    fn = None
-    lineno = None
-
-    # Make a poor effort at linking C extension types
-    if isinstance(obj, type) and obj.__module__ == 'numpy':
-        fn = _get_c_source_file(obj)
-
-    if fn is None:
-        try:
-            fn = inspect.getsourcefile(obj)
-        except Exception:
-            fn = None
-        if not fn:
-            return None
-
-        # Ignore re-exports as their source files are not within the numpy repo
-        module = inspect.getmodule(obj)
-        if module is not None and not module.__name__.startswith("numpy"):
-            return None
-
-        try:
-            source, lineno = inspect.getsourcelines(obj)
-        except Exception:
-            lineno = None
-
-        fn = relpath(fn, start=dirname(numpy.__file__))
-
-    if lineno:
-        linespec = "#L%d-L%d" % (lineno, lineno + len(source) - 1)
-    else:
-        linespec = ""
-
-    if 'dev' in numpy.__version__:
-        return "https://github.com/FlynnOConnell/spk2py/spk2py/blob/main/spk2k/%s%s" % (
-           fn, linespec)
-    else:
-        return "https://github.com/numpy/numpy/blob/v%s/numpy/%s%s" % (
-           numpy.__version__, fn, linespec)
-
-from pygments.lexers import CLexer
-from pygments.lexer import inherit, bygroups
-from pygments.token import Comment
-
-
-
-# -----------------------------------------------------------------------------
-# Breathe & Doxygen
-# -----------------------------------------------------------------------------
-breathe_projects = dict(numpy=os.path.join("..", "build", "doxygen", "xml"))
-breathe_default_project = "spk2py"
-breathe_default_members = ("members", "undoc-members", "protected-members")

@@ -42,6 +42,19 @@ Technical Explanation
 
    spike_waveform_samples_explanation
 
+
+API Documentation
+=================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Documentation
+   :name: api
+
+   api/modules
+
+
+
 Indices and Tables
 ==================
 
