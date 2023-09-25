@@ -51,5 +51,5 @@ API Documentation
    :caption: API
    :name: api
 
-   spike_data
+   spk2py.spike_data
 

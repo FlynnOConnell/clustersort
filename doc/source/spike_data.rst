@@ -1,5 +1,5 @@
 Spike Data Documentation
 =========================
 
-.. automodule:: spike_data
+.. automodule:: spk2py.spike_data
    :members:
