@@ -18,7 +18,10 @@ jobs:
           command: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design
       - run:
           name: Build docs
-          command: cd doc/ && make clean/ && make html
+          command: |
+            cd doc
+            make clean
+            make html
 
       - persist_to_workspace:
           root: doc/build
