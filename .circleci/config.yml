@@ -23,7 +23,7 @@ jobs:
             sphinx-build -b html doc/source doc/build
             ls -la doc/build  # Show files here to check
       - store_artifacts:
-          path: ~/repo/doc/build/html/
+          path: doc/build/html
 
   deploy:
     <<: *defaults
