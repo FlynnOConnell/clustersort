@@ -9,51 +9,48 @@ _defaults: &defaults
   working_directory: ~/repo
 
 jobs:
-  build:
+  docs-build:
     <<: *defaults
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design sphinx_rtd_theme IPython
+          name: Install dev dependencies
+          command: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design
       - run:
           name: Build docs
-          command: |
-              sphinx-build -b html doc/source doc/build/
-      - persist_to_workspace:
-          root: .
-          paths:
-              - doc/build
+          command: cd doc/ && make clean/ && make html
 
-  deploy:
+      - persist_to_workspace:
+          root: doc/build
+          paths: html
+
+  docs-deploy:
     <<: *defaults
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: doc/build
       - run:
-          name: Deploy to GitHub Pages
+          name: Install and configure dependencies
           command: |
-            pwd
-            ls -la
+            npm install -g --silent gh-pages@2.0.1
             git config --global user.email "FlynnOConnell@gmail.com"
             git config --global user.name "Flynn OConnell"
-            git clone --branch gh-pages https://github.com/flynnoconnell/spk2py.git gh-pages
-            cp -a ~/repo/doc/build/* gh-pages
-            cd gh-pages
-            touch .nojekyll
-            git add -A
-            git commit -m "Update documentation"
-            git push origin gh-pages
+      - run:
+          name: Disable jekyll
+          command: touch docs/build/html/.nojekyll
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist doc
 
 workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build
-      - deploy:
+      - docs-build
+      - docs-deploy:
           requires:
-            - build
+            - docs-build
           filters:
             branches:
               only: master
