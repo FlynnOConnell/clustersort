@@ -207,7 +207,7 @@ def implement_pca(scaled_slices):
     return pca_slices, pca.explained_variance_ratio_
 
 
-def clusterGMM(data, n_clusters, n_iter, restarts, threshold):
+def cluster_gmm(data, n_clusters, n_iter, restarts, threshold):
     """
     Cluster the data using a Gaussian Mixture Model (GMM).
 
@@ -265,7 +265,7 @@ def clusterGMM(data, n_clusters, n_iter, restarts, threshold):
         logger.warning(f"Error in clusterGMM: {e}", exc_info=True)
 
 
-def get_Lratios(data, predictions):
+def get_lratios(data, predictions):
     """
     Calculate L-ratios for each cluster, a measure of cluster quality.
 

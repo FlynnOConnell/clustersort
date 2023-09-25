@@ -1,14 +1,20 @@
-# Import stuff
+"""
+file: spk2py/autosort/wf_shader.py
+
+A function that creates a datashader image from an array of waveforms.
+
+May want to conglomerate similar utilities into a module in the future.
+"""
 import shutil
 from functools import partial
 
-import datashader as ds
-import datashader.transfer_functions as tf
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from datashader.utils import export_image
 import imageio
+import datashader as ds
+import datashader.transfer_functions as tf
+from datashader.utils import export_image
+import matplotlib.pyplot as plt
 
 
 def waveforms_datashader(waveforms, x_values, dir_name="datashader_temp"):

@@ -22,7 +22,9 @@ from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
 from spk2py.autosort.wf_shader import waveforms_datashader
-from spk2py.cluster import clusterGMM, get_Lratios, scale_waveforms, implement_pca
+from spk2py.cluster import cluster_gmm, get_lratios, scale_waveforms, implement_pca
+from spk2py.autosort.spk_config import SpkConfig
+from spk2py.autosort.directory_manager import DirectoryManager
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"
@@ -31,7 +33,13 @@ logger.addHandler(logging.StreamHandler())
 
 
 # Factory
-def run_spk_process(filename, data, params, dir_manager, chan_num):
+def run_spk_process(
+    filename: str | Path,
+    data: dict,
+    params: SpkConfig,
+    dir_manager: DirectoryManager,
+    chan_num: int,
+):
     """
     Factory method for running the spike sorting process on a single channel.
 
@@ -44,7 +52,7 @@ def run_spk_process(filename, data, params, dir_manager, chan_num):
 
     Parameters
     ----------
-    filename : str
+    filename : str or Path
         Name of the file to be sorted
     data : dict
         Dictionary containing the data to be sorted
@@ -66,16 +74,22 @@ def run_spk_process(filename, data, params, dir_manager, chan_num):
     proc.process_channel()
 
 
-def infofile(filename, path, sort_time, params):
+def infofile(
+    filename: str, path: str | Path, sort_time: float | str, params: SpkConfig
+):
     """
-    Dumps run info to a .info file
+    Dumps run info to a .info file.
 
     Parameters
     ----------
-    filename
-    path
-    sort_time
-    params
+    filename : str
+        Name of the HDF5 file being processed.
+    path : str or Path
+        The directory path where the .info file will be saved.
+    sort_time : float or str
+        Time taken for sorting.
+    params : SpkConfig
+        Instance of SpkConfig with parameters used for sorting.
 
     Returns
     -------
@@ -87,7 +101,7 @@ def infofile(filename, path, sort_time, params):
         "Run Time": sort_time,
         "Run Date": date.today().strftime("%m/%d/%y"),
     }
-    config["PARAMS USED"] = params
+    config["PARAMS USED"] = params.get_all()
     with open(
         path + "/" + os.path.splitext(filename)[0] + "_" + "sort.info", "w"
     ) as info_file:
@@ -97,9 +111,79 @@ def infofile(filename, path, sort_time, params):
 class ProcessChannel:
     """
     Class for running the spike sorting process on a single channel.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the file to be processed.
+    data : ndarray
+        Raw data array.
+    params : SpkConfig
+        Instance of SpkConfig holding processing parameters.
+    dir_manager : DirectoryManager
+        Directory manager object.
+    chan_num : int
+        Channel number to be processed.
+
+    Attributes
+    ----------
+    filename : str
+        Name of the file to be processed.
+    data : ndarray
+        Raw data array.
+    params : dict
+        Dictionary of processing parameters.
+    dir_manager : DirectoryManager
+        Directory manager object.
+    chan_num : int
+        Channel number to be processed.
+    sampling_rate : float
+        Sampling rate (Default is 18518.52).
+
+    Methods
+    -------
+    pvar()
+        Returns the percent variance explained by the principal components.
+    usepvar()
+        Returns whether to use the percent variance explained by the principal components.
+    userpc()
+        Returns the number of principal components to use.
+    max_clusters()
+        Returns the total number of clusters to be sorted.
+    max_iterations()
+        Returns the maximum number of iterations to run the GMM.
+    thresh()
+        Returns the convergence criterion for the GMM.
+    num_restarts()
+        Returns the number of random restarts to run the GMM.
+    wf_amplitude_sd_cutoff()
+        Returns the number of standard deviations above the mean to reject waveforms.
+    artifact_removal()
+        Returns the number of standard deviations above the mean to reject waveforms.
+    pre_time()
+        Returns the number of standard deviations above the mean to reject waveforms.
+    post_time()
+        Returns the number of standard deviations above the mean to reject waveforms.
+    bandpass()
+        Returns the low and high cutoff frequencies for the bandpass filter.
+    spike_detection()
+        Returns the number of standard deviations above the mean to reject waveforms.
+    std()
+        Returns the number of standard deviations above the mean to reject waveforms.
+    max_breach_rate()
+        Returns the maximum breach rate.
+    max_breach_count()
+        Returns the maximum breach count.
+    max_breach_avg()
+        Returns the maximum breach average.
+    voltage_cutoff()
+        Returns the voltage cutoff.
+
     """
+
     def __init__(self, filename, data, params, dir_manager, chan_num):
         """
+        Process a single channel.
 
         Parameters
         ----------
@@ -108,6 +192,7 @@ class ProcessChannel:
         params
         dir_manager
         chan_num
+
         """
         self.filename = filename
         self.data = data
@@ -208,10 +293,10 @@ class ProcessChannel:
         """
         The number of standard deviations above the mean to reject waveforms.
         """
-        return int(self.params["spike-detection"])
+        return int(self.params.detection["spike-detection"])
 
     @property
-    def STD(self):
+    def std(self):
         """
         The number of standard deviations above the mean to reject waveforms.
         """
@@ -249,11 +334,33 @@ class ProcessChannel:
         self,
     ):
         """
-        Runs the spike sorting process on a single channel.
+        Executes spike sorting for a single recording channel.
+
+        This method performs the entire spike sorting workflow for one channel.
+        It includes dejittering, PCA transformation, and GMM-based clustering.
+        If no spikes are found in the data, it writes out a warning and returns.
 
         Returns
         -------
         None
+            Writes intermediate data and results to disk, does not return any value.
+
+        Raises
+        ------
+        Warning
+            Raises a warning if no spikes are found in the channel.
+
+        Notes
+        -----
+        The function does the following main steps:
+
+        1. Checks for spikes in the data. If none are found, writes a warning and returns.
+        2. Dejitters spikes and extracts their amplitudes.
+        3. Saves the spike waveforms and times as `.npy` files.
+        4. Scales the spikes by waveform energy and applies PCA.
+        5. Saves the PCA-transformed waveforms as `.npy` files.
+        6. Performs GMM-based clustering on the PCA-transformed data.
+
         """
         while True:
             if self.data["spikes"].size == 0:
@@ -358,22 +465,51 @@ class ProcessChannel:
 
     def spk_gmm(self, data, times_final, n_pc, amplitudes):
         """
-        Runs the Gaussian Mixture Model clustering algorithm on the data.
+        Perform Gaussian Mixture Model (GMM) clustering on spike waveform data.
+
+        This method takes pre-processed waveform data and applies GMM-based clustering
+        to categorize each waveform into different neuronal units. It performs multiple
+        checks for the validity of the clustering solution.
 
         Parameters
         ----------
-        data
-        times_final
-        n_pc
-        amplitudes
+        data : array_like
+            A 2D array where each row represents a waveform and each column is a feature
+            of the waveform (e.g., amplitude, principal component, etc.).
+        times_final : array_like
+            A 1D array representing the time stamps for each waveform in `data`.
+        n_pc : int
+            Number of principal components used in feature extraction.
+        amplitudes : array_like
+            A 1D array containing the amplitude information for each waveform.
 
         Returns
         -------
         None
+            This function saves the clustering results to disk, but does not return any value.
+
+        Raises
+        ------
+        Exception
+            If the GMM clustering encounters an error.
+
+        See Also
+        --------
+        cluster_gmm : The actual GMM clustering algorithm implementation.
+        mahalanobis : Compute Mahalanobis distance for assessing clustering quality.
+
+        Notes
+        -----
+        The method performs the following steps:
+
+        1. Iterate through different numbers of clusters and apply GMM.
+        2. Discard invalid clustering based on certain criteria (e.g., too few waveforms).
+        3. Compute clustering metrics like L-Ratio and ISI violations.
+
         """
         for i in range(self.max_clusters - 2):
             try:
-                model, predictions, bic = clusterGMM(
+                model, predictions, bic = cluster_gmm(
                     data,
                     n_clusters=i + 3,
                     n_iter=self.max_iterations,
@@ -381,7 +517,7 @@ class ProcessChannel:
                     threshold=self.thresh,
                 )
             except Exception as e:
-                logger.warning("Error in clusterGMM", exc_info=True)
+                logger.warning(f"Error in cluster_gmm: {e}", exc_info=True)
                 continue
 
             if np.any(
@@ -390,11 +526,11 @@ class ProcessChannel:
                     for cluster in range(i + 3)
                 ]
             ):
-                plots_waveforms_ISIs_path = (
+                plot_waveform_isi = (
                     self.dir_manager.plots
                     / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs"
                 )
-                plots_waveforms_ISIs_path.mkdir(parents=True, exist_ok=True)
+                plot_waveform_isi.mkdir(parents=True, exist_ok=True)
 
                 # Create and write to the invalid_sort.txt files
                 with open(
@@ -491,18 +627,18 @@ class ProcessChannel:
             for ref_cluster in range(i + 3):
                 fig = plt.figure()
                 ref_mean = np.mean(data[np.where(predictions == ref_cluster)], axis=0)
-                ref_covar_I = linalg.inv(
+                ref_covar_i = linalg.inv(
                     np.cov(data[np.where(predictions == ref_cluster)[0]], rowvar=False)
                 )
                 xsave = None
                 for other_cluster in range(i + 3):
                     mahalanobis_dist = [
-                        mahalanobis(data[point, :], ref_mean, ref_covar_I)
+                        mahalanobis(data[point, :], ref_mean, ref_covar_i)
                         for point in np.where(predictions[:] == other_cluster)[0]
                     ]
                     # Plot histogram of Mahalanobis distances
-                    y, binEdges = np.histogram(mahalanobis_dist, bins=25)
-                    bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
+                    y, bin_edges = np.histogram(mahalanobis_dist, bins=25)
+                    bincenters = 0.5 * (bin_edges[1:] + bin_edges[:-1])
                     plt.plot(
                         bincenters, y, label="Dist from hpc_cluster %i" % other_cluster
                     )
@@ -533,10 +669,9 @@ class ProcessChannel:
                 clust_path.mkdir(parents=True, exist_ok=True)
 
             x = np.arange(len(self.data["spikes"][0]) / 10) + 1
-            ISIList = []
+            isi_list = []
             for cluster in range(i + 3):
                 cluster_points = np.where(predictions[:] == cluster)[0]
-                fig, ax = plt.subplots()
                 fig, ax = waveforms_datashader(
                     self.data["spikes"][cluster_points, :],
                     x,
@@ -559,10 +694,10 @@ class ProcessChannel:
 
                 fig = plt.figure()
                 cluster_times = times_final[cluster_points]
-                ISIs = np.ediff1d(np.sort(cluster_times))
-                ISIs = ISIs / 40.0
+                isi = np.ediff1d(np.sort(cluster_times))
+                isi = isi / 40.0
                 plt.hist(
-                    ISIs,
+                    isi,
                     bins=[
                         0.0,
                         1.0,
@@ -575,30 +710,24 @@ class ProcessChannel:
                         8.0,
                         9.0,
                         10.0,
-                        np.max(ISIs),
+                        np.max(isi),
                     ],
                 )
                 plt.xlim([0.0, 10.0])
                 plt.title(
                     "2ms ISI violations = %.1f percent (%i/%i)"
                     % (
-                        (
-                            float(len(np.where(ISIs < 2.0)[0]))
-                            / float(len(cluster_times))
-                        )
+                        (float(len(np.where(isi < 2.0)[0])) / float(len(cluster_times)))
                         * 100.0,
-                        len(np.where(ISIs < 2.0)[0]),
+                        len(np.where(isi < 2.0)[0]),
                         len(cluster_times),
                     )
                     + "\n"
                     + "1ms ISI violations = %.1f percent (%i/%i)"
                     % (
-                        (
-                            float(len(np.where(ISIs < 1.0)[0]))
-                            / float(len(cluster_times))
-                        )
+                        (float(len(np.where(isi < 1.0)[0])) / float(len(cluster_times)))
                         * 100.0,
-                        len(np.where(ISIs < 1.0)[0]),
+                        len(np.where(isi < 1.0)[0]),
                         len(cluster_times),
                     )
                 )
@@ -607,19 +736,16 @@ class ProcessChannel:
                     / f"channel_{self.chan_num + 1}/{i + 3}_clusters_waveforms_ISIs/Cluster{cluster}_ISIs"
                 )
                 plt.close("all")
-                ISIList.append(
+                isi_list.append(
                     "%.1f"
                     % (
-                        (
-                            float(len(np.where(ISIs < 1.0)[0]))
-                            / float(len(cluster_times))
-                        )
+                        (float(len(np.where(isi < 1.0)[0])) / float(len(cluster_times)))
                         * 100.0
                     )
                 )
 
             # Get isolation statistics for each solution
-            Lrats = get_Lratios(data, predictions)
+            l_ratios = get_lratios(data, predictions)
 
             isodf = pd.DataFrame(
                 {
@@ -632,8 +758,8 @@ class ProcessChannel:
                         len(np.where(predictions[:] == cluster)[0])
                         for cluster in range(i + 3)
                     ],
-                    "ISIs (%)": ISIList,
-                    "L-Ratio": [round(Lrats[cl], 3) for cl in range(i + 3)],
+                    "ISIs (%)": isi_list,
+                    "L-Ratio": [round(l_ratios[cl], 3) for cl in range(i + 3)],
                 }
             )
             cluster_path = (
@@ -672,9 +798,7 @@ class ProcessChannel:
                     spacing=50,
                     align="left",
                 )
-                draw.multiline_text(
-                    (380, 100), text2, fill=(0, 0, 0, 255), spacing=50
-                )
+                draw.multiline_text((380, 100), text2, fill=(0, 0, 0, 255), spacing=50)
                 isoimg = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
                 temp_filename = str(
                     self.dir_manager.plots
@@ -692,19 +816,26 @@ class ProcessChannel:
         ) as f:
             f.write("Congratulations, this channel was sorted successfully")
 
-    def superplots(self, maxclust):
+    def superplots(self, maxclust: int):
         """
         Creates superplots for each channel.
 
-        Conglomerates all the plots into a single plot.
+        This function conglomerates individual plots into a single, combined plot per channel.
 
         Parameters
         ----------
-        maxclust
+        maxclust : int
+            The maximum number of clusters to consider for creating superplots.
 
         Returns
         -------
         None
+            This function doesn't return any value; it creates superplots as side-effects.
+
+        Raises
+        ------
+        Exception
+            If the superplot cannot be created for a channel, an exception is printed to the console.
         """
         path = self.dir_manager.plots / f"channel_{self.chan_num + 1}"
         outpath = self.dir_manager.plots / f"channel_{self.chan_num + 1}" / "superplots"
@@ -790,14 +921,39 @@ class ProcessChannel:
                     + str(e)
                 )
 
-    def compile_isoi(self, maxclust=7, Lrat_cutoff=0.1):
+    def compile_isoi(self, maxclust=7, l_ratio_cutoff=0.1):
         """
-        Compiles the ISI data for each channel.
+        Compiles the Inter-Spike Interval (ISI) data for each channel and applies conditional formatting.
+
+        This method iterates through each channel's clustering solutions, reads ISI information,
+        and writes the compiled data to an Excel file. It also applies conditional formatting
+        based on ISI values.
 
         Parameters
         ----------
-        maxclust
-        Lrat_cutoff
+        maxclust : int, optional
+            The maximum number of clusters to consider for each channel. Default is 7.
+        l_ratio_cutoff : float, optional
+            The L-Ratio cutoff value for conditional formatting in the Excel sheet. Default is 0.1.
+
+        Returns
+        -------
+        None
+            Writes compiled ISI data and errors to an Excel file but does not return any value.
+
+        Raises
+        ------
+        Exception
+            If reading ISI information for a channel and solution fails.
+
+        Notes
+        -----
+        The function does the following:
+
+        1. Iterates through each channel and solution to read ISI information.
+        2. Appends ISI data to a DataFrame and writes it to a CSV file.
+        3. Creates an Excel file that contains compiled ISI data with conditional formatting.
+
         """
         path = self.dir_manager.reports / "clusters"
         file_isoi = pd.DataFrame()
@@ -830,7 +986,8 @@ class ProcessChannel:
             )  # add this channel's info to the whole file info
             try:
                 file_isoi = file_isoi.drop(columns=["Unnamed: 0"])
-            except:
+            except Exception as e:
+                logger.warning(f"{e}")
                 pass
         with pd.ExcelWriter(
             os.path.split(path)[0] + f"/{os.path.split(path)[-1]}_compiled_isoi.xlsx",
@@ -854,7 +1011,7 @@ class ProcessChannel:
                 "A2:H{}".format(file_isoi.shape[0] + 1),
                 {
                     "type": "formula",
-                    "criteria": "=AND($G2>1,$H2>{})".format(str(Lrat_cutoff)),
+                    "criteria": "=AND($G2>1,$H2>{})".format(str(l_ratio_cutoff)),
                     "format": redden,
                 },
             )
@@ -862,7 +1019,7 @@ class ProcessChannel:
                 f"A2:H{file_isoi.shape[0] + 1}",
                 {
                     "type": "formula",
-                    "criteria": f"=OR(AND($G2>.5,$H2>{str(Lrat_cutoff)}),$G2>1)",
+                    "criteria": f"=OR(AND($G2>.5,$H2>{str(l_ratio_cutoff)}),$G2>1)",
                     "format": orangen,
                 },
             )
@@ -870,7 +1027,7 @@ class ProcessChannel:
                 "A2:H{}".format(file_isoi.shape[0] + 1),
                 {
                     "type": "formula",
-                    "criteria": f"=OR($G2>.5,$H2>{str(Lrat_cutoff)})",
+                    "criteria": f"=OR($G2>.5,$H2>{str(l_ratio_cutoff)})",
                     "format": yellen,
                 },
             )

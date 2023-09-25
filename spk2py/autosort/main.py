@@ -17,25 +17,33 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def move_files(files, source, destination):
-    for f in files:
-        shutil.move(source / f, destination)
-        logger.info(f"Moved {f} to {destination}")
-
-
 def main(params: spk_config.SpkConfig, parallel: bool = True):
     """
     Entry point for the autosort package.
-    Optionally include a SpkConfig object to override the default parameters.
+    Optionally include a `SpkConfig` object to override the default parameters.
+
+    This function iterates over data files, manages directories, and executes sorting either sequentially
+    or in parallel.
 
     Parameters
     ----------
-    params
-    parallel
+    params : spk_config.SpkConfig
+        Configuration parameters for spike sorting. If `None`, default parameters are used.
+    parallel : bool, optional
+        Whether to run the sorting in parallel. Default is `True`.
 
     Returns
     -------
     None
+
+    Raises
+    ------
+    Exception
+        If the run type specified in `params` is not either "Manual" or "Auto".
+
+    Examples
+    --------
+    >>> main(spk_config.SpkConfig(), parallel=True)
     """
     if not params:
         params = spk_config.SpkConfig()
@@ -96,6 +104,7 @@ def main(params: spk_config.SpkConfig, parallel: bool = True):
                     chan_data = h5file['unit'][chan_name]
                     dir_manager.idx = i
                     run_spk_process(curr_file, chan_data, params, dir_manager, i)
+
 
 if __name__ == "__main__":
     main_params = spk_config.SpkConfig()

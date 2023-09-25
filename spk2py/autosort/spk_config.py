@@ -1,5 +1,5 @@
 """
-Configurations managed by the SpkConfig class for the AutoSort pipeline.
+file: spk2py/spk_config.py - Configurations managed by the SpkConfig class for the AutoSort pipeline.
 
 See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
 """
@@ -308,6 +308,7 @@ class SpkConfig:
         assert(self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
         assert(self.run["run-type"] in ["Auto", "Manual"]), (f"Run type {self.run['run-type']} is not valid. Options "
                                                              f"are 'Auto' or 'Manual'")
+
 
 if __name__ == '__main__':
     test_cfg = SpkConfig()

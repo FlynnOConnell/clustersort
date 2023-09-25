@@ -1,3 +1,6 @@
+"""
+file: spk2py/spike_data.py - Functions and class for handling Spike2 electrophysiological data.
+"""
 from __future__ import annotations
 
 import logging

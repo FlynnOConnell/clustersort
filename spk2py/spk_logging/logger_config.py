@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytz
 
+import sys
+
 
 class ESTFormatter(logging.Formatter):
     """
@@ -38,6 +40,7 @@ class ESTFormatter(logging.Formatter):
             return dt.strftime(datefmt)
         else:
             return dt.strftime('%Y-%m-%d %H:%M:%S')
+
 
 class ColoredFormatter(logging.Formatter):
     """
@@ -78,6 +81,7 @@ class ColoredFormatter(logging.Formatter):
         log_message = super().format(record)
         return f"{self.COLORS.get(record.levelname, '')}{log_message}\033[0m"
 
+
 def configure_logger(name, log_file: Path | str, level=logging.INFO):
     """
     Configure a logger with file and stream handlers.
@@ -96,6 +100,10 @@ def configure_logger(name, log_file: Path | str, level=logging.INFO):
     logging.Logger
         Configured logger object.
     """
+
+    if 'sphinx' in sys.modules:
+        return logging.getLogger(name)
+
     # Create a logger
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -118,3 +126,6 @@ def configure_logger(name, log_file: Path | str, level=logging.INFO):
     logger.addHandler(stream_handler)
 
     return logger
+
+
+
