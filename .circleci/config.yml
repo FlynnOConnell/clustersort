@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   python: circleci/python@2.1.1
 
-# Aliases to reuse
 _defaults: &defaults
   docker:
     - image: cimg/python:3.9
@@ -19,13 +18,11 @@ jobs:
           command: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design sphinx_rtd_theme IPython
       - run:
           name: Build docs
-          command: sphinx-build -b html doc/source doc/build
+          command: |
+            sphinx-build -b html doc/source doc/build
+            ls -la ~/repo/doc/build/html
       - store_artifacts:
-          path: doc/build/html/
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - doc/build/html
+          path: ~/repo/doc/build/html/
 
   deploy:
     <<: *defaults
