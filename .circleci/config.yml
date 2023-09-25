@@ -6,6 +6,7 @@ orbs:
 _defaults: &defaults
   docker:
     - image: cimg/python:3.9
+    - image: cimg/node:20.7.0
   working_directory: ~/repo
 
 jobs:
@@ -34,13 +35,6 @@ jobs:
       - attach_workspace:
           at: doc/build
       - run:
-          name: Install Node.js and npm
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y curl
-            curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-      - run:
           name: Install and configure dependencies
           command: |
             sudo npm install -g gh-pages 
@@ -51,7 +45,7 @@ jobs:
           command: touch doc/build/html/.nojekyll
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist ~/repo/doc/build/html
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist "~/repo/doc/build/html"
 
 workflows:
   version: 2
