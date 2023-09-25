@@ -5,6 +5,7 @@ See Also: `configparser from python std library <https://docs.python.org/3/libra
 """
 from __future__ import annotations
 
+from typing import Any
 import configparser
 from pathlib import Path
 
@@ -80,22 +81,32 @@ class SpkConfig:
             """
         return dict(self.config[section])
 
-    def set(self, section, key, value):
+    def set(self, section: str, key: str, value: Any):
         """
-        
-        Args:
-            section:
-            key:
-            value:
+        Set the value of a configuraton parameter.
 
-        Returns:
+        Parameters
+        ----------
+        section : str
+        key : str
+        value : Any
 
+        Returns
+        -------
+        None
         """
+
         if section not in self.config:
             self.config.add_section(section)
         self.config.set(section, key, str(value))
 
     def get_all(self):
+        """
+        Returns
+        -------
+        dict
+            A dictionary containing all key-value pairs from all sections.
+        """
         params = {}
         for section in self.config.sections():
             for key, value in self.config.items(section):
@@ -104,46 +115,112 @@ class SpkConfig:
 
     @property
     def run(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'run' section.
+            """
         return self.get_section('run')
 
     @property
     def path(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'path' section.
+            """
         return self.get_section('path')
 
     @property
     def cluster(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'cluster' section.
+            """
         return self.get_section('cluster')
 
     @property
     def breach(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'breach' section.
+            """
         return self.get_section('breach')
 
     @property
     def filter(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'breach' section.
+            """
         return self.get_section('filter')
 
     @property
     def spike(self):
+        """
+           Returns
+           -------
+           dict
+               A dictionary containing key-value pairs for the 'spike' section.
+           """
         return self.get_section('spike')
 
     @property
     def detection(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'detection' section.
+            """
         return self.get_section('detection')
 
     @property
     def pca(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'pca' section.
+            """
         return self.get_section('pca')
 
     @property
     def postprocess(self):
+        """
+            Returns
+            -------
+            dict
+                A dictionary containing key-value pairs for the 'postprocess' section.
+            """
         return self.get_section('postprocess')
 
     def read_config(self):
+        """
+            Returns
+            -------
+            ConfigParser
+                A ConfigParser object loaded with the INI file.
+            """
         config = configparser.ConfigParser()
         config.read(self.cfg_path)
         return config
 
     def set_config(self, default=False):
+        """
+            Parameters
+            ----------
+            default : bool, optional
+                If True, sets the configuration to its default settings. Defaults to False.
+            """
         if default:
             self.set_default_config()
     
@@ -152,6 +229,9 @@ class SpkConfig:
             print(f"Default configuration file has been created. You can find it in {self.cfg_path}")
 
     def set_default_config(self) -> None:
+        """
+            Sets the default configurations for all sections. Writes these to the configuration file.
+            """
         assert self.cfg_path.parent.is_dir(), f"Parent directory {self.cfg_path.parent} does not exist"
         self.cfg_path.parent.mkdir(parents=True, exist_ok=True)
         default_data_path = self.cfg_path.parent
@@ -217,6 +297,14 @@ class SpkConfig:
             config.write(configfile)
 
     def _validate_config(self):
+        """
+            Validates the loaded configurations to ensure they meet specified criteria.
+
+            Raises
+            ------
+            AssertionError
+                If any of the loaded configurations are not valid.
+            """
         assert(self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
         assert(self.run["run-type"] in ["Auto", "Manual"]), (f"Run type {self.run['run-type']} is not valid. Options "
                                                              f"are 'Auto' or 'Manual'")
