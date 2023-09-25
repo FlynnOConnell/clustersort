@@ -57,7 +57,7 @@ jobs:
             git checkout gh-pages 
             rsync -av ~/repo/doc/build/html/ . 
             git add . 
-            git commit -m "[skip ci] Updates" 
+            git diff --cached --quiet || git commit -m "[skip ci] Updates" && git push origin gh-pages
             git push origin gh-pages
 
 workflows:
