@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import logging
+import sys
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import pytz
-
-import sys
 
 
 class ESTFormatter(logging.Formatter):
@@ -19,6 +18,7 @@ class ESTFormatter(logging.Formatter):
     formatTime(record, datefmt=None)
         Format the time for the log record.
     """
+
     def formatTime(self, record, datefmt=None):
         """
         Format the time for the log record.
@@ -58,7 +58,7 @@ class ColoredFormatter(logging.Formatter):
     """
     COLORS = {
         'DEBUG': '\033[33m',  # Orange
-        'INFO': '\033[34m',   # Blue
+        'INFO': '\033[34m',  # Blue
         'WARNING': '\033[31m',  # Red
         'ERROR': '\033[41m',  # Red background
         'CRITICAL': '\033[45m'  # Magenta background
@@ -82,7 +82,7 @@ class ColoredFormatter(logging.Formatter):
         return f"{self.COLORS.get(record.levelname, '')}{log_message}\033[0m"
 
 
-def configure_logger(name, log_file: Path | str, level=logging.INFO):
+def configure_logger(name: str, log_file: Path | str, level: int = logging.INFO) -> logging.Logger:
     """
     Configure a logger with file and stream handlers.
 
@@ -113,12 +113,14 @@ def configure_logger(name, log_file: Path | str, level=logging.INFO):
 
     # Create a file handler with rotation
     file_handler = RotatingFileHandler(log_file, mode='a', maxBytes=int(1e6))
-    file_handler.setFormatter(ESTFormatter('%(filename)s - %(asctime)s - %(levelname)s - %(message)s', datefmt='%m-%d-%Y %I:%M:%S %p'))
+    file_handler.setFormatter(
+        ESTFormatter('%(filename)s - %(asctime)s - %(levelname)s - %(message)s', datefmt='%m-%d-%Y %I:%M:%S %p'))
     file_handler.setLevel(level)
 
     # Create a stream handler with color
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(ColoredFormatter('%(filename)s - %(asctime)s - %(levelname)s - %(message)s', datefmt='%m-%d-%Y %I:%M:%S %p'))
+    stream_handler.setFormatter(
+        ColoredFormatter('%(filename)s - %(asctime)s - %(levelname)s - %(message)s', datefmt='%m-%d-%Y %I:%M:%S %p'))
     stream_handler.setLevel(level)
 
     # Add handlers to logger
@@ -126,6 +128,3 @@ def configure_logger(name, log_file: Path | str, level=logging.INFO):
     logger.addHandler(stream_handler)
 
     return logger
-
-
-

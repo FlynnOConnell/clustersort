@@ -6,7 +6,7 @@
 *spk2py. A full analysis pipeline for spike preprocessing, sorting and post-processing utilities.*
 
 spk2py is a Python-based framework for processing and analyzing electrophysiological spike data.
-It extracts spike waveforms from raw Spike2 files using the lower-level SonPy library, and then
+It extracts spike waveforms from raw Spike2 files using the C++ wrapper SonPy library, and then
 performs waveform extraction and spike sorting. It also provides a number of tools for analyzing
 the resulting spike data. Once spikes are sorted, users are able to post-process the spikes using
 plots for mahalanobis distance, ISI, and autocorrelograms. The spike data can also be exported to

@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import logging
+from pathlib import Path
+
 import numpy as np
+from numba import jit
+from numba.typed import List
 from scipy import linalg
 from scipy.interpolate import interp1d
 from scipy.signal import butter
@@ -9,17 +14,13 @@ from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
-import logging
-from pathlib import Path
-from numba import jit
-from numba.typed import List
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 logpath = Path().home() / 'autosort' / "cluster.log"
 
 
-def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
+def filter_signal(sig, sampling_rate: int | float, freq=(300, 6000), ):
     """
     Apply a bandpass filter to the input electrode signal using a Butterworth digital and analog filter design.
 
@@ -27,11 +28,11 @@ def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
     ----------
     sig : array-like
         The input electrode signal as a 1-D array.
+    sampling_rate : float, optional
+        The sampling rate of the signal in Hz. Default is 20kHz.
     freq : tuple, optional
         The frequency range for the bandpass filter as (low_frequency, high_frequency).
         Default is (300, 6000.0).
-    sampling_rate : float, optional
-        The sampling rate of the signal in Hz. Default is 20kHz.
 
     Returns
     -------
@@ -53,7 +54,7 @@ def filter_signal(sig, freq=(300, 6000), sampling_rate=20000):
 
 @jit(nopython=True)
 def extract_waveforms(
-    signal: np.ndarray, sampling_rate: int | float, spike_snapshot: tuple=(0.2, 0.6), STD=2.0, cutoff_std=10.0
+        signal: np.ndarray, sampling_rate: int | float, spike_snapshot: tuple = (0.2, 0.6), STD=2.0, cutoff_std=10.0
 ):
     """
     Extract individual spike waveforms from the filtered electrode signal.
@@ -95,18 +96,19 @@ def extract_waveforms(
             == np.min(signal[pos[changes[i]: changes[i + 1]]])
         )[0]
         if pos[minimum[0] + changes[i]] - int(
-            (spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)
+                (spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)
         ) > 0 and pos[minimum[0] + changes[i]] + int(
             (spike_snapshot[1] + 0.1) * (sampling_rate / 1000.0)
         ) < len(
             signal
         ):
             tempslice = signal[
-                pos[minimum[0] + changes[i]]
-                - int((spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)) : pos[
-                    minimum[0] + changes[i]
-                ]
-                + int((spike_snapshot[1] + 0.1) * (sampling_rate / 1000.0))
+                        pos[minimum[0] + changes[i]]
+                        - int((spike_snapshot[0] + 0.1) * (sampling_rate / 1000.0)): pos[
+                                                                                         minimum[0] + changes[i]
+                                                                                         ]
+                                                                                     + int(
+                            (spike_snapshot[1] + 0.1) * (sampling_rate / 1000.0))
                         ]
             if ~np.any(np.absolute(tempslice) > (th * cutoff_std) / STD):
                 slices.append(tempslice)
@@ -115,7 +117,7 @@ def extract_waveforms(
     return slices, spike_times
 
 
-def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6),):
+def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6), ):
     """
     Adjust the alignment of extracted spike waveforms to minimize jitter.
 
@@ -155,9 +157,9 @@ def dejitter(slices, spike_times, sampling_rate, spike_snapshot=(0.2, 0.6),):
         # 40kHz recording, 40 samples after interpolation) If minimum hasn't shifted at all, then minimum - 5ms
         # should be equal to zero (because we sliced 5 ms before the minimum in extract_waveforms())
         if np.abs(
-            minimum - int((spike_snapshot[0] + 0.1) * (sampling_rate / 100.0))
+                minimum - int((spike_snapshot[0] + 0.1) * (sampling_rate / 100.0))
         ) < int(10.0 * (sampling_rate / 10000.0)):
-            slices_dejittered.append(ynew[minimum - before * 10 : minimum + after * 10])
+            slices_dejittered.append(ynew[minimum - before * 10: minimum + after * 10])
             spike_times_dejittered.append(spike_times[i])
     return slices_dejittered, spike_times_dejittered
 
@@ -178,7 +180,7 @@ def scale_waveforms(slices_dejittered):
     energy : array-like
         The energy of each spike waveform as a 1-D array.
     """
-    energy = np.sqrt(np.sum(slices_dejittered**2, axis=1)) / len(slices_dejittered[0])
+    energy = np.sqrt(np.sum(slices_dejittered ** 2, axis=1)) / len(slices_dejittered[0])
     scaled_slices = np.zeros((len(slices_dejittered), len(slices_dejittered[0])))
     for i in range(len(slices_dejittered)):
         scaled_slices[i] = slices_dejittered[i] / energy[i]

@@ -1,5 +1,11 @@
 """
-file: spk2py/autosort/__init__.py
+========
+Autosort
+========
+.. currentmodule:: spk2py.autosort
+
+.. autosummary::
+    :toctree: generated/
 
 Autosort: A Python package for spike sorting.
 
@@ -18,8 +24,9 @@ are performed on the data to extract spikes and cluster them. The pipeline is as
 5. Perform breach analysis on the clusters.
 6. Resort the clusters based on the breach analysis.
 7. Save the data to an HDF5 file, and graphs to given plotting folders.
+
 """
-from spk2py.autosort.autosort import run_spk_process, ProcessChannel
+from spk2py.autosort.autosort import *
 from spk2py.autosort.wf_shader import waveforms_datashader
 from spk2py.autosort.spk_config import SpkConfig
 from spk2py.autosort.directory_manager import DirectoryManager

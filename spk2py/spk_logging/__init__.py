@@ -1,8 +1,17 @@
 """
-module: spk2py/spk_logging/__init__.py
-
+======
+Logger
+======
 Initialization of the module logger.
-"""
-from spk2py.spk_logging.logger_config import configure_logger
 
-__all__ = ["configure_logger"]
+.. currentmodule:: spk2py.spk_logging
+
+.. autosummary::
+    :toctree: generated/
+
+Colorized output, file and stream handlers are configured in :func:`configure_logger`.
+
+"""
+from spk2py.spk_logging.logger_config import *
+
+__all__ = ["configure_logger", "ColoredFormatter", "ESTFormatter"]

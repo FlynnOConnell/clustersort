@@ -8,9 +8,9 @@
 """
 from __future__ import annotations
 
-from typing import Any
 import configparser
 from pathlib import Path
+from typing import Any
 
 
 class SpkConfig:
@@ -46,6 +46,7 @@ class SpkConfig:
     See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
 
     """
+
     def __init__(self, cfg_path: Path | str = ""):
         """
         Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
@@ -258,7 +259,7 @@ class SpkConfig:
             """
         if default:
             self.set_default_config()
-    
+
         if not self.cfg_path.is_file() or default:
             self.set_default_config()
             print(f"Default configuration file has been created. You can find it in {self.cfg_path}")
@@ -276,7 +277,7 @@ class SpkConfig:
         default_results_path.mkdir(parents=True, exist_ok=True)
         default_completed_path = default_data_path / "completed"
         default_completed_path.mkdir(parents=True, exist_ok=True)
-    
+
         config = configparser.ConfigParser()
         config["run"] = {
             "resort-limit": "3",
@@ -286,13 +287,13 @@ class SpkConfig:
             "run-type": "Auto",
             "manual-run": "2",
         }
-    
+
         config["path"] = {
             "run": str(default_run_path),  # Path to directory containing files to be sorted
             "results": str(default_results_path),  # Path to directory to store results
             "completed": str(default_completed_path),  # Path to directory to store completed files
         }
-    
+
         config["cluster"] = {
             "max-clusters": "7",
             "max-iterations": "1000",
@@ -301,26 +302,26 @@ class SpkConfig:
             "l-ratio-cutoff": ".1",
             "intra-cluster-cutoff": "3",
         }
-    
+
         config["breach"] = {
             "disconnect-voltage": "1500",
             "max-breach-rate": ".2",
             "max-breach-count": "10",
             "max-breach-avg": "20",
         }
-    
+
         config["filter"] = {"low-cutoff": "300", "high-cutoff": "3000"}
-    
-        config["spike"] = {"pre-time": "0.2", "post-time": "0.6",}
-    
+
+        config["spike"] = {"pre-time": "0.2", "post-time": "0.6", }
+
         config["detection"] = {"spike-detection": "2.0", "artifact-removal": "10.0"}
-    
+
         config["pca"] = {
             "variance-explained": ".95",
             "use-percent-variance": "1",
             "principal-component-n": "5",
         }
-    
+
         config["postprocess"] = {
             "reanalyze": "0",
             "simple-gmm": "1",
@@ -340,9 +341,9 @@ class SpkConfig:
             AssertionError
                 If any of the loaded configurations are not valid.
             """
-        assert(self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
-        assert(self.run["run-type"] in ["Auto", "Manual"]), (f"Run type {self.run['run-type']} is not valid. Options "
-                                                             f"are 'Auto' or 'Manual'")
+        assert (self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
+        assert (self.run["run-type"] in ["Auto", "Manual"]), (f"Run type {self.run['run-type']} is not valid. Options "
+                                                              f"are 'Auto' or 'Manual'")
 
 
 if __name__ == '__main__':

@@ -23,6 +23,10 @@ jobs:
             conda activate spk2py
             pip install -r requirements.txt
       - run:
+          name: Install editable spk2py
+          command: |
+            pip install -e .
+      - run:
           name: Build docs
           command: cd docs/ && make html
       - persist_to_workspace:
