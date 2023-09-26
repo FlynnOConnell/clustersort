@@ -20,7 +20,6 @@ jobs:
             echo 'export PYTHONPATH=$PYTHONPATH:$(pwd)' >> $BASH_ENV
             curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
             bash Mambaforge-$(uname)-$(uname -m).sh -b # auto accept
-            source ~/miniforge3/bin/activate
             conda config --set always_yes yes --set changeps1 no
       - run:
           name: Install deps
