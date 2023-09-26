@@ -22,7 +22,7 @@ jobs:
             echo ". ${HOME}/conda/etc/profile.d/conda.sh" >> $BASH_ENV
             source "${HOME}/conda/etc/profile.d/conda.sh"
             source "${HOME}/conda/etc/profile.d/mamba.sh"
-            conda activate
+            conda activate spk2py
       - run:
           name: Install deps
           command: |
