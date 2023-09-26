@@ -8,6 +8,22 @@ This pipeline requires Python 3.9+, and numpy <= 1.3.5 to comply with numba rest
 
 It is recommended to install using `mambaforge <https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install>`_ this will drastically speed up environment creation:
 
+.. code-block:: bash
+# works with conda too, but mamba is much faster
+mamba env create -f environment.yml
+conda activate spk2py
+
+Additionally, though not recommended, ``spk2py`` can be installed directly from pip:
+
+.. warning::
+   pip installing has **not** been tested on systems other than linux.
+   Using ``mamba`` has been tested on each platform.
+   As has docker.
+
+.. code-block:: bash
+
+pip install spk2py
+
 Mamba Installation
 ==================
 
