@@ -35,7 +35,7 @@ jobs:
             cd doc
             # with makefile
             make clean
-            make html
+            sphinx-build -b html -v source/ build/
 
       - persist_to_workspace:
           root: ~/repo
