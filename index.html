@@ -133,29 +133,15 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="configuration_guide.html">
-                        Configuration Guide
+                      <a class="nav-link nav-internal" href="guide/index.html">
+                        Guide
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="spike_waveform_samples_explanation.html">
-                        Spike Waveform Samples Explanation
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="guide/autosort.html">
-                        Semi-Supervised Spike Sorting
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="spike_data.html">
-                        Spike Data API
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API
                       </a>
                     </li>
                 
@@ -244,29 +230,15 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="configuration_guide.html">
-                        Configuration Guide
+                      <a class="nav-link nav-internal" href="guide/index.html">
+                        Guide
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="spike_waveform_samples_explanation.html">
-                        Spike Waveform Samples Explanation
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="guide/autosort.html">
-                        Semi-Supervised Spike Sorting
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="spike_data.html">
-                        Spike Data API
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API
                       </a>
                     </li>
                 
@@ -328,72 +300,32 @@ the resulting spike data. Once spikes are sorted, users are able to post-process
 plots for mahalanobis distance, ISI, and autocorrelograms. The spike data can also be exported to
 a variety of formats for further analysis in other programs.</p>
 </div>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound" id="gettingstarted">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#mamba-installation">Mamba Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#existing-conda-install-not-recommended">Existing <code class="docutils literal notranslate"><span class="pre">conda</span></code> install (not recommended)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#docker-images">Docker images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#mamba-installation">Mamba Installation</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="guide/index.html">Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html"> Autosort Procedures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/configuration_guide.html"> Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/spike_waveform_samples_explanation.html"> Waveform Extraction</a></li>
 </ul>
 </li>
-</ul>
-</div>
-</section>
-<section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="id1">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Configuration Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="configuration_guide.html">Configuration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration_guide.html#function-default-config">Function: <code class="docutils literal notranslate"><span class="pre">default_config</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration_guide.html#configuration-sections-and-parameters">Configuration Sections and Parameters</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="technical-explanation">
-<h2>Technical Explanation<a class="headerlink" href="#technical-explanation" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="technical">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Technical Explanation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spike_waveform_samples_explanation.html">Spike Waveform Samples Explanation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spike_waveform_samples_explanation.html#setting-up-snapshot-duration">Setting Up Snapshot Duration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spike_waveform_samples_explanation.html#calculating-number-of-samples">Calculating Number of Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/spike_data.html"> Spike Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cluster.html"> Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/io.html"> I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/logger.html"> Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/autosort.html"> Main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/directory_manager.html"> Directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/datashader.html"> Data Shading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/configuration.html"> Configuration</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</section>
-<section id="users-guide">
-<h2>Users Guide<a class="headerlink" href="#users-guide" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="guide">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Users Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="guide/autosort.html">Semi-Supervised Spike Sorting</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#pipeline">Pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#external-resources">External Resources</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="api-documentation">
-<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="api">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html">Spike Data API</a></li>
-</ul>
-</div>
-</section>
 </section>
 
 
@@ -427,20 +359,6 @@ a variety of formats for further analysis in other programs.</p>
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#technical-explanation">Technical Explanation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#users-guide">Users Guide</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-documentation">API Documentation</a></li>
-</ul>
-  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
