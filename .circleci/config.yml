@@ -26,6 +26,7 @@ jobs:
           name: Install deps
           command: |
             conda env create -f environment.yml
+            echo "export PATH=${HOME}/conda/envs/spk2py/bin:$PATH" >> $BASH_ENV
             conda activate spk2py
             pip install -r requirements.txt
       - run:
