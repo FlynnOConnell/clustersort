@@ -10,55 +10,12 @@ Welcome to spk2py's Documentation
     plots for mahalanobis distance, ISI, and autocorrelograms. The spike data can also be exported to
     a variety of formats for further analysis in other programs.
 
-
-Overview
-========
-
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    :caption: Getting Started
    :name: gettingstarted
 
-   install
-
-
-Configuration
-=============
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Configuration Guide
-   :name: configuration
-
-   configuration_guide
-
-Technical Explanation
-=====================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Technical Explanation
-   :name: technical
-
-   spike_waveform_samples_explanation
-
-Users Guide
-===========
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Users Guide
-   :name: guide
-
-   guide/autosort
-
-API Documentation
-=================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API
-   :name: api
-
-   spike_data
+   Installation <install>
+   Guide <guide/index>
+   API <api/index>
 

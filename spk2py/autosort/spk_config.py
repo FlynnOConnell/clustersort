@@ -1,7 +1,10 @@
 """
-file: spk2py/spk_config.py - Configurations managed by the SpkConfig class for the AutoSort pipeline.
+.. module:: spk_config
+    :synopsis: Module to manage configurations for the AutoSort pipeline.
 
-See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
+.. moduleauthor:: Flynn O'Connell <
+
+
 """
 from __future__ import annotations
 
@@ -11,6 +14,38 @@ from pathlib import Path
 
 
 class SpkConfig:
+    """
+    Class to manage configurations for the AutoSort pipeline.
+
+    This class reads from an INI-style configuration file and provides methods
+    to access the configurations for different sections. These sections include
+    'run', 'path', 'cluster', and so on.
+
+    Parameters
+    ----------
+    cfg_path : str or Path, optional
+        The path to the configuration file. Defaults to a pre-defined location.
+
+    Notes
+    -----
+    The configuration file is an INI-style file with the following sections:
+
+    - run : dict
+        Contains configurations related to runtime settings like 'resort-limit', 'cores-used'.
+    - path : dict
+        Contains path settings like directories for 'run', 'results'.
+    - cluster : dict
+        Contains clustering parameters like 'max-clusters', 'max-iterations'.
+    - breach : dict
+        Contains breach analysis parameters like 'disconnect-voltage', 'max-breach-rate'.
+    - filter : dict
+        Contains filter parameters like 'low-cutoff', 'high-cutoff'.
+    - spike : dict
+        Contains spike-extraction settings like 'pre-time', 'post-time'.
+
+    See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
+
+    """
     def __init__(self, cfg_path: Path | str = ""):
         """
         Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.

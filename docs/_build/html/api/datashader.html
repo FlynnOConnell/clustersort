@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Semi-Supervised Spike Sorting &#8212; spk2py  documentation</title>
+    <title>DataShader &#8212; spk2py  documentation</title>
   
   
   
@@ -43,11 +43,11 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'guide/autosort';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/datashader';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Configuration Guide" href="configuration_guide.html" />
-    <link rel="prev" title="spk2py API" href="index.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Directory Manager" href="directory_manager.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -145,15 +145,15 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
                         Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         API
                       </a>
                     </li>
@@ -246,15 +246,15 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
                         Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         API
                       </a>
                     </li>
@@ -287,10 +287,22 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Autosort Procedures</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration_guide.html"> Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spike_waveform_samples_explanation.html"> Waveform Extraction</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="spike_data.html"> Spike Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cluster.html"> Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html"> I/O</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Data Shading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
 </ul>
 </div>
 </nav></div>
@@ -331,7 +343,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">spk2py API</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Semi-Supervi...</li>
+    <li class="breadcrumb-item active" aria-current="page">DataShader</li>
   </ul>
 </nav>
 </div>
@@ -348,74 +360,76 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="semi-supervised-spike-sorting">
-<h1>Semi-Supervised Spike Sorting<a class="headerlink" href="#semi-supervised-spike-sorting" title="Permalink to this heading">#</a></h1>
-<p>This Python repository is adapted from the methods and code described in Mukherjee, Wachutka, &amp; Katz (2017) <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
-A large percentage of the clustering parameters were made in reference to Reddish (2005) <a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+  <section id="module-spk2py.autosort.wf_shader">
+<span id="datashader"></span><h1>DataShader<a class="headerlink" href="#module-spk2py.autosort.wf_shader" title="Permalink to this heading">#</a></h1>
+<p>Create a Datashader image from an array of waveforms.</p>
+<p>This function takes in waveform data and their corresponding x-axis values,
+and generates a Datashader image for visualization. It performs downsampling,
+DataFrame creation, Datashader canvas setup, aggregation, and image export.
+The resulting Datashader image is displayed using Matplotlib.</p>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Permalink to this heading">#</a></h2>
+<dl class="simple">
+<dt>waveforms<span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy array containing waveform data.</p>
+</dd>
+<dt>x_values<span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy array of x-axis values corresponding to the waveform data.</p>
+</dd>
+<dt>dir_name<span class="classifier">str, optional</span></dt><dd><p>The directory where temporary files and images are stored.
+Default is “datashader_temp”.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns:<a class="headerlink" href="#returns" title="Permalink to this heading">#</a></h2>
+<dl class="simple">
+<dt>fig<span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The Matplotlib figure containing the Datashader image.</p>
+</dd>
+<dt>ax<span class="classifier">matplotlib.axes.Axes</span></dt><dd><p>The Matplotlib axes used for plotting.</p>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This program is designed for sorting spikes from electrophysiological recordings into single, isolated units. The primary input is a .h5 file containing the continuous signal or thresholded waveforms.</p>
+<p>This function is intended for use with the <code class="docutils literal notranslate"><span class="pre">spk2py.autosort</span></code> module.
+It is not intended for general use.
+It relies on the <code class="docutils literal notranslate"><span class="pre">datashader</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> packages.</p>
 </div>
-<p><strong>Compatibility and Licensing</strong></p>
-<p>This software is compatible with Windows, macOS, and Linux, and is well-suited for containerization and high-performance computing clusters. It is distributed under the GNU General Public License v3.0 (GPLv3). For more information, consult the LICENSE file in this repository.</p>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
-<section id="analysis">
-<h3>Analysis<a class="headerlink" href="#analysis" title="Permalink to this heading">#</a></h3>
-<p>The primary folder used for analysis is the ‘superplots’ folder. The ‘Plots’ folder contains individual plots, but in ‘superplots’, they are compiled for user convenience.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.autosort.wf_shader.waveforms_datashader">
+<span class="sig-prename descclassname"><span class="pre">spk2py.autosort.wf_shader.</span></span><span class="sig-name descname"><span class="pre">waveforms_datashader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'datashader_temp'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.wf_shader.waveforms_datashader" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a Datashader image from an array of waveforms.</p>
+<p>This function takes in waveform data and their corresponding x-axis values,
+and generates a Datashader image for visualization. It performs downsampling,
+DataFrame creation, Datashader canvas setup, aggregation, and image export.
+The resulting Datashader image is displayed using Matplotlib.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>waveforms</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy array containing waveform data.</p>
+</dd>
+<dt><strong>x_values</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy array of x-axis values corresponding to the waveform data.</p>
+</dd>
+<dt><strong>dir_name</strong><span class="classifier">str, optional</span></dt><dd><p>The directory where temporary files and images are stored.
+Default is “datashader_temp”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The Matplotlib figure containing the Datashader image.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes.Axes</span></dt><dd><p>The Matplotlib axes used for plotting.</p>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Important files include <cite>.info</cite>, which contains information about the sort run, and <cite>clustering_results_compiled_isoi.xlsx</cite>, which contains details about each cluster.</p>
+<p>This function is intended for use with the <code class="docutils literal notranslate"><span class="pre">spk2py.autosort</span></code> module.
+It is not intended for general use.
+It relies on the <code class="docutils literal notranslate"><span class="pre">datashader</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> packages.</p>
 </div>
-</section>
-<section id="criteria">
-<h3>Criteria<a class="headerlink" href="#criteria" title="Permalink to this heading">#</a></h3>
-<p>The primary criteria for considering a unit isolated are:</p>
-<ol class="arabic simple">
-<li><p>1 ms ISIs must be &lt;= 0.5%</p></li>
-<li><p>The waveform must be cellular</p></li>
-<li><p>The unit must be sufficiently separated based on Mahalanobis distribution</p></li>
-<li><p>L-Ratio must be &lt;= 0.1, as described in Schmitzer-Torbert et al. (2005) <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For structuring the plot paths and further details on L-Ratio, refer to the Autosort configuration file.</p>
-</div>
-</section>
-<section id="post-processing">
-<h3>Post-Processing<a class="headerlink" href="#post-processing" title="Permalink to this heading">#</a></h3>
-<p>The post-processing is carried out via a GUI.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This step requires both the .h5 files and the output folders from the Processing step.</p>
-</div>
-</section>
-</section>
-<section id="pipeline">
-<h2>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this heading">#</a></h2>
-<p>The pipeline functions as follows:</p>
-<ol class="arabic simple">
-<li><p><strong>Pre-Processing</strong>: Data is extracted from Spike2 files and packaged into .h5 files.</p></li>
-<li><p><strong>Processing</strong>: Multiple steps are performed, as detailed in Mukherjee et al. (2017) <a class="footnote-reference brackets" href="#id5" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
-<li><p><strong>Post-Processing</strong>: The data is packaged into .json files.</p></li>
-</ol>
-</section>
-<section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
-<aside class="footnote brackets" id="id5" role="note">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
-<p>Mukherjee, Narendra &amp; Wachutka, Joseph &amp; Katz, Donald. (2017). Python meets systems neuroscience: affordable, scalable and open-source electrophysiology in awake, behaving rodents. 98-105.</p>
-</aside>
-<aside class="footnote brackets" id="id6" role="note">
-<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
-<p>Schmitzer-Torbert N, Jackson J, Henze D, Harris K, Redish AD. Quantitative measures of cluster quality for use in extracellular recordings. Neuroscience. 2005;131:1–11.</p>
-</aside>
-</section>
-<section id="external-resources">
-<h2>External Resources<a class="headerlink" href="#external-resources" title="Permalink to this heading">#</a></h2>
-<p>For interacting with Spike2 data, the SonPy library is used and available via <a class="reference external" href="https://pypi.org/project/sonpy/">pypi.org</a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -430,20 +444,20 @@ A large percentage of the clustering parameters were made in reference to Reddis
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="directory_manager.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">spk2py API</p>
+        <p class="prev-next-title">Directory Manager</p>
       </div>
     </a>
     <a class="right-next"
-       href="configuration_guide.html"
+       href="configuration.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Configuration Guide</p>
+        <p class="prev-next-title">Configuration</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -462,21 +476,14 @@ A large percentage of the clustering parameters were made in reference to Reddis
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis">Analysis</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#criteria">Criteria</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-processing">Post-Processing</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline">Pipeline</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#external-resources">External Resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns:</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/guide/autosort.rst.txt">
+    <a href="../_sources/api/datashader.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

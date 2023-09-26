@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Semi-Supervised Spike Sorting &#8212; spk2py  documentation</title>
+    <title>I/O &#8212; spk2py  documentation</title>
   
   
   
@@ -43,11 +43,11 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'guide/autosort';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/io';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Configuration Guide" href="configuration_guide.html" />
-    <link rel="prev" title="spk2py API" href="index.html" />
+    <link rel="next" title="Logger" href="logger.html" />
+    <link rel="prev" title="Cluster" href="cluster.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -145,15 +145,15 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
                         Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         API
                       </a>
                     </li>
@@ -246,15 +246,15 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../guide/index.html">
                         Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         API
                       </a>
                     </li>
@@ -287,10 +287,22 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Autosort Procedures</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration_guide.html"> Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spike_waveform_samples_explanation.html"> Waveform Extraction</a></li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="spike_data.html"> Spike Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cluster.html"> Clustering</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#"> I/O</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datashader.html"> Data Shading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
 </ul>
 </div>
 </nav></div>
@@ -331,7 +343,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">spk2py API</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Semi-Supervi...</li>
+    <li class="breadcrumb-item active" aria-current="page">I/O</li>
   </ul>
 </nav>
 </div>
@@ -348,75 +360,73 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="semi-supervised-spike-sorting">
-<h1>Semi-Supervised Spike Sorting<a class="headerlink" href="#semi-supervised-spike-sorting" title="Permalink to this heading">#</a></h1>
-<p>This Python repository is adapted from the methods and code described in Mukherjee, Wachutka, &amp; Katz (2017) <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
-A large percentage of the clustering parameters were made in reference to Reddish (2005) <a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This program is designed for sorting spikes from electrophysiological recordings into single, isolated units. The primary input is a .h5 file containing the continuous signal or thresholded waveforms.</p>
+  <section id="module-spk2py.spk_io">
+<span id="i-o"></span><h1>I/O<a class="headerlink" href="#module-spk2py.spk_io" title="Permalink to this heading">#</a></h1>
+<p>file: spk2py/spk_io.py - Functions for saving/writing to h5 files using h5py.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.spk_io.read_group">
+<span class="sig-prename descclassname"><span class="pre">spk2py.spk_io.</span></span><span class="sig-name descname"><span class="pre">read_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Group</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#spk2py.spk_io.read_group" title="Permalink to this definition">#</a></dt>
+<dd><p>Read a single HDF5 group and return a dictionary containing the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>group</strong><span class="classifier">h5py.Group</span></dt><dd><p>HDF5 group to read.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary containing the data from the HDF5 group.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.spk_io.read_h5">
+<span class="sig-prename descclassname"><span class="pre">spk2py.spk_io.</span></span><span class="sig-name descname"><span class="pre">read_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#spk2py.spk_io.read_h5" title="Permalink to this definition">#</a></dt>
+<dd><p>Read a single HDF5 file and return a dictionary containing the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str or Path</span></dt><dd><p>Path to the HDF5 file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary containing the data from the HDF5 file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">read_h5</span><span class="p">(</span><span class="s1">&#39;input.h5&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<p><strong>Compatibility and Licensing</strong></p>
-<p>This software is compatible with Windows, macOS, and Linux, and is well-suited for containerization and high-performance computing clusters. It is distributed under the GNU General Public License v3.0 (GPLv3). For more information, consult the LICENSE file in this repository.</p>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
-<section id="analysis">
-<h3>Analysis<a class="headerlink" href="#analysis" title="Permalink to this heading">#</a></h3>
-<p>The primary folder used for analysis is the ‘superplots’ folder. The ‘Plots’ folder contains individual plots, but in ‘superplots’, they are compiled for user convenience.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Important files include <cite>.info</cite>, which contains information about the sort run, and <cite>clustering_results_compiled_isoi.xlsx</cite>, which contains details about each cluster.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.spk_io.write_h5">
+<span class="sig-prename descclassname"><span class="pre">spk2py.spk_io.</span></span><span class="sig-name descname"><span class="pre">write_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spk_io.write_h5" title="Permalink to this definition">#</a></dt>
+<dd><p>Save the specified data dictionaries to an HDF5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Path to the output HDF5 file.</p>
+</dd>
+<dt><strong>unit_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing unit data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">write_h5</span><span class="p">(</span><span class="s1">&#39;output.h5&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;unit1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;unit2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]})</span>
+</pre></div>
 </div>
-</section>
-<section id="criteria">
-<h3>Criteria<a class="headerlink" href="#criteria" title="Permalink to this heading">#</a></h3>
-<p>The primary criteria for considering a unit isolated are:</p>
-<ol class="arabic simple">
-<li><p>1 ms ISIs must be &lt;= 0.5%</p></li>
-<li><p>The waveform must be cellular</p></li>
-<li><p>The unit must be sufficiently separated based on Mahalanobis distribution</p></li>
-<li><p>L-Ratio must be &lt;= 0.1, as described in Schmitzer-Torbert et al. (2005) <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For structuring the plot paths and further details on L-Ratio, refer to the Autosort configuration file.</p>
-</div>
-</section>
-<section id="post-processing">
-<h3>Post-Processing<a class="headerlink" href="#post-processing" title="Permalink to this heading">#</a></h3>
-<p>The post-processing is carried out via a GUI.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This step requires both the .h5 files and the output folders from the Processing step.</p>
-</div>
-</section>
-</section>
-<section id="pipeline">
-<h2>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this heading">#</a></h2>
-<p>The pipeline functions as follows:</p>
-<ol class="arabic simple">
-<li><p><strong>Pre-Processing</strong>: Data is extracted from Spike2 files and packaged into .h5 files.</p></li>
-<li><p><strong>Processing</strong>: Multiple steps are performed, as detailed in Mukherjee et al. (2017) <a class="footnote-reference brackets" href="#id5" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
-<li><p><strong>Post-Processing</strong>: The data is packaged into .json files.</p></li>
-</ol>
-</section>
-<section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
-<aside class="footnote brackets" id="id5" role="note">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
-<p>Mukherjee, Narendra &amp; Wachutka, Joseph &amp; Katz, Donald. (2017). Python meets systems neuroscience: affordable, scalable and open-source electrophysiology in awake, behaving rodents. 98-105.</p>
-</aside>
-<aside class="footnote brackets" id="id6" role="note">
-<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
-<p>Schmitzer-Torbert N, Jackson J, Henze D, Harris K, Redish AD. Quantitative measures of cluster quality for use in extracellular recordings. Neuroscience. 2005;131:1–11.</p>
-</aside>
-</section>
-<section id="external-resources">
-<h2>External Resources<a class="headerlink" href="#external-resources" title="Permalink to this heading">#</a></h2>
-<p>For interacting with Spike2 data, the SonPy library is used and available via <a class="reference external" href="https://pypi.org/project/sonpy/">pypi.org</a>.</p>
-</section>
+</dd></dl>
+
 </section>
 
 
@@ -430,20 +440,20 @@ A large percentage of the clustering parameters were made in reference to Reddis
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="cluster.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">spk2py API</p>
+        <p class="prev-next-title">Cluster</p>
       </div>
     </a>
     <a class="right-next"
-       href="configuration_guide.html"
+       href="logger.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Configuration Guide</p>
+        <p class="prev-next-title">Logger</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -457,26 +467,8 @@ A large percentage of the clustering parameters were made in reference to Reddis
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
   <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis">Analysis</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#criteria">Criteria</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-processing">Post-Processing</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline">Pipeline</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#external-resources">External Resources</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/guide/autosort.rst.txt">
+    <a href="../_sources/api/io.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
