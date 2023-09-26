@@ -25,14 +25,15 @@ The primary folder used for analysis is the 'superplots' folder. The 'Plots' fol
 
    Important files include `.info`, which contains information about the sort run, and `clustering_results_compiled_isoi.xlsx`, which contains details about each cluster.
 
-.. ref::
 
-   The criteria for considering a unit isolated are:
+Criteria
+---------
+The primary criteria for considering a unit isolated are:
 
-   #. 1 ms ISIs must be <= 0.5%
-   #. The waveform must be cellular
-   #. The unit must be sufficiently separated based on Mahalanobis distribution
-   #. L-Ratio must be <= 0.1, as described in Schmitzer-Torbert et al. (2005) [2]_.
+#. 1 ms ISIs must be <= 0.5%
+#. The waveform must be cellular
+#. The unit must be sufficiently separated based on Mahalanobis distribution
+#. L-Ratio must be <= 0.1, as described in Schmitzer-Torbert et al. (2005) [2]_.
 
 .. note::
 
