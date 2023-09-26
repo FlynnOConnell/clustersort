@@ -3,13 +3,17 @@ import sys
 import importlib
 from pathlib import Path
 
-repo = Path().home() / 'repos' / "spk2py"
-spk = repo / "spk2py"
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, str(repo.absolute()))
-sys.path.insert(0, str(spk.absolute()))
-sys.path.insert(0, os.path.abspath('../'))
-os.environ['PYTHONPATH'] = str(repo) + ':' + os.environ.get('PYTHONPATH', '')
+source_path = os.path.abspath('.')
+docs_path = os.path.abspath('../')
+package_path = os.path.abspath('../../')
+spk2py_package_path = os.path.abspath('../../spk2py')
+
+sys.path.insert(0, source_path)
+sys.path.insert(0, docs_path)
+sys.path.insert(0, package_path)
+sys.path.insert(0, spk2py_package_path)
+os.environ['PYTHONPATH'] = package_path + ':' + os.environ.get('PYTHONPATH', '')
+os.environ['PYTHONPATH'] = spk2py_package_path + ':' + os.environ.get('PYTHONPATH', '')
 
 
 # Minimum version, enforced by sphinx
