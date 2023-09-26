@@ -42,6 +42,15 @@ Technical Explanation
 
    spike_waveform_samples_explanation
 
+Users Guide
+===========
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Users Guide
+   :name: guide
+
+   guide/autosort
 
 API Documentation
 =================
