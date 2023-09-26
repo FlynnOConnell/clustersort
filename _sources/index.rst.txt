@@ -18,4 +18,5 @@ Welcome to spk2py's Documentation
    Installation <install>
    Guide <guide/index>
    API <api/index>
+   Package <package/index>
 

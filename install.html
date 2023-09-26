@@ -146,6 +146,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
       
@@ -243,6 +250,13 @@ document.write(`
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
         
@@ -323,12 +337,11 @@ document.write(`
 <li><p><a class="reference external" href="https://github.com/FlynnOConnell/spk2py/">spk2py on GitHub</a></p></li>
 </ul>
 <p>It is recommended to install using <a class="reference external" href="https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install">mambaforge</a> this will drastically speed up environment creation:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># works with conda too, but mamba is much faster</span>
+mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
+conda<span class="w"> </span>activate<span class="w"> </span>spk2py
 </pre></div>
 </div>
-<p># works with conda too, but mamba is much faster
-mamba env create -f environment.yml
-conda activate spk2py</p>
 <p>Additionally, though not recommended, <code class="docutils literal notranslate"><span class="pre">spk2py</span></code> can be installed directly from pip:</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -336,10 +349,9 @@ conda activate spk2py</p>
 Using <code class="docutils literal notranslate"><span class="pre">mamba</span></code> has been tested on each platform.
 As has docker.</p>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>spk2py
 </pre></div>
 </div>
-<p>pip install spk2py</p>
 <section id="mamba-installation">
 <h2>Mamba Installation<a class="headerlink" href="#mamba-installation" title="Permalink to this heading">#</a></h2>
 <p>We recommend that you start with the <a class="reference external" href="https://github.com/conda-forge/miniforge#mambaforge">Mambaforge distribution</a>.
