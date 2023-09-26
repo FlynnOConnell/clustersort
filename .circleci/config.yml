@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Install deps
           command: |
-            mamba install -f environment.yml
+            conda install -f environment.yml
             pip install -r requirements.txt
       - run:
           name: Build docs
@@ -62,10 +62,10 @@ jobs:
           name: Deploy docs to gh-pages branch
           command: |
             ls -la
-            git fetch origin gh-pages:gh-pages 
-            git checkout gh-pages 
-            rsync -av ~/repo/doc/build/html/ . 
-            git add . 
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+            rsync -av ~/repo/doc/build/html/ .
+            git add .
             git diff --cached --quiet || git commit -m "[skip ci] Updates" && git push origin gh-pages
             git push origin gh-pages
 
