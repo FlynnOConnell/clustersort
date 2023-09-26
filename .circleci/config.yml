@@ -15,7 +15,9 @@ jobs:
       - checkout
       - run:
           name: Install dev dependencies
-          command: pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design
+          command: |
+            echo 'export PYTHONPATH=$PYTHONPATH:$(pwd)' >> $BASH_ENV
+            pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design
       - run:
           name: Build docs
           command: |
