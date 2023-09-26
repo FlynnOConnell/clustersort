@@ -14,10 +14,19 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dev dependencies
+          name: Setup Mamba
           command: |
+            pwd
             echo 'export PYTHONPATH=$PYTHONPATH:$(pwd)' >> $BASH_ENV
-            pip install sphinx numpydoc matplotlib pydata_sphinx_theme sphinx_design
+            curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
+            bash Mambaforge-$(uname)-$(uname -m).sh
+            source ~/miniforge3/bin/activate
+            conda config --set always_yes yes --set changeps1 no
+      - run:
+          name: Install deps
+          command: |
+            mamba install -f environment.yml
+            pip install -r requirements.txt
       - run:
           name: Build docs
           command: |
