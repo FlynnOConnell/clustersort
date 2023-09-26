@@ -46,9 +46,6 @@ jobs:
             git config user.email "FlynnOConnell@gmail.com"
             git config user.name "Flynn OConnell"
 
-      - add_ssh_keys:
-          fingerprints:
-            - "1b:4c:8b:33:2d:5a:f5:6f:f0:14:d2:79:62:2f:59:c8"
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/_build/html
