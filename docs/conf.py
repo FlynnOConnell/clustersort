@@ -57,7 +57,8 @@ html_context = {"default_mode": "dark"}
 add_function_parentheses = False
 
 # -----------------------------------------------------------------------------
-# Autosummary
+# Autosummary/numpydoc
 # -----------------------------------------------------------------------------
 
 autosummary_generate = True
+numpydoc_show_class_members = False
