@@ -8,43 +8,36 @@ channels:
   - conda-forge
 dependencies:
   - python=3.9
+
+# Scientific libraries
   - numpy<=1.23.5 # to avoid conflicts with numba
+  - scipy
   - pandas
+  - scikit-learn
+  - scikit-image
   - matplotlib
+
+# Image and IO
   - h5py
   - pillow
   - Opencv
-  - scipy
-  - scikit-learn
-  - scikit-image
   - openpyxl
   - OpenSSL
   - datashader
   - imageio
+
+# Compilation
   - compilers
   - openblas
-  - setuptools=59.2.0
-  - pkg-config
-  - meson-python
   - pip
   - spin
-  # For type annotations
+
+# For type annotations
   - typing_extensions>=4.2.0  # needed for python < 3.10
   - mypy=1.5.1
-  # For building docs
+
+# Documentation
   - sphinx>=4.5.0
   - sphinx-design
-  - numpydoc=1.4.0
-  - ipython
-  - scipy
-  - pandas
-  - matplotlib
   - pydata-sphinx-theme=0.13.3
-  # NOTE: breathe 4.33.0 collides with sphinx.ext.graphviz
-  - breathe>4.33.0
-  # For linting
-  - pycodestyle=2.7.0
-  - gitpython
-  # Used in some tests
-  - cffi
-  - pytz
+  - numpydoc=1.4.0
