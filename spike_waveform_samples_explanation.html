@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Welcome to spk2py’s Documentation &#8212; spk2py  documentation</title>
+    <title>Spike Waveform Samples Explanation &#8212; spk2py  documentation</title>
   
   
   
@@ -40,10 +40,12 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'spike_waveform_samples_explanation';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="install.html" />
+    <link rel="next" title="Semi-Supervised Spike Sorting" href="guide/autosort.html" />
+    <link rel="prev" title="Configuration Guide" href="configuration_guide.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -99,7 +101,7 @@
       <div class="navbar-item">
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="index.html">
   
   
   
@@ -139,8 +141,8 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="spike_waveform_samples_explanation.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Spike Waveform Samples Explanation
                       </a>
                     </li>
@@ -250,8 +252,8 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="spike_waveform_samples_explanation.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Spike Waveform Samples Explanation
                       </a>
                     </li>
@@ -309,7 +311,33 @@ document.write(`
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article"></div>
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Spike Waveform Samples Explanation</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
               
               
               
@@ -317,82 +345,26 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="welcome-to-spk2py-s-documentation">
-<h1>Welcome to spk2py’s Documentation<a class="headerlink" href="#welcome-to-spk2py-s-documentation" title="Permalink to this heading">#</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>spk2py is a Python-based framework for processing and analyzing electrophysiological spike data.
-It extracts spike waveforms from raw Spike2 files using the lower-level SonPy library, and then
-performs waveform extraction and spike sorting. It also provides a number of tools for analyzing
-the resulting spike data. Once spikes are sorted, users are able to post-process the spikes using
-plots for mahalanobis distance, ISI, and autocorrelograms. The spike data can also be exported to
-a variety of formats for further analysis in other programs.</p>
-</div>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="gettingstarted">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#mamba-installation">Mamba Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#existing-conda-install-not-recommended">Existing <code class="docutils literal notranslate"><span class="pre">conda</span></code> install (not recommended)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#docker-images">Docker images</a></li>
+  <section id="spike-waveform-samples-explanation">
+<h1>Spike Waveform Samples Explanation<a class="headerlink" href="#spike-waveform-samples-explanation" title="Permalink to this heading">#</a></h1>
+<p>When processing electrophysiological data to extract spike waveforms, it’s crucial to understand how many samples each extracted spike waveform will contain.</p>
+<section id="setting-up-snapshot-duration">
+<h2>Setting Up Snapshot Duration<a class="headerlink" href="#setting-up-snapshot-duration" title="Permalink to this heading">#</a></h2>
+<p>In the extract_waveforms() code, a “snapshot” around each detected spike is defined using the parameter <cite>spike_snapshot</cite>, set to <cite>(0.2, 0.6)</cite> milliseconds by default. This means that each snapshot will contain:</p>
+<ul class="simple">
+<li><p>0.2 milliseconds of data before the spike</p></li>
+<li><p>0.6 milliseconds of data after the spike</p></li>
+<li><p>The spike itself</p></li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
 </section>
-<section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="id1">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Configuration Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="configuration_guide.html">Configuration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration_guide.html#function-default-config">Function: <code class="docutils literal notranslate"><span class="pre">default_config</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration_guide.html#configuration-sections-and-parameters">Configuration Sections and Parameters</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="technical-explanation">
-<h2>Technical Explanation<a class="headerlink" href="#technical-explanation" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="technical">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Technical Explanation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spike_waveform_samples_explanation.html">Spike Waveform Samples Explanation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spike_waveform_samples_explanation.html#setting-up-snapshot-duration">Setting Up Snapshot Duration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spike_waveform_samples_explanation.html#calculating-number-of-samples">Calculating Number of Samples</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="users-guide">
-<h2>Users Guide<a class="headerlink" href="#users-guide" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="guide">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Users Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="guide/autosort.html">Semi-Supervised Spike Sorting</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#pipeline">Pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#external-resources">External Resources</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="api-documentation">
-<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="api">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html">Spike Data API</a></li>
-</ul>
-</div>
+<section id="calculating-number-of-samples">
+<h2>Calculating Number of Samples<a class="headerlink" href="#calculating-number-of-samples" title="Permalink to this heading">#</a></h2>
+<p>Given a sampling rate of 18,518 Hz, the duration of each sample would be <span class="math notranslate nohighlight">\(\frac{1}{18518}\)</span> seconds or approximately 0.054 milliseconds.</p>
+<ol class="arabic simple">
+<li><p>Pre-spike samples: <span class="math notranslate nohighlight">\(\frac{0.2}{0.054} \approx 3.7\)</span>, rounded to 4 samples</p></li>
+<li><p>Post-spike samples: <span class="math notranslate nohighlight">\(\frac{0.6}{0.054} \approx 11.1\)</span>, rounded to 11 samples</p></li>
+<li><p>Adding 1 for the spike itself gives you <span class="math notranslate nohighlight">\(4 + 11 + 1 = 16\)</span> samples</p></li>
+</ol>
 </section>
 </section>
 
@@ -407,12 +379,21 @@ a variety of formats for further analysis in other programs.</p>
   
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="configuration_guide.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Configuration Guide</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="install.html"
+       href="guide/autosort.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title">Semi-Supervised Spike Sorting</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -434,17 +415,14 @@ a variety of formats for further analysis in other programs.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#technical-explanation">Technical Explanation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#users-guide">Users Guide</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-documentation">API Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-snapshot-duration">Setting Up Snapshot Duration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-number-of-samples">Calculating Number of Samples</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="_sources/index.rst.txt">
+    <a href="_sources/spike_waveform_samples_explanation.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

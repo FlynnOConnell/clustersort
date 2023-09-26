@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Welcome to spk2py’s Documentation &#8212; spk2py  documentation</title>
+    <title>Installation &#8212; spk2py  documentation</title>
   
   
   
@@ -40,10 +40,11 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="install.html" />
+    <link rel="next" title="Configuration Guide" href="configuration_guide.html" />
+    <link rel="prev" title="Welcome to spk2py’s Documentation" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -99,7 +100,7 @@
       <div class="navbar-item">
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="index.html">
   
   
   
@@ -125,8 +126,8 @@
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="install.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Installation
                       </a>
                     </li>
@@ -236,8 +237,8 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="install.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Installation
                       </a>
                     </li>
@@ -309,7 +310,33 @@ document.write(`
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article"></div>
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Installation</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
               
               
               
@@ -317,82 +344,50 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="welcome-to-spk2py-s-documentation">
-<h1>Welcome to spk2py’s Documentation<a class="headerlink" href="#welcome-to-spk2py-s-documentation" title="Permalink to this heading">#</a></h1>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h1>
+<p>This pipeline requires Python 3.9+, and numpy &lt;= 1.3.5 to comply with numba restrictions.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/FlynnOConnell/spk2py/">spk2py on GitHub</a></p></li>
+</ul>
+<p>It is recommended to install using <a class="reference external" href="https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install">mambaforge</a> this will drastically speed up environment creation:</p>
+<section id="mamba-installation">
+<h2>Mamba Installation<a class="headerlink" href="#mamba-installation" title="Permalink to this heading">#</a></h2>
+<p>We recommend that you start with the <a class="reference external" href="https://github.com/conda-forge/miniforge#mambaforge">Mambaforge distribution</a>.
+Mambaforge comes with the popular <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel preconfigured, but you can modify the configuration to use any channel you like.
+Note that Anaconda channels are generally incompatible with conda-forge, so you should not mix them.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>spk2py is a Python-based framework for processing and analyzing electrophysiological spike data.
-It extracts spike waveforms from raw Spike2 files using the lower-level SonPy library, and then
-performs waveform extraction and spike sorting. It also provides a number of tools for analyzing
-the resulting spike data. Once spikes are sorted, users are able to post-process the spikes using
-plots for mahalanobis distance, ISI, and autocorrelograms. The spike data can also be exported to
-a variety of formats for further analysis in other programs.</p>
+<p>For both <code class="docutils literal notranslate"><span class="pre">mamba</span></code> and <code class="docutils literal notranslate"><span class="pre">conda</span></code>, the <code class="docutils literal notranslate"><span class="pre">base</span></code> environment is meant to hold their dependencies.
+It is strongly discouraged to install anything else in the base envionment.
+Doing so may break <code class="docutils literal notranslate"><span class="pre">mamba</span></code> and <code class="docutils literal notranslate"><span class="pre">conda</span></code> installation.</p>
 </div>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="gettingstarted">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#mamba-installation">Mamba Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#existing-conda-install-not-recommended">Existing <code class="docutils literal notranslate"><span class="pre">conda</span></code> install (not recommended)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#docker-images">Docker images</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<section id="existing-conda-install-not-recommended">
+<h3>Existing <code class="docutils literal notranslate"><span class="pre">conda</span></code> install (not recommended)<a class="headerlink" href="#existing-conda-install-not-recommended" title="Permalink to this heading">#</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This way of installing Mamba is <strong>not recommended</strong>.
+We strongly recommend to use the Mambaforge method (see above).</p>
+</div>
+<p>To get <code class="docutils literal notranslate"><span class="pre">mamba</span></code>, just install it <em>into the base environment</em> from the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOT RECOMMENDED: This method of installation is not recommended, prefer Mambaforge instead (see above)</span>
+<span class="c1"># conda install -n base --override-channels -c conda-forge mamba &#39;python_abi=*=*cp*&#39;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Installing mamba into any other environment than <code class="docutils literal notranslate"><span class="pre">base</span></code> is not supported.</p>
 </div>
 </section>
-<section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="id1">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Configuration Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="configuration_guide.html">Configuration Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration_guide.html#function-default-config">Function: <code class="docutils literal notranslate"><span class="pre">default_config</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration_guide.html#configuration-sections-and-parameters">Configuration Sections and Parameters</a></li>
-</ul>
-</li>
-</ul>
+<section id="docker-images">
+<h3>Docker images<a class="headerlink" href="#docker-images" title="Permalink to this heading">#</a></h3>
+<p>In addition to the Mambaforge standalone distribution (see above), there are also the
+<a class="reference external" href="https://hub.docker.com/r/condaforge/mambaforge">condaforge/mambaforge</a> docker
+images:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>condaforge/mambaforge:latest<span class="w"> </span>mamba<span class="w"> </span>info
+</pre></div>
 </div>
 </section>
-<section id="technical-explanation">
-<h2>Technical Explanation<a class="headerlink" href="#technical-explanation" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="technical">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Technical Explanation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spike_waveform_samples_explanation.html">Spike Waveform Samples Explanation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spike_waveform_samples_explanation.html#setting-up-snapshot-duration">Setting Up Snapshot Duration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spike_waveform_samples_explanation.html#calculating-number-of-samples">Calculating Number of Samples</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="users-guide">
-<h2>Users Guide<a class="headerlink" href="#users-guide" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="guide">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Users Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="guide/autosort.html">Semi-Supervised Spike Sorting</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#pipeline">Pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide/autosort.html#external-resources">External Resources</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="api-documentation">
-<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound" id="api">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html">Spike Data API</a></li>
-</ul>
-</div>
 </section>
 </section>
 
@@ -407,12 +402,21 @@ a variety of formats for further analysis in other programs.</p>
   
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Welcome to spk2py’s Documentation</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="install.html"
+       href="configuration_guide.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title">Configuration Guide</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -434,17 +438,17 @@ a variety of formats for further analysis in other programs.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#technical-explanation">Technical Explanation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#users-guide">Users Guide</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-documentation">API Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mamba-installation">Mamba Installation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existing-conda-install-not-recommended">Existing <code class="docutils literal notranslate"><span class="pre">conda</span></code> install (not recommended)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#docker-images">Docker images</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="_sources/index.rst.txt">
+    <a href="_sources/install.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
