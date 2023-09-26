@@ -1,4 +1,4 @@
-Spike Data Documentation
+Spike Data API
 =========================
 
 .. automodule:: spike_data
