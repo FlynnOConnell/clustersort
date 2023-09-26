@@ -20,6 +20,7 @@ jobs:
           name: Build docs
           command: |
             cd doc
+            # with makefile
             make clean
             make html
 
