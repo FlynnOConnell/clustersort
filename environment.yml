@@ -2,7 +2,7 @@
 #
 #   $ conda env create -f environment.yml  # `mamba` works too for this command
 #   $ conda activate spk2py-dev
-#
+
 name: spk2py
 channels:
   - conda-forge

@@ -24,6 +24,6 @@ setup(
         'Operating System :: POSIX',
         'Operating System :: Unix',
         'Operating System :: MacOS',
-    ]
+    ],
     python_requires='>=3.9',
 )
