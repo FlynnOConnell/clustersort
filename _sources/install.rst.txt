@@ -8,11 +8,28 @@ This pipeline requires Python 3.9+, and numpy <= 1.3.5 to comply with numba rest
 
 It is recommended to install using `mambaforge <https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install>`_ this will drastically speed up environment creation:
 
-.. code-block:: bash
+Installing from source
+======================
 
-    # works with conda too, but mamba is much faster
-    mamba env create -f environment.yml
+**Linux and MacOS:**
+.. code-block:: bash
+    git clone https://github.com/FlynnOConnell/spk2py.git
+    cd path/to/spk2py
+    # This is for MambaForge, but you can use conda if you want
+    # Note if you use conda, but want to go the mamba route, you will really want to uninstall miniconda/anaconda first
+    wget -O Mambaforge.sh  "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
+    bash Mambaforge.sh -b -p "${HOME}/conda"
+    # !!!! FOR BASH USERS !!!!
+    # If you dont know what these are, then use this one
+    # If you use zsh, just change this to ~/.zshrc
+    echo ". ${HOME}/conda/etc/profile.d/conda.sh" >> ~/.bashrc
+    source "${HOME}/conda/etc/profile.d/conda.sh"
+
+.. code-block:: bash
+    mamba env create -f environment.yml # this will take a while
     conda activate spk2py
+    pip install -r requirements.txt
+    pip install -e .
 
 Additionally, though not recommended, ``spk2py`` can be installed directly from pip:
 
@@ -22,7 +39,6 @@ Additionally, though not recommended, ``spk2py`` can be installed directly from 
    As has docker.
 
 .. code-block:: bash
-
     pip install spk2py
 
 Mamba Installation
@@ -65,5 +81,4 @@ In addition to the Mambaforge standalone distribution (see above), there are als
 images:
 
 .. code-block:: bash
-
   docker run -it --rm condaforge/mambaforge:latest mamba info
