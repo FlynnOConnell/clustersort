@@ -2,4 +2,4 @@ SPK2PY
 ======
 
 .. automodule::
-   spkpy
+   spkpy.spk2py
