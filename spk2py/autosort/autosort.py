@@ -4,6 +4,7 @@ AutoSort: A Python package for automated spike sorting of extracellular recordin
 """
 from __future__ import annotations
 
+# Standard Library Imports
 import configparser
 import logging
 import os
@@ -12,6 +13,7 @@ import warnings
 from datetime import date
 from pathlib import Path
 
+# External Dependencies
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,10 +23,11 @@ from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
 
-from spk2py.autosort.wf_shader import waveforms_datashader
-from spk2py.cluster import cluster_gmm, get_lratios, scale_waveforms, implement_pca
-from spk2py.autosort.directory_manager import DirectoryManager
-from spk2py.autosort.spk_config import SpkConfig
+from .directory_manager import DirectoryManager
+from .spk_config import SpkConfig
+from .wf_shader import waveforms_datashader
+
+from ..util import cluster_gmm, get_lratios, scale_waveforms, implement_pca
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"

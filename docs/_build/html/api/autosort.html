@@ -46,8 +46,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/autosort';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Directory Manager" href="directory_manager.html" />
-    <link rel="prev" title="Logger" href="logger.html" />
+    <link rel="next" title="Extraction" href="extraction.html" />
+    <link rel="prev" title="spk2py API" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -158,6 +158,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
       
@@ -259,6 +266,13 @@ document.write(`
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
         
@@ -287,22 +301,12 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html"> Spike Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cluster.html"> Clustering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html"> I/O</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Main</a></li>
-<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datashader.html"> Data Shading</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Autosort</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extraction.html"> Extraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html"> Util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
 </ul>
 </div>
 </nav></div>
@@ -360,12 +364,116 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-spk2py.autosort.autosort">
-<span id="autosort"></span><h1>Autosort<a class="headerlink" href="#module-spk2py.autosort.autosort" title="Permalink to this heading">#</a></h1>
-<p>AutoSort: A Python package for automated spike sorting of extracellular recordings.</p>
+  <section id="module-spk2py.autosort">
+<span id="autosort"></span><h1>Autosort<a class="headerlink" href="#module-spk2py.autosort" title="Permalink to this heading">#</a></h1>
+<table class="autosummary longtable table autosummary">
+<tbody>
+</tbody>
+</table>
+<p>Autosort: A Python package for spike sorting.</p>
+<p>This package is designed to automate the spike sorting process for extracellular recordings.</p>
+<p>It is designed to be used with the Spike2 software package from CED, with pl2 files from Plexon
+in development.</p>
+<p>The package is designed to be used with the AutoSort pipeline, which is a series of steps that
+are performed on the data to extract spikes and cluster them. The pipeline is as follows:</p>
+<ol class="arabic simple">
+<li><p>Read in the data from the pl2 file.</p></li>
+<li><p>Filter the data.</p></li>
+<li><p>Extract spikes from the filtered data.</p></li>
+<li><p>Cluster the spikes.</p></li>
+<li><p>Perform breach analysis on the clusters.</p></li>
+<li><p>Resort the clusters based on the breach analysis.</p></li>
+<li><p>Save the data to an HDF5 file, and graphs to given plotting folders.</p></li>
+</ol>
 <dl class="py class">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.autosort.autosort.</span></span><span class="sig-name descname"><span class="pre">ProcessChannel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan_num</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.autosort.</span></span><span class="sig-name descname"><span class="pre">DirectoryManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.DirectoryManager" title="Permalink to this definition">#</a></dt>
+<dd><p>Manages directories for storing processed data, plots, reports, and intermediate files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Stem of the input filepath.</p>
+</dd>
+<dt><strong>base_path</strong><span class="classifier">Path</span></dt><dd><p>Parent directory for the main categories of directories.</p>
+</dd>
+<dt><strong>base_suffix</strong><span class="classifier">str</span></dt><dd><p>Suffix of the base path.</p>
+</dd>
+<dt><strong>directories</strong><span class="classifier">list of Path</span></dt><dd><p>List of all primary directories managed by this instance.</p>
+</dd>
+<dt><strong>idx</strong><span class="classifier">int</span></dt><dd><p>Index used for channel directory creation, default is 0.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.channel">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel</span></span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.channel" title="Permalink to this definition">#</a></dt>
+<dd><p>int : Channel index incremented by 1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.create_base_directories">
+<span class="sig-name descname"><span class="pre">create_base_directories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.create_base_directories" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates the base directories for raw data, processed data, plots, reports, and temporary files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.create_channel_directories">
+<span class="sig-name descname"><span class="pre">create_channel_directories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_chan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.create_channel_directories" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a set of subdirectories for a specific channel under each base directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_chan</strong><span class="classifier">int</span></dt><dd><p>Number of channels for which to create directories.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.flush_directories">
+<span class="sig-name descname"><span class="pre">flush_directories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.flush_directories" title="Permalink to this definition">#</a></dt>
+<dd><p>Deletes all files and subdirectories in each base directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Exception</dt><dd><p>If there is an error in deleting files or directories.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.intermediate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">intermediate</span></span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.intermediate" title="Permalink to this definition">#</a></dt>
+<dd><p>Path : Directory for storing intermediate files.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.plots">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plots</span></span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.plots" title="Permalink to this definition">#</a></dt>
+<dd><p>Path : Directory for storing plots.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.processed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">processed</span></span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.processed" title="Permalink to this definition">#</a></dt>
+<dd><p>Path : Directory for storing processed data.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.DirectoryManager.reports">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reports</span></span><a class="headerlink" href="#spk2py.autosort.DirectoryManager.reports" title="Permalink to this definition">#</a></dt>
+<dd><p>Path : Directory for storing reports.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.autosort.</span></span><span class="sig-name descname"><span class="pre">ProcessChannel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan_num</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.ProcessChannel" title="Permalink to this definition">#</a></dt>
 <dd><p>Class for running the spike sorting process on a single channel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -459,20 +567,20 @@ document.write(`
 </tbody>
 </table>
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.artifact_removal">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">artifact_removal</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.artifact_removal" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.artifact_removal">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">artifact_removal</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.artifact_removal" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.bandpass">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bandpass</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.bandpass" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.bandpass">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bandpass</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.bandpass" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.compile_isoi">
-<span class="sig-name descname"><span class="pre">compile_isoi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maxclust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_ratio_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.compile_isoi" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.compile_isoi">
+<span class="sig-name descname"><span class="pre">compile_isoi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maxclust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_ratio_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.compile_isoi" title="Permalink to this definition">#</a></dt>
 <dd><p>Compiles the Inter-Spike Interval (ISI) data for each channel and applies conditional formatting.</p>
 <p>This method iterates through each channel’s clustering solutions, reads ISI information,
 and writes the compiled data to an Excel file. It also applies conditional formatting
@@ -509,56 +617,56 @@ based on ISI values.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.max_breach_avg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_breach_avg</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.max_breach_avg" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.max_breach_avg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_breach_avg</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.max_breach_avg" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.max_breach_count">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_breach_count</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.max_breach_count" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.max_breach_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_breach_count</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.max_breach_count" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.max_breach_rate">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_breach_rate</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.max_breach_rate" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.max_breach_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_breach_rate</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.max_breach_rate" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.max_clusters">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_clusters</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.max_clusters" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.max_clusters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_clusters</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.max_clusters" title="Permalink to this definition">#</a></dt>
 <dd><p>The total number of clusters to be sorted.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.max_iterations">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_iterations</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.max_iterations" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.max_iterations">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_iterations</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.max_iterations" title="Permalink to this definition">#</a></dt>
 <dd><p>The maximum number of iterations to run the GMM.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.num_restarts">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_restarts</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.num_restarts" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.num_restarts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_restarts</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.num_restarts" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of random restarts to run the GMM.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.post_time">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">post_time</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.post_time" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.post_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">post_time</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.post_time" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.pre_time">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pre_time</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.pre_time" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.pre_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pre_time</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.pre_time" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.process_channel">
-<span class="sig-name descname"><span class="pre">process_channel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.process_channel" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.process_channel">
+<span class="sig-name descname"><span class="pre">process_channel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.process_channel" title="Permalink to this definition">#</a></dt>
 <dd><p>Executes spike sorting for a single recording channel.</p>
 <p>This method performs the entire spike sorting workflow for one channel.
 It includes dejittering, PCA transformation, and GMM-based clustering.
@@ -590,20 +698,20 @@ If no spikes are found in the data, it writes out a warning and returns.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.pvar">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pvar</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.pvar" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.pvar">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pvar</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.pvar" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the percent variance explained by the principal components.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.spike_detection">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spike_detection</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.spike_detection" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.spike_detection">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spike_detection</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.spike_detection" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.spk_gmm">
-<span class="sig-name descname"><span class="pre">spk_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times_final</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.spk_gmm" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.spk_gmm">
+<span class="sig-name descname"><span class="pre">spk_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times_final</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.spk_gmm" title="Permalink to this definition">#</a></dt>
 <dd><p>Perform Gaussian Mixture Model (GMM) clustering on spike waveform data.</p>
 <p>This method takes pre-processed waveform data and applies GMM-based clustering
 to categorize each waveform into different neuronal units. It performs multiple
@@ -654,14 +762,14 @@ of the waveform (e.g., amplitude, principal component, etc.).</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.std">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">std</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.std" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.std">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">std</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.std" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.superplots">
-<span class="sig-name descname"><span class="pre">superplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maxclust</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.superplots" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.superplots">
+<span class="sig-name descname"><span class="pre">superplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maxclust</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.superplots" title="Permalink to this definition">#</a></dt>
 <dd><p>Creates superplots for each channel.</p>
 <p>This function conglomerates individual plots into a single, combined plot per channel.</p>
 <dl class="field-list simple">
@@ -687,52 +795,247 @@ of the waveform (e.g., amplitude, principal component, etc.).</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.thresh">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">thresh</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.thresh" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.thresh">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">thresh</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.thresh" title="Permalink to this definition">#</a></dt>
 <dd><p>The convergence criterion for the GMM.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.usepvar">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">usepvar</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.usepvar" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.usepvar">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">usepvar</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.usepvar" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns whether to use the percent variance explained by the principal components.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.userpc">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">userpc</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.userpc" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.userpc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">userpc</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.userpc" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the number of principal components to use.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.voltage_cutoff">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">voltage_cutoff</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.voltage_cutoff" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.voltage_cutoff">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">voltage_cutoff</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.voltage_cutoff" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.ProcessChannel.wf_amplitude_sd_cutoff">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wf_amplitude_sd_cutoff</span></span><a class="headerlink" href="#spk2py.autosort.autosort.ProcessChannel.wf_amplitude_sd_cutoff" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.ProcessChannel.wf_amplitude_sd_cutoff">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wf_amplitude_sd_cutoff</span></span><a class="headerlink" href="#spk2py.autosort.ProcessChannel.wf_amplitude_sd_cutoff" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of standard deviations above the mean to reject waveforms.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.infofile">
-<span class="sig-prename descclassname"><span class="pre">spk2py.autosort.autosort.</span></span><span class="sig-name descname"><span class="pre">infofile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="configuration.html#spk2py.autosort.spk_config.SpkConfig" title="spk2py.autosort.spk_config.SpkConfig"><span class="pre">SpkConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.infofile" title="Permalink to this definition">#</a></dt>
-<dd><p>Dumps run info to a .info file.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.autosort.</span></span><span class="sig-name descname"><span class="pre">SpkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.SpkConfig" title="Permalink to this definition">#</a></dt>
+<dd><p>Class to manage configurations for the AutoSort pipeline.</p>
+<p>This class reads from an INI-style configuration file and provides methods
+to access the configurations for different sections. These sections include
+‘run’, ‘path’, ‘cluster’, and so on.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of the HDF5 file being processed.</p>
+<dt><strong>cfg_path</strong><span class="classifier">str or Path, optional</span></dt><dd><p>The path to the configuration file. Defaults to a pre-defined location.</p>
 </dd>
-<dt><strong>path</strong><span class="classifier">str or Path</span></dt><dd><p>The directory path where the .info file will be saved.</p>
+</dl>
 </dd>
-<dt><strong>sort_time</strong><span class="classifier">float or str</span></dt><dd><p>Time taken for sorting.</p>
+</dl>
+<p class="rubric">Notes</p>
+<p>The configuration file is an INI-style file with the following sections:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>run<span class="classifier">dict</span></dt><dd><p>Contains configurations related to runtime settings like ‘resort-limit’, ‘cores-used’.</p>
 </dd>
-<dt><strong>params</strong><span class="classifier">SpkConfig</span></dt><dd><p>Instance of SpkConfig with parameters used for sorting.</p>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>path<span class="classifier">dict</span></dt><dd><p>Contains path settings like directories for ‘run’, ‘results’.</p>
 </dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>cluster<span class="classifier">dict</span></dt><dd><p>Contains clustering parameters like ‘max-clusters’, ‘max-iterations’.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>breach<span class="classifier">dict</span></dt><dd><p>Contains breach analysis parameters like ‘disconnect-voltage’, ‘max-breach-rate’.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>filter<span class="classifier">dict</span></dt><dd><p>Contains filter parameters like ‘low-cutoff’, ‘high-cutoff’.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>spike<span class="classifier">dict</span></dt><dd><p>Contains spike-extraction settings like ‘pre-time’, ‘post-time’.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>See Also: <a class="reference external" href="https://docs.python.org/3/library/configparser.html">configparser from python std library</a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.breach">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">breach</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.breach" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘breach’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.cluster">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cluster</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.cluster" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘cluster’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.detection">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detection</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.detection" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘detection’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.filter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.filter" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘breach’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.get_all">
+<span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.SpkConfig.get_all" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing all key-value pairs from all sections.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.get_section">
+<span class="sig-name descname"><span class="pre">get_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.SpkConfig.get_section" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a dictionary containing key-value pairs for the given section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>section</strong><span class="classifier">str</span></dt><dd><p>The name of the section in the config file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary containing the section’s key-value pairs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.path" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘path’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.pca">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pca</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.pca" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘pca’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.postprocess">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">postprocess</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.postprocess" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘postprocess’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.read_config">
+<span class="sig-name descname"><span class="pre">read_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.SpkConfig.read_config" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ConfigParser</dt><dd><p>A ConfigParser object loaded with the INI file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.run">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.run" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘run’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.SpkConfig.set" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the value of a configuraton parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>section</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>key</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>value</strong><span class="classifier">Any</span></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -743,9 +1046,43 @@ of the waveform (e.g., amplitude, principal component, etc.).</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.set_config">
+<span class="sig-name descname"><span class="pre">set_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.SpkConfig.set_config" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>default</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, sets the configuration to its default settings. Defaults to False.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.set_default_config">
+<span class="sig-name descname"><span class="pre">set_default_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.set_default_config" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the default configurations for all sections. Writes these to the configuration file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spk2py.autosort.SpkConfig.spike">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spike</span></span><a class="headerlink" href="#spk2py.autosort.SpkConfig.spike" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary containing key-value pairs for the ‘spike’ section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.autosort.autosort.run_spk_process">
-<span class="sig-prename descclassname"><span class="pre">spk2py.autosort.autosort.</span></span><span class="sig-name descname"><span class="pre">run_spk_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="configuration.html#spk2py.autosort.spk_config.SpkConfig" title="spk2py.autosort.spk_config.SpkConfig"><span class="pre">SpkConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="directory_manager.html#spk2py.autosort.directory_manager.DirectoryManager" title="spk2py.autosort.directory_manager.DirectoryManager"><span class="pre">DirectoryManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.autosort.run_spk_process" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.autosort.run_spk_process">
+<span class="sig-prename descclassname"><span class="pre">spk2py.autosort.</span></span><span class="sig-name descname"><span class="pre">run_spk_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spk2py.autosort.SpkConfig" title="spk2py.autosort.SpkConfig"><span class="pre">SpkConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spk2py.autosort.DirectoryManager" title="spk2py.autosort.DirectoryManager"><span class="pre">DirectoryManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chan_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.run_spk_process" title="Permalink to this definition">#</a></dt>
 <dd><p>Factory method for running the spike sorting process on a single channel.</p>
 <p>. .note::
 Data can be in several formats:
@@ -770,6 +1107,43 @@ Data can be in several formats:
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.autosort.waveforms_datashader">
+<span class="sig-prename descclassname"><span class="pre">spk2py.autosort.</span></span><span class="sig-name descname"><span class="pre">waveforms_datashader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'datashader_temp'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.autosort.waveforms_datashader" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a Datashader image from an array of waveforms.</p>
+<p>This function takes in waveform data and their corresponding x-axis values,
+and generates a Datashader image for visualization. It performs downsampling,
+DataFrame creation, Datashader canvas setup, aggregation, and image export.
+The resulting Datashader image is displayed using Matplotlib.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>waveforms</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy array containing waveform data.</p>
+</dd>
+<dt><strong>x_values</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy array of x-axis values corresponding to the waveform data.</p>
+</dd>
+<dt><strong>dir_name</strong><span class="classifier">str, optional</span></dt><dd><p>The directory where temporary files and images are stored.
+Default is “datashader_temp”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The Matplotlib figure containing the Datashader image.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes.Axes</span></dt><dd><p>The Matplotlib axes used for plotting.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is intended for use with the <code class="docutils literal notranslate"><span class="pre">spk2py.autosort</span></code> module.
+It is not intended for general use.
+It relies on the <code class="docutils literal notranslate"><span class="pre">datashader</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> packages.</p>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -783,20 +1157,20 @@ Data can be in several formats:
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="logger.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Logger</p>
+        <p class="prev-next-title">spk2py API</p>
       </div>
     </a>
     <a class="right-next"
-       href="directory_manager.html"
+       href="extraction.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Directory Manager</p>
+        <p class="prev-next-title">Extraction</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

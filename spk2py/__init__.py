@@ -20,27 +20,9 @@ I recommend exploring the docstrings using
 TAB-completion and introspection capabilities.
 
 """
-from spk2py import spk_logging
 from spk2py import autosort
-from spk2py import spike_data
-from spk2py.cluster import (
-    filter_signal,
-    extract_waveforms,
-    dejitter,
-    scale_waveforms,
-    cluster_gmm,
-    get_lratios,
-)
-from spk2py.spk_io import read_h5, read_group, write_h5
+from spk2py import extraction
+from spk2py import logging
+from spk2py import util
 
-__all__ = [
-    "scale_waveforms",
-    "cluster_gmm",
-    "get_lratios",
-    "filter_signal",
-    "extract_waveforms",
-    "dejitter",
-    "spike_data",
-    "spk_logging",
-    "autosort"
-]
+__all__ = ["util", "logging", "autosort", "extraction"]

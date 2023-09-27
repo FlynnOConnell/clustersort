@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Spike Data API &#8212; spk2py  documentation</title>
+    <title>Extraction &#8212; spk2py  documentation</title>
   
   
   
@@ -43,11 +43,11 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/spike_data';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/extraction';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Cluster" href="cluster.html" />
-    <link rel="prev" title="spk2py API" href="index.html" />
+    <link rel="next" title="Util" href="util.html" />
+    <link rel="prev" title="Autosort" href="autosort.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -158,6 +158,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
       
@@ -259,6 +266,13 @@ document.write(`
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
         
@@ -287,22 +301,12 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Spike Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cluster.html"> Clustering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html"> I/O</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
-<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Autosort</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Extraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html"> Util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Main</a></li>
-<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datashader.html"> Data Shading</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
 </ul>
 </div>
 </nav></div>
@@ -343,7 +347,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">spk2py API</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Spike Data API</li>
+    <li class="breadcrumb-item active" aria-current="page">Extraction</li>
   </ul>
 </nav>
 </div>
@@ -360,11 +364,11 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-spk2py.spike_data">
-<span id="spike-data-api"></span><h1>Spike Data API<a class="headerlink" href="#module-spk2py.spike_data" title="Permalink to this heading">#</a></h1>
+  <section id="module-spk2py.extraction">
+<span id="extraction"></span><h1>Extraction<a class="headerlink" href="#module-spk2py.extraction" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">SpikeData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('Respirat',</span> <span class="pre">'Sniff',</span> <span class="pre">'RefBrain')</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.extraction.</span></span><span class="sig-name descname"><span class="pre">SpikeData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('Respirat',</span> <span class="pre">'Sniff',</span> <span class="pre">'RefBrain')</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData" title="Permalink to this definition">#</a></dt>
 <dd><p>Container class for Spike2 data.</p>
 <p>Can be used as:
 - A dictionary, where the keys are the channel names and the values are the waveforms (LFP + Unit).
@@ -372,8 +376,8 @@ document.write(`
 - A boolean, where True means the file is empty and False means it is not.
 - A string, where the string is the filename stem.</p>
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.bandpass_high">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bandpass_high</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.bandpass_high" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.bandpass_high">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bandpass_high</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.bandpass_high" title="Permalink to this definition">#</a></dt>
 <dd><p>The upper bound of the bandpass filter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -385,14 +389,14 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.bandpass_low">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bandpass_low</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.bandpass_low" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.bandpass_low">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bandpass_low</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.bandpass_low" title="Permalink to this definition">#</a></dt>
 <dd><p>The lower bound of the bandpass filter.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.bundle_metadata">
-<span class="sig-name descname"><span class="pre">bundle_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.bundle_metadata" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.bundle_metadata">
+<span class="sig-name descname"><span class="pre">bundle_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.bundle_metadata" title="Permalink to this definition">#</a></dt>
 <dd><p>Bundle the metadata into a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -405,15 +409,15 @@ document.write(`
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.channel_interval">
-<span class="sig-name descname"><span class="pre">channel_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.channel_interval" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.channel_interval">
+<span class="sig-name descname"><span class="pre">channel_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.channel_interval" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the waveform sample interval, in clock ticks.
 Used by channels that sample equal interval waveforms and equal to the number of file clock ticks per second.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.channel_max_ticks">
-<span class="sig-name descname"><span class="pre">channel_max_ticks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.channel_max_ticks" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.channel_max_ticks">
+<span class="sig-name descname"><span class="pre">channel_max_ticks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.channel_max_ticks" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the last time-point in the array, in ticks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -432,14 +436,14 @@ Used by channels that sample equal interval waveforms and equal to the number of
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.channel_max_time">
-<span class="sig-name descname"><span class="pre">channel_max_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.channel_max_time" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.channel_max_time">
+<span class="sig-name descname"><span class="pre">channel_max_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.channel_max_time" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the last time-point in the channel-array, in seconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.channel_num_ticks">
-<span class="sig-name descname"><span class="pre">channel_num_ticks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.channel_num_ticks" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.channel_num_ticks">
+<span class="sig-name descname"><span class="pre">channel_num_ticks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.channel_num_ticks" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the number of clock ticks in the channel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -458,8 +462,8 @@ Used by channels that sample equal interval waveforms and equal to the number of
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.channel_sample_period">
-<span class="sig-name descname"><span class="pre">channel_sample_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.channel_sample_period" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.channel_sample_period">
+<span class="sig-name descname"><span class="pre">channel_sample_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.channel_sample_period" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the waveform sample period, in seconds. Used by channels that sample</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -478,44 +482,44 @@ Used by channels that sample equal interval waveforms and equal to the number of
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.max_channels">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_channels</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.max_channels" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.max_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_channels</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.max_channels" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of channels in the file.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.max_ticks">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_ticks</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.max_ticks" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.max_ticks">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_ticks</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.max_ticks" title="Permalink to this definition">#</a></dt>
 <dd><p>The total number of clock ticks in the file.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.postinfusion">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">postinfusion</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.postinfusion" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.postinfusion">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">postinfusion</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.postinfusion" title="Permalink to this definition">#</a></dt>
 <dd><p>Check if the filename contains the post-infusion suffix.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.preinfusion">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preinfusion</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.preinfusion" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.preinfusion">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preinfusion</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.preinfusion" title="Permalink to this definition">#</a></dt>
 <dd><p>Check if the filename contains the pre-infusion suffix.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.process_units">
-<span class="sig-name descname"><span class="pre">process_units</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.SpikeData.process_units" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.process_units">
+<span class="sig-name descname"><span class="pre">process_units</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.SpikeData.process_units" title="Permalink to this definition">#</a></dt>
 <dd><p>Extracts unit data from the Spike2 file.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.recording_length">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">recording_length</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.recording_length" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.recording_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">recording_length</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.recording_length" title="Permalink to this definition">#</a></dt>
 <dd><p>The total recording length, in seconds.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spk2py.spike_data.SpikeData.time_base">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_base</span></span><a class="headerlink" href="#spk2py.spike_data.SpikeData.time_base" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.SpikeData.time_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_base</span></span><a class="headerlink" href="#spk2py.extraction.SpikeData.time_base" title="Permalink to this definition">#</a></dt>
 <dd><p>The number of seconds per clock tick.</p>
 <p>Everything in the file is quantified by the underlying clock tick (64-bit).
 All values in the file are stored, set and returned in ticks.
@@ -533,63 +537,20 @@ You need to read this value to interpret times in seconds.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="spk2py.spike_data.UnitData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">UnitData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.UnitData" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.UnitData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.extraction.</span></span><span class="sig-name descname"><span class="pre">UnitData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extraction.UnitData" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py attribute">
-<dt class="sig sig-object py" id="spk2py.spike_data.UnitData.spikes">
-<span class="sig-name descname"><span class="pre">spikes</span></span><a class="headerlink" href="#spk2py.spike_data.UnitData.spikes" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.UnitData.spikes">
+<span class="sig-name descname"><span class="pre">spikes</span></span><a class="headerlink" href="#spk2py.extraction.UnitData.spikes" title="Permalink to this definition">#</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="spk2py.spike_data.UnitData.times">
-<span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#spk2py.spike_data.UnitData.times" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.extraction.UnitData.times">
+<span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#spk2py.extraction.UnitData.times" title="Permalink to this definition">#</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spike_data.load_spike_data_from_h5">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">load_spike_data_from_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.load_spike_data_from_h5" title="Permalink to this definition">#</a></dt>
-<dd><p>Load data from h5.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spike_data.merge_spike_data">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">merge_spike_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spike_data1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_data2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.merge_spike_data" title="Permalink to this definition">#</a></dt>
-<dd><p>Merge spike data.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spike_data.merge_spike_data_from_dicts">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">merge_spike_data_from_dicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spike_data_dict1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_data_dict2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.merge_spike_data_from_dicts" title="Permalink to this definition">#</a></dt>
-<dd><p>Merge data from dicts.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spike_data.save_merged_spike_data_to_h5">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">save_merged_spike_data_to_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">merged_spike_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.save_merged_spike_data_to_h5" title="Permalink to this definition">#</a></dt>
-<dd><p>Save to h5 merge.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spike_data.save_spike_data_to_h5">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spike_data.</span></span><span class="sig-name descname"><span class="pre">save_spike_data_to_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spike_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spk2py.spike_data.SpikeData" title="spk2py.spike_data.SpikeData"><span class="pre">SpikeData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spike_data.save_spike_data_to_h5" title="Permalink to this definition">#</a></dt>
-<dd><p>Save data to h5 file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>spike_data</strong></dt><dd></dd>
-<dt><strong>filename</strong></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>None</dt><dd></dd>
-</dl>
-</dd>
-</dl>
 </dd></dl>
 
 </section>
@@ -605,20 +566,20 @@ You need to read this value to interpret times in seconds.</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="autosort.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">spk2py API</p>
+        <p class="prev-next-title">Autosort</p>
       </div>
     </a>
     <a class="right-next"
-       href="cluster.html"
+       href="util.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Cluster</p>
+        <p class="prev-next-title">Util</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -633,7 +594,7 @@ You need to read this value to interpret times in seconds.</p>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/spike_data.rst.txt">
+    <a href="../_sources/api/extraction.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

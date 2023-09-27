@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Cluster &#8212; spk2py  documentation</title>
+    <title>Util &#8212; spk2py  documentation</title>
   
   
   
@@ -43,11 +43,11 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/cluster';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/util';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="I/O" href="io.html" />
-    <link rel="prev" title="Spike Data API" href="spike_data.html" />
+    <link rel="next" title="Logger" href="logger.html" />
+    <link rel="prev" title="Extraction" href="extraction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -158,6 +158,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
       
@@ -259,6 +266,13 @@ document.write(`
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../package/index.html">
+                        Package
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
         
@@ -287,22 +301,12 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html"> Spike Data</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Clustering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html"> I/O</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
-<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Autosort</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extraction.html"> Extraction</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#"> Util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Main</a></li>
-<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datashader.html"> Data Shading</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
 </ul>
 </div>
 </nav></div>
@@ -343,7 +347,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">spk2py API</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Cluster</li>
+    <li class="breadcrumb-item active" aria-current="page">Util</li>
   </ul>
 </nav>
 </div>
@@ -360,11 +364,12 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-spk2py.cluster">
-<span id="cluster"></span><h1>Cluster<a class="headerlink" href="#module-spk2py.cluster" title="Permalink to this heading">#</a></h1>
+  <section id="module-spk2py.util">
+<span id="util"></span><h1>Util<a class="headerlink" href="#module-spk2py.util" title="Permalink to this heading">#</a></h1>
+<p>Utilities for spk2py.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.cluster_gmm">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">cluster_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">restarts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.cluster_gmm" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.cluster_gmm">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">cluster_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">restarts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.cluster_gmm" title="Permalink to this definition">#</a></dt>
 <dd><p>Cluster the data using a Gaussian Mixture Model (GMM).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -395,8 +400,8 @@ document.write(`
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.dejitter">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">dejitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_snapshot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">0.6)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.dejitter" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.dejitter">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">dejitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_snapshot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">0.6)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.dejitter" title="Permalink to this definition">#</a></dt>
 <dd><p>Adjust the alignment of extracted spike waveforms to minimize jitter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -423,8 +428,8 @@ document.write(`
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.extract_waveforms">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">extract_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">0.6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">STD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.extract_waveforms" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.extract_waveforms">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">extract_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">0.6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">STD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.extract_waveforms" title="Permalink to this definition">#</a></dt>
 <dd><p>Extract individual spike waveforms from the filtered electrode signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -454,8 +459,8 @@ Default is (0.2, 0.6).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.filter_signal">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">filter_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(300,</span> <span class="pre">6000)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.filter_signal" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.filter_signal">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">filter_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(300,</span> <span class="pre">6000)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.filter_signal" title="Permalink to this definition">#</a></dt>
 <dd><p>Apply a bandpass filter to the input electrode signal using a Butterworth digital and analog filter design.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -479,8 +484,8 @@ Default is (300, 6000.0).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.get_lratios">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">get_lratios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.get_lratios" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.get_lratios">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">get_lratios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.get_lratios" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate L-ratios for each cluster, a measure of cluster quality.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -501,8 +506,8 @@ Default is (300, 6000.0).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.implement_pca">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">implement_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scaled_slices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.implement_pca" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.implement_pca">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">implement_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scaled_slices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.implement_pca" title="Permalink to this definition">#</a></dt>
 <dd><p>Perform PCA (Principal Component Analysis) on the scaled spike waveforms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -523,8 +528,52 @@ Default is (300, 6000.0).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spk2py.cluster.scale_waveforms">
-<span class="sig-prename descclassname"><span class="pre">spk2py.cluster.</span></span><span class="sig-name descname"><span class="pre">scale_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_dejittered</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster.scale_waveforms" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="spk2py.util.read_group">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">read_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Group</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#spk2py.util.read_group" title="Permalink to this definition">#</a></dt>
+<dd><p>Read a single HDF5 group and return a dictionary containing the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>group</strong><span class="classifier">h5py.Group</span></dt><dd><p>HDF5 group to read.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary containing the data from the HDF5 group.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.util.read_h5">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">read_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#spk2py.util.read_h5" title="Permalink to this definition">#</a></dt>
+<dd><p>Read a single HDF5 file and return a dictionary containing the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str or Path</span></dt><dd><p>Path to the HDF5 file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary containing the data from the HDF5 file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">read_h5</span><span class="p">(</span><span class="s1">&#39;input.h5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.util.scale_waveforms">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">scale_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_dejittered</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.scale_waveforms" title="Permalink to this definition">#</a></dt>
 <dd><p>Scale the extracted spike waveforms by their energy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -544,6 +593,26 @@ Default is (300, 6000.0).</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.util.write_h5">
+<span class="sig-prename descclassname"><span class="pre">spk2py.util.</span></span><span class="sig-name descname"><span class="pre">write_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.util.write_h5" title="Permalink to this definition">#</a></dt>
+<dd><p>Save the specified data dictionaries to an HDF5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Path to the output HDF5 file.</p>
+</dd>
+<dt><strong>unit_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing unit data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">write_h5</span><span class="p">(</span><span class="s1">&#39;output.h5&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;unit1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;unit2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]})</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 
 
@@ -557,20 +626,20 @@ Default is (300, 6000.0).</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="spike_data.html"
+       href="extraction.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Spike Data API</p>
+        <p class="prev-next-title">Extraction</p>
       </div>
     </a>
     <a class="right-next"
-       href="io.html"
+       href="logger.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">I/O</p>
+        <p class="prev-next-title">Logger</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -585,7 +654,7 @@ Default is (300, 6000.0).</p>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/cluster.rst.txt">
+    <a href="../_sources/api/util.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

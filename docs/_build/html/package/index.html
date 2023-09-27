@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>I/O &#8212; spk2py  documentation</title>
+    <title>spk2py API &#8212; spk2py  documentation</title>
   
   
   
@@ -43,11 +43,11 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/io';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'package/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Logger" href="logger.html" />
-    <link rel="prev" title="Cluster" href="cluster.html" />
+    <link rel="next" title="spk2py" href="package.html" />
+    <link rel="prev" title="Logger" href="../api/logger.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -152,9 +152,16 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Package
                       </a>
                     </li>
                 
@@ -253,9 +260,16 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Package
                       </a>
                     </li>
                 
@@ -287,22 +301,8 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html"> Spike Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cluster.html"> Clustering</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"> I/O</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="logger.html"> Logging</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Main</a></li>
-<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datashader.html"> Data Shading</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="package.html">spk2py</a></li>
 </ul>
 </div>
 </nav></div>
@@ -340,10 +340,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">spk2py API</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">I/O</li>
+    <li class="breadcrumb-item active" aria-current="page">spk2py API</li>
   </ul>
 </nav>
 </div>
@@ -360,73 +357,13 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-spk2py.spk_io">
-<span id="i-o"></span><h1>I/O<a class="headerlink" href="#module-spk2py.spk_io" title="Permalink to this heading">#</a></h1>
-<p>file: spk2py/spk_io.py - Functions for saving/writing to h5 files using h5py.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spk_io.read_group">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spk_io.</span></span><span class="sig-name descname"><span class="pre">read_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Group</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#spk2py.spk_io.read_group" title="Permalink to this definition">#</a></dt>
-<dd><p>Read a single HDF5 group and return a dictionary containing the data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>group</strong><span class="classifier">h5py.Group</span></dt><dd><p>HDF5 group to read.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>dict</dt><dd><p>Dictionary containing the data from the HDF5 group.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spk_io.read_h5">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spk_io.</span></span><span class="sig-name descname"><span class="pre">read_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#spk2py.spk_io.read_h5" title="Permalink to this definition">#</a></dt>
-<dd><p>Read a single HDF5 file and return a dictionary containing the data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>filename</strong><span class="classifier">str or Path</span></dt><dd><p>Path to the HDF5 file.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>dict</dt><dd><p>Dictionary containing the data from the HDF5 file.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">read_h5</span><span class="p">(</span><span class="s1">&#39;input.h5&#39;</span><span class="p">)</span>
-</pre></div>
+  <section id="spk2py-api">
+<h1>spk2py API<a class="headerlink" href="#spk2py-api" title="Permalink to this heading">#</a></h1>
+<div class="toctree-wrapper compound" id="package">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="package.html">spk2py</a></li>
+</ul>
 </div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spk_io.write_h5">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spk_io.</span></span><span class="sig-name descname"><span class="pre">write_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spk_io.write_h5" title="Permalink to this definition">#</a></dt>
-<dd><p>Save the specified data dictionaries to an HDF5 file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Path to the output HDF5 file.</p>
-</dd>
-<dt><strong>unit_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing unit data.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">write_h5</span><span class="p">(</span><span class="s1">&#39;output.h5&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;unit1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;unit2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]})</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </section>
 
 
@@ -440,20 +377,20 @@ document.write(`
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="cluster.html"
+       href="../api/logger.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Cluster</p>
+        <p class="prev-next-title">Logger</p>
       </div>
     </a>
     <a class="right-next"
-       href="logger.html"
+       href="package.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Logger</p>
+        <p class="prev-next-title">spk2py</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -468,7 +405,7 @@ document.write(`
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/io.rst.txt">
+    <a href="../_sources/package/index.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

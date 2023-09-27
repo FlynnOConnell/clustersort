@@ -1,9 +1,14 @@
 """
-file: spk2py/spk_io.py - Functions for saving/writing to h5 files using h5py.
+=========
+spk2py_io
+=========
+
+Functions for saving/writing to h5 files using h5py.
 """
 from __future__ import annotations
 
 from pathlib import Path
+
 import h5py
 
 

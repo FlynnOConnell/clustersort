@@ -26,19 +26,15 @@ are performed on the data to extract spikes and cluster them. The pipeline is as
 7. Save the data to an HDF5 file, and graphs to given plotting folders.
 
 """
-from spk2py.autosort.autosort import *
-from spk2py.autosort.wf_shader import waveforms_datashader
-from spk2py.autosort.spk_config import SpkConfig
-from spk2py.autosort.directory_manager import DirectoryManager
-from spk2py.cluster import cluster_gmm, get_lratios, scale_waveforms, implement_pca
+from .autosort import *
+from .directory_manager import *
+from .spk_config import *
+from .wf_shader import *
 
 __all__ = [
-    'run_spk_process',
+    "run_spk_process",
     "ProcessChannel",
-    "waveforms_datashader",
+    "DirectoryManager",
     "SpkConfig",
-    "cluster_gmm",
-    "get_lratios",
-    "scale_waveforms",
-    "implement_pca"
+    "waveforms_datashader",
 ]

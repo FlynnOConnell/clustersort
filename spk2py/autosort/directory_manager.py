@@ -3,9 +3,9 @@ file: spk2py/autosort/directory_manager.py
 
 Class for managing directories produced and utilized when running the autosort pipeline.
 """
+import logging
 import shutil
 from pathlib import Path
-import logging
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"

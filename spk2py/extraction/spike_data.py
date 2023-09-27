@@ -16,8 +16,8 @@ import h5py
 import numpy as np
 from sonpy import lib as sp
 
-from spk2py.cluster import extract_waveforms, filter_signal
-from spk2py.spk_logging.logger_config import configure_logger
+from spk2py.logging.logger_config import configure_logger
+from spk2py.util import extract_waveforms, filter_signal
 
 logfile = Path().home() / "data" / "spike_data.log"
 logger = configure_logger(__name__, logfile, level=logging.DEBUG)
@@ -63,7 +63,7 @@ def save_spike_data_to_h5(spike_data: SpikeData, filename: str | Path):
 
 
 # Function to load a SpikeData instance from a h5 file
-def load_spike_data_from_h5(filename: str | Path):
+def __load_spk2_from_h5(filename: str | Path):
     """
     Load data from h5.
     """
@@ -83,10 +83,9 @@ def load_spike_data_from_h5(filename: str | Path):
 
 
 # Function to merge two SpikeData instances
-def merge_spike_data(spike_data1, spike_data2):
+def __merge_spk2(spike_data1, spike_data2):
     """
     Merge spike data.
-
     """
     merged_spike_data = {"metadata": spike_data1["metadata"], "unit": {}}
 
@@ -101,10 +100,9 @@ def merge_spike_data(spike_data1, spike_data2):
         merged_spike_data["unit"][channel] = UnitData(merged_spikes, merged_times)
     return merged_spike_data
 
-def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
+def __merge_spk2_from_dict(spike_data_dict1, spike_data_dict2):
     """
     Merge data from dicts.
-
     """
     merged_spike_data = {'metadata': spike_data_dict1['metadata'],'sampling_rates': spike_data_dict1['sampling_rates'], 'unit': {}}
 
@@ -130,10 +128,9 @@ def merge_spike_data_from_dicts(spike_data_dict1, spike_data_dict2):
 
     return merged_spike_data
 
-def save_merged_spike_data_to_h5(merged_spike_data: dict, filename: str | Path):
+def __save_merged_to_h5(merged_spike_data: dict, filename: str | Path):
     """
     Save to h5 merge.
-
     """
     with h5py.File(filename, "w") as f:
         metadata_grp = f.create_group("metadata")
@@ -509,15 +506,15 @@ if __name__ == "__main__":
     # # load the h5
     data = []
     for file in files:
-        data.append(load_spike_data_from_h5(file))
+        data.append(__load_spk2_from_h5(file))
 
     # merge the data
-    merged_data = merge_spike_data_from_dicts(data[0], data[1])
+    merged_data = __merge_spk2_from_dict(data[0], data[1])
 
     # save the merged data
     basename = __get_base_filename__(merged_data)
     filename = path_combined / (basename + ".h5")
-    save_merged_spike_data_to_h5(merged_data, filename)
+    __save_merged_to_h5(merged_data, filename)
     # for file in files:
     #     data = SpikeData(
     #         file,

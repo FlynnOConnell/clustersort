@@ -1,5 +1,5 @@
 Autosort
 ========
 
-.. automodule:: spk2py.autosort.autosort
+.. automodule:: spk2py.autosort
    :members:
