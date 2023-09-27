@@ -34,7 +34,6 @@ setup(
     packages=find_packages(),
     install_requires=reqs,
     extras_require={'docs': docs_extras},
-    package_dir={'': 'spk2py'},
     include_package_data=True,
     zip_safe=False,
     classifiers = [
@@ -54,5 +53,5 @@ setup(
         'Operating System :: Unix',
         'Operating System :: MacOS',
     ],
-    python_requires='>=3.9',
+    python_requires='>=3.9,<3.10',
 )
