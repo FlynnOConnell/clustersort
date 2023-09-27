@@ -13,7 +13,7 @@ reqs = [
     'pip',
     'h5py',
     'pillow',
-    'Opencv',
+    'opencv-python',
     'imageio'
 ]
 
