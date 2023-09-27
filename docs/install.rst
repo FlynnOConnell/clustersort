@@ -85,4 +85,5 @@ In addition to the Mambaforge standalone distribution (see above), there are als
 images:
 
 .. code-block:: bash
+
   docker run -it --rm condaforge/mambaforge:latest mamba info

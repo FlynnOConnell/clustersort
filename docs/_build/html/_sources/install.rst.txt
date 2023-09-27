@@ -12,7 +12,9 @@ Installing from source
 ======================
 
 **Linux and MacOS:**
+
 .. code-block:: bash
+
     git clone https://github.com/FlynnOConnell/spk2py.git
     cd path/to/spk2py
     # This is for MambaForge, but you can use conda if you want
@@ -26,6 +28,7 @@ Installing from source
     source "${HOME}/conda/etc/profile.d/conda.sh"
 
 .. code-block:: bash
+
     mamba env create -f environment.yml # this will take a while
     conda activate spk2py
     pip install -r requirements.txt
@@ -39,6 +42,7 @@ Additionally, though not recommended, ``spk2py`` can be installed directly from 
    As has docker.
 
 .. code-block:: bash
+
     pip install spk2py
 
 Mamba Installation
@@ -81,4 +85,5 @@ In addition to the Mambaforge standalone distribution (see above), there are als
 images:
 
 .. code-block:: bash
+
   docker run -it --rm condaforge/mambaforge:latest mamba info

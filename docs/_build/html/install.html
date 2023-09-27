@@ -339,27 +339,35 @@ document.write(`
 <p>It is recommended to install using <a class="reference external" href="https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install">mambaforge</a> this will drastically speed up environment creation:</p>
 <section id="installing-from-source">
 <h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this heading">#</a></h2>
-<p><strong>Linux and MacOS:</strong>
-.. code-block:: bash</p>
-<blockquote>
-<div><p>git clone <a class="github reference external" href="https://github.com/FlynnOConnell/spk2py.git">FlynnOConnell/spk2py.git</a>
-cd path/to/spk2py
-# This is for MambaForge, but you can use conda if you want
-# Note if you use conda, but want to go the mamba route, you will really want to uninstall miniconda/anaconda first
-wget -O Mambaforge.sh  “<a class="github reference external" href="https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname">conda-forge/miniforge</a> -m).sh”
-bash Mambaforge.sh -b -p “${HOME}/conda”
-# !!!! FOR BASH USERS !!!!
-# If you dont know what these are, then use this one
-# If you use zsh, just change this to ~/.zshrc
-echo “. ${HOME}/conda/etc/profile.d/conda.sh” &gt;&gt; ~/.bashrc
-source “${HOME}/conda/etc/profile.d/conda.sh”</p>
-</div></blockquote>
+<p><strong>Linux and MacOS:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/FlynnOConnell/spk2py.git
+<span class="nb">cd</span><span class="w"> </span>path/to/spk2py
+<span class="c1"># This is for MambaForge, but you can use conda if you want</span>
+<span class="c1"># Note if you use conda, but want to go the mamba route, you will really want to uninstall miniconda/anaconda first</span>
+wget<span class="w"> </span>-O<span class="w"> </span>Mambaforge.sh<span class="w">  </span><span class="s2">&quot;https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">-</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">.sh&quot;</span>
+bash<span class="w"> </span>Mambaforge.sh<span class="w"> </span>-b<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/conda&quot;</span>
+<span class="c1"># !!!! FOR BASH USERS !!!!</span>
+<span class="c1"># If you dont know what these are, then use this one</span>
+<span class="c1"># If you use zsh, just change this to ~/.zshrc</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;. </span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/conda/etc/profile.d/conda.sh&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/conda/etc/profile.d/conda.sh&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml<span class="w"> </span><span class="c1"># this will take a while</span>
+conda<span class="w"> </span>activate<span class="w"> </span>spk2py
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
 <p>Additionally, though not recommended, <code class="docutils literal notranslate"><span class="pre">spk2py</span></code> can be installed directly from pip:</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>pip installing has <strong>not</strong> been tested on systems other than linux.
 Using <code class="docutils literal notranslate"><span class="pre">mamba</span></code> has been tested on each platform.
 As has docker.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>spk2py
+</pre></div>
 </div>
 </section>
 <section id="mamba-installation">
@@ -395,6 +403,9 @@ We strongly recommend to use the Mambaforge method (see above).</p>
 <p>In addition to the Mambaforge standalone distribution (see above), there are also the
 <a class="reference external" href="https://hub.docker.com/r/condaforge/mambaforge">condaforge/mambaforge</a> docker
 images:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>condaforge/mambaforge:latest<span class="w"> </span>mamba<span class="w"> </span>info
+</pre></div>
+</div>
 </section>
 </section>
 </section>
