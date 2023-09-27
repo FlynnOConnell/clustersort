@@ -31,7 +31,6 @@ classifiers = [
 
 [project.urls]
 homepage = "https://www.github.com/Flynnoconnell/spk2py"
-documentation = ""
 source = "https://www.github.com/Flynnoconnell/spk2py"
 
 [build-system]
