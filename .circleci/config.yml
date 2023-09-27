@@ -18,6 +18,7 @@ jobs:
       - run:
           name: Install deps
           command: |
+            conda update conda
             conda env create -f environment.yml
             echo "export PATH=${HOME}/conda/envs/spk2py/bin:$PATH" >> $BASH_ENV
             conda activate spk2py
