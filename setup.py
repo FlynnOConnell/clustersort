@@ -8,7 +8,7 @@ reqs = [
     'scikit-learn',
     'scikit-image',
     'matplotlib',
-    'openSSL',
+    'pyOpenSSL',
     'datashader',
     'pip',
     'h5py',
