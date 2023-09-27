@@ -37,6 +37,3 @@ source = "https://www.github.com/Flynnoconnell/spk2py"
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[project.dependencies]
-numpy = "^1.21"
-scipy = "^1.7"
