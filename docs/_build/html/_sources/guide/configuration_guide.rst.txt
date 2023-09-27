@@ -2,111 +2,95 @@
 Configuration Guide
 ===================
 
-----------------------------
-Function: ``default_config``
-----------------------------
+.. currentmodule:: spk2py.autosort.spk_config
 
-The ``default_config`` function initializes a configuration file with default settings and creates necessary directories for the run.
+Overview
+--------
 
-**Parameters:**
+This class manages configurations for the AutoSort pipeline. It reads from an INI-style configuration file and provides methods to access configurations for various sections.
 
-- ``path: Path``: The path where the configuration file will be saved.
-- ``config_ver: int``: The version of the configuration to be used. Default is 5.
+.. moduleauthor:: Flynn O'Connell
 
--------------------------------------
-Configuration Sections and Parameters
--------------------------------------
 
-run-settings
-============
+Initialize a new ``SpkConfig`` object by specifying the ``cfg_path`` parameter. If no path is provided, it defaults to a predefined location.
 
-Parameters defining the software and hardware configurations.
+Attributes
+----------
 
-- ``resort-limit``: Default is '3'.
-- ``cores-used``: Default is '8'.
-- ``weekday-run``: Default is '2'.
-- ``weekend-run``: Default is '8'.
-- ``run-type``: Default is 'Auto'.
-- ``manual-run``: Default is '2'.
+- ``cfg_path``: Path to the configuration file, either provided by the user or a default path.
+- ``config``: A ``ConfigParser`` object containing the loaded configurations.
+- ``params``: A dictionary containing all the configuration parameters.
 
-paths
-=====
+Methods
+-------
 
-Defines various paths necessary for the script.
+get_section(section: str)
+    Returns a dictionary containing key-value pairs for the given section.
 
-- ``run-path``: Path to directory for files to be processed.
-- ``results-path``: Path to directory for results.
-- ``completed-path``: Path where completed files will be moved.
+set(section: str, key: str, value: Any)
+    Sets a value for a configuration parameter within a specified section.
 
-clustering
-==========
+get_all()
+    Returns a dictionary containing all key-value pairs from all sections.
 
-Parameters defining the clustering process.
+Property Methods
+----------------
 
-- ``max-clusters``: Default is '7'.
-- ``max-iterations``: Default is '1000'.
-- ``convergence-criterion``: Default is '.0001'.
-- ``random-restarts``: Default is '10'.
-- ``l-ratio-cutoff``: Default is '.1'.
+run
+    Returns a dictionary containing key-value pairs for the 'run' section.
 
-signal
-======
+path
+    Returns a dictionary containing key-value pairs for the 'path' section.
 
-Parameters for signal preprocessing and spike detection.
+cluster
+    Returns a dictionary containing key-value pairs for the 'cluster' section.
 
-- ``disconnect-voltage``: Default is '1500'.
-- ``max-breach-rate``: Default is '.2'.
-- ``max-breach-count``: Default is '10'.
-- ``max-breach-avg``: Default is '20'.
-- ``intra-hpc_cluster-cutoff``: Default is '3'.
+breach
+    Returns a dictionary containing key-value pairs for the 'breach' section.
 
-filtering
-=========
-
-Filtering parameters to isolate the frequency range of interest.
-
-- ``low-cutoff``: Default is '600'.
-- ``high-cutoff``: Default is '3000'.
+filter
+    Returns a dictionary containing key-value pairs for the 'filter' section.
 
 spike
-=====
+    Returns a dictionary containing key-value pairs for the 'spike' section.
 
-Spike detection and extraction parameters.
-
-- ``pre-time``: Default is '.2'.
-- ``post-time``: Default is '.6'.
-- ``sampling-rate``: Default is '20000'.
-
-std-dev
-=======
-
-Standard deviation parameters for spike detection and artifact removal.
-
-- ``spike-detection``: Default is '2.0'.
-- ``artifact-removal``: Default is '10.0'.
+detection
+    Returns a dictionary containing key-value pairs for the 'detection' section.
 
 pca
-===
+    Returns a dictionary containing key-value pairs for the 'pca' section.
 
-Parameters for principal component analysis (PCA).
+postprocess
+    Returns a dictionary containing key-value pairs for the 'postprocess' section.
 
-- ``variance-explained``: Default is '.95'.
-- ``use-percent-variance``: Default is '1'.
-- ``principal-component-n``: Default is '5'.
+INI Configuration File
+----------------------
 
-post-process
-============
+This file is the easiest entrypoint to change parameters. You can specify where this file
+is created with the ``cfg_path`` attribute.
 
-Post-processing parameters.
+- ``run``: Contains runtime settings like ``resort-limit``, ``cores-used``.
+- ``path``: Contains path settings like directories for ``run``, ``results``.
+- ``cluster``: Contains clustering parameters like ``max-clusters``, ``max-iterations``.
+- ``breach``: Contains breach analysis parameters like ``disconnect-voltage``, ``max-breach-rate``.
+- ``filter``: Contains filter parameters like ``low-cutoff``, ``high-cutoff``.
+- ``spike``: Contains spike-extraction settings like ``pre-time``, ``post-time``.
 
-- ``reanalyze``: Default is '0'.
-- ``simple-gmm``: Default is '1'.
-- ``image-size``: Default is '70'.
-- ``temporary-dir``: Default is user's home directory followed by '/tmp_python'.
+Note: All values are stored as strings due to the nature of INI files. It's up to the user to convert these to appropriate types.
 
-version
-=======
+Example
+-------
 
-Version control parameters.
+.. code-block:: python
 
-- ``config-version``: Default is determined by the ``config_ver`` parameter passed to the ``default_config`` function.
+    cfg = SpkConfig()
+    run = cfg.run
+    print(type(run), run)
+
+    cfg.set('run', 'resort-limit', 5)
+    print(cfg.run['resort-limit'])
+
+See Also
+--------
+
+- `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_

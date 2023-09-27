@@ -7,7 +7,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>spk2py &#8212; spk2py  documentation</title>
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -33,15 +33,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/design-tabs.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'package/package';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -57,15 +54,6 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
-
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -106,8 +94,7 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  
-  <div class="col-lg-3 navbar-header-items__start">
+  <div class="navbar-header-items__start">
     
       <div class="navbar-item">
   
@@ -123,6 +110,7 @@
 </a></div>
     
   </div>
+  
   
   <div class="col-lg-9 navbar-header-items">
     
@@ -174,25 +162,23 @@
       
         <div class="navbar-item navbar-persistent--container">
           
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+  </button>
+`);
+</script>
         </div>
       
       
         <div class="navbar-item">
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script></div>
@@ -203,20 +189,18 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+  </button>
+`);
+</script>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
       <span class="fa-solid fa-outdent"></span>
     </label>
   
@@ -284,10 +268,10 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script></div>
@@ -331,8 +315,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
-  <ul class="bd-breadcrumbs">
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -377,6 +361,243 @@ a variety of formats for further analysis in other programs.</p>
 TAB-completion and introspection capabilities.</p>
 </section>
 </section>
+<dl class="py class">
+<dt class="sig sig-object py" id="spk2py.ColoredFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">ColoredFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.ColoredFormatter" title="Permalink to this definition">#</a></dt>
+<dd><p>Formatter for logging with colored output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>COLORS</strong><span class="classifier">dict</span></dt><dd><p>Mapping of log levels to terminal colors.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>format(record)</strong></p></td>
+<td><p>Format the log record with colors.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.ColoredFormatter.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.ColoredFormatter.format" title="Permalink to this definition">#</a></dt>
+<dd><p>Format the log record with colors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>record</strong><span class="classifier">logging.LogRecord</span></dt><dd><p>The log record to be formatted.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd><p>The formatted log message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spk2py.ESTFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">ESTFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.ESTFormatter" title="Permalink to this definition">#</a></dt>
+<dd><p>Formatter for logging timestamps in the US Eastern Time zone.</p>
+<p class="rubric">Methods</p>
+<table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>formatTime(record, datefmt=None)</strong></p></td>
+<td><p>Format the time for the log record.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="spk2py.ESTFormatter.formatTime">
+<span class="sig-name descname"><span class="pre">formatTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.ESTFormatter.formatTime" title="Permalink to this definition">#</a></dt>
+<dd><p>Format the time for the log record.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>record</strong><span class="classifier">logging.LogRecord</span></dt><dd><p>The log record.</p>
+</dd>
+<dt><strong>datefmt</strong><span class="classifier">str, optional</span></dt><dd><p>The date format, by default None</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd><p>The formatted time string.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.cluster_gmm">
+<span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">cluster_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">restarts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.cluster_gmm" title="Permalink to this definition">#</a></dt>
+<dd><p>Cluster the data using a Gaussian Mixture Model (GMM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">array-like</span></dt><dd><p>The input data to be clustered, generally the output of a PCA, as a 2-D array.</p>
+</dd>
+<dt><strong>n_clusters</strong><span class="classifier">int</span></dt><dd><p>The number of clusters to use in the GMM.</p>
+</dd>
+<dt><strong>n_iter</strong><span class="classifier">int</span></dt><dd><p>The maximum number of iterations to perform in the GMM.</p>
+</dd>
+<dt><strong>restarts</strong><span class="classifier">int</span></dt><dd><p>The number of times to restart the GMM with different initializations.</p>
+</dd>
+<dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>The convergence threshold for the GMM.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>best_fit_gmm</strong><span class="classifier">object</span></dt><dd><p>The best-fitting GMM object.</p>
+</dd>
+<dt><strong>predictions</strong><span class="classifier">array-like</span></dt><dd><p>The cluster assignments for each data point as a 1-D array.</p>
+</dd>
+<dt><strong>min_bayesian</strong><span class="classifier">float</span></dt><dd><p>The minimum Bayesian information criterion (BIC) value achieved across all restarts.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.configure_logger">
+<span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">configure_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">logging.Logger</span></span></span><a class="headerlink" href="#spk2py.configure_logger" title="Permalink to this definition">#</a></dt>
+<dd><p>Configure a logger with file and stream handlers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the logger.</p>
+</dd>
+<dt><strong>log_file</strong><span class="classifier">Path | str</span></dt><dd><p>Path to the log file.</p>
+</dd>
+<dt><strong>level</strong><span class="classifier">int, optional</span></dt><dd><p>Logging level, by default logging.INFO</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>logging.Logger</dt><dd><p>Configured logger object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.dejitter">
+<span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">dejitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_snapshot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">0.6)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.dejitter" title="Permalink to this definition">#</a></dt>
+<dd><p>Adjust the alignment of extracted spike waveforms to minimize jitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>slices</strong><span class="classifier">list of array-like</span></dt><dd><p>List of extracted spike waveforms, each as a 1-D array.</p>
+</dd>
+<dt><strong>spike_times</strong><span class="classifier">list of int</span></dt><dd><p>List of indices indicating the positions of the extracted spikes in the input array.</p>
+</dd>
+<dt><strong>sampling_rate</strong><span class="classifier">float</span></dt><dd><p>The sampling rate of the signal in Hz.</p>
+</dd>
+<dt><strong>spike_snapshot</strong><span class="classifier">tuple of float, optional</span></dt><dd><p>The time range (in milliseconds) around each spike to extract, given as (pre_spike_time, post_spike_time).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>slices_dejittered</strong><span class="classifier">array-like</span></dt><dd><p>The dejittered spike waveforms as a 2-D array.</p>
+</dd>
+<dt><strong>spike_times_dejittered</strong><span class="classifier">array-like</span></dt><dd><p>The updated spike times as a 1-D array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.extract_waveforms">
+<span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">extract_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.2,</span> <span class="pre">0.6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">STD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.extract_waveforms" title="Permalink to this definition">#</a></dt>
+<dd><p>Extract individual spike waveforms from the filtered electrode signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>signal</strong><span class="classifier">array-like</span></dt><dd><p>The (already bandpass-filtered) electrode signal as a 1-D array.</p>
+</dd>
+<dt><strong>sampling_rate</strong><span class="classifier">float</span></dt><dd><p>The sampling rate of the signal in Hz. Default is 20000.0 Hz.</p>
+</dd>
+<dt><strong>spike_snapshot</strong><span class="classifier">tuple of float, optional</span></dt><dd><p>The time range (in milliseconds) around each spike to extract, given as (pre_spike_time, post_spike_time).
+Default is (0.2, 0.6).</p>
+</dd>
+<dt><strong>STD</strong><span class="classifier">float, optional</span></dt><dd><p>The number of standard deviations to use for the spike detection threshold. Default is 2.0.</p>
+</dd>
+<dt><strong>cutoff_std</strong><span class="classifier">float, optional</span></dt><dd><p>The cutoff threshold, in units of the standard deviation, for rejecting spikes. Default is 10.0.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>slices</strong><span class="classifier">list of array-like</span></dt><dd><p>List of extracted spike waveforms, each as a 1-D array.</p>
+</dd>
+<dt><strong>spike_times</strong><span class="classifier">list of int</span></dt><dd><p>List of indices indicating the positions of the extracted spikes in the input array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.get_lratios">
+<span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">get_lratios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.get_lratios" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate L-ratios for each cluster, a measure of cluster quality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">array-like</span></dt><dd><p>The input data, generally the output of a PCA, as a 2-D array.</p>
+</dd>
+<dt><strong>predictions</strong><span class="classifier">array-like</span></dt><dd><p>The cluster assignments for each data point as a 1-D array.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Lrats</strong><span class="classifier">dict</span></dt><dd><p>A dictionary with cluster labels as keys and the corresponding L-ratio values as values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spk2py.scale_waveforms">
+<span class="sig-prename descclassname"><span class="pre">spk2py.</span></span><span class="sig-name descname"><span class="pre">scale_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_dejittered</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.scale_waveforms" title="Permalink to this definition">#</a></dt>
+<dd><p>Scale the extracted spike waveforms by their energy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>slices_dejittered</strong><span class="classifier">array-like</span></dt><dd><p>The dejittered spike waveforms as a 2-D array.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>scaled_slices</strong><span class="classifier">array-like</span></dt><dd><p>The scaled spike waveforms as a 2-D array.</p>
+</dd>
+<dt><strong>energy</strong><span class="classifier">array-like</span></dt><dd><p>The energy of each spike waveform as a 1-D array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -384,10 +605,11 @@ TAB-completion and introspection capabilities.</p>
               
               
               
-              
-              
-                <footer class="prev-next-footer">
-                  <!-- Previous / next buttons -->
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="index.html"
@@ -398,7 +620,10 @@ TAB-completion and introspection capabilities.</p>
         <p class="prev-next-title">spk2py API</p>
       </div>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -417,6 +642,20 @@ TAB-completion and introspection capabilities.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-guide">Documentation Guide</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.ColoredFormatter"><code class="docutils literal notranslate"><span class="pre">ColoredFormatter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.ColoredFormatter.format"><code class="docutils literal notranslate"><span class="pre">ColoredFormatter.format</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.ESTFormatter"><code class="docutils literal notranslate"><span class="pre">ESTFormatter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.ESTFormatter.formatTime"><code class="docutils literal notranslate"><span class="pre">ESTFormatter.formatTime</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.cluster_gmm"><code class="docutils literal notranslate"><span class="pre">cluster_gmm</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.configure_logger"><code class="docutils literal notranslate"><span class="pre">configure_logger</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.dejitter"><code class="docutils literal notranslate"><span class="pre">dejitter</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.extract_waveforms"><code class="docutils literal notranslate"><span class="pre">extract_waveforms</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.get_lratios"><code class="docutils literal notranslate"><span class="pre">get_lratios</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.scale_waveforms"><code class="docutils literal notranslate"><span class="pre">scale_waveforms</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -441,8 +680,8 @@ TAB-completion and introspection capabilities.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -460,7 +699,7 @@ TAB-completion and introspection capabilities.</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     <br/>
   </p>
 </div>
@@ -468,11 +707,10 @@ TAB-completion and introspection capabilities.</p>
     </div>
   
   
-  
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
 </p></div>
       
     </div>
