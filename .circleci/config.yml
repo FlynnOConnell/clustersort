@@ -34,8 +34,8 @@ jobs:
           root: docs/_build
           paths: html
       - store_artifacts:
-        path: docs/_build/html
-        destination: docs
+          path: docs/_build/html
+          destination: docs
 
   docs-deploy:
     docker:
