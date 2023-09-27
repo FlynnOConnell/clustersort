@@ -43,8 +43,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/logger';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Autosort" href="autosort.html" />
-    <link rel="prev" title="I/O" href="io.html" />
+    <link rel="next" title="spk2py API" href="../package/index.html" />
+    <link rel="prev" title="Util" href="util.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -285,22 +285,12 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extraction</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="spike_data.html"> Spike Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cluster.html"> Clustering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html"> I/O</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Logging</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Autosort</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extraction.html"> Extraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html"> Util</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#"> Logging</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Autosort</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="autosort.html"> Main</a></li>
-<li class="toctree-l1"><a class="reference internal" href="directory_manager.html"> Directories</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datashader.html"> Data Shading</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html"> Configuration</a></li>
 </ul>
 </div>
 </nav></div>
@@ -358,116 +348,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-spk2py.spk_logging">
-<span id="logger"></span><h1>Logger<a class="headerlink" href="#module-spk2py.spk_logging" title="Permalink to this heading">#</a></h1>
-<p>Initialization of the module logger.</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-</tbody>
-</table>
-<p>Colorized output, file and stream handlers are configured in <a class="reference internal" href="#spk2py.spk_logging.configure_logger" title="spk2py.spk_logging.configure_logger"><code class="xref py py-func docutils literal notranslate"><span class="pre">configure_logger</span></code></a>.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="spk2py.spk_logging.ColoredFormatter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.spk_logging.</span></span><span class="sig-name descname"><span class="pre">ColoredFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spk_logging.ColoredFormatter" title="Permalink to this definition">#</a></dt>
-<dd><p>Formatter for logging with colored output.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>COLORS</strong><span class="classifier">dict</span></dt><dd><p>Mapping of log levels to terminal colors.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Methods</p>
-<table class="table">
-<tbody>
-<tr class="row-odd"><td><p><strong>format(record)</strong></p></td>
-<td><p>Format the log record with colors.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spk_logging.ColoredFormatter.format">
-<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spk_logging.ColoredFormatter.format" title="Permalink to this definition">#</a></dt>
-<dd><p>Format the log record with colors.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>record</strong><span class="classifier">logging.LogRecord</span></dt><dd><p>The log record to be formatted.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>str</dt><dd><p>The formatted log message.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="spk2py.spk_logging.ESTFormatter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spk2py.spk_logging.</span></span><span class="sig-name descname"><span class="pre">ESTFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spk_logging.ESTFormatter" title="Permalink to this definition">#</a></dt>
-<dd><p>Formatter for logging timestamps in the US Eastern Time zone.</p>
-<p class="rubric">Methods</p>
-<table class="table">
-<tbody>
-<tr class="row-odd"><td><p><strong>formatTime(record, datefmt=None)</strong></p></td>
-<td><p>Format the time for the log record.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py method">
-<dt class="sig sig-object py" id="spk2py.spk_logging.ESTFormatter.formatTime">
-<span class="sig-name descname"><span class="pre">formatTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spk2py.spk_logging.ESTFormatter.formatTime" title="Permalink to this definition">#</a></dt>
-<dd><p>Format the time for the log record.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>record</strong><span class="classifier">logging.LogRecord</span></dt><dd><p>The log record.</p>
-</dd>
-<dt><strong>datefmt</strong><span class="classifier">str, optional</span></dt><dd><p>The date format, by default None</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>str</dt><dd><p>The formatted time string.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spk2py.spk_logging.configure_logger">
-<span class="sig-prename descclassname"><span class="pre">spk2py.spk_logging.</span></span><span class="sig-name descname"><span class="pre">configure_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">logging.Logger</span></span></span><a class="headerlink" href="#spk2py.spk_logging.configure_logger" title="Permalink to this definition">#</a></dt>
-<dd><p>Configure a logger with file and stream handlers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the logger.</p>
-</dd>
-<dt><strong>log_file</strong><span class="classifier">Path | str</span></dt><dd><p>Path to the log file.</p>
-</dd>
-<dt><strong>level</strong><span class="classifier">int, optional</span></dt><dd><p>Logging level, by default logging.INFO</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>logging.Logger</dt><dd><p>Configured logger object.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
+  <section id="logger">
+<h1>Logger<a class="headerlink" href="#logger" title="Permalink to this heading">#</a></h1>
 </section>
 
 
@@ -482,20 +364,20 @@ document.write(`
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="io.html"
+       href="util.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">I/O</p>
+        <p class="prev-next-title">Util</p>
       </div>
     </a>
     <a class="right-next"
-       href="autosort.html"
+       href="../package/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Autosort</p>
+        <p class="prev-next-title">spk2py API</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -510,24 +392,6 @@ document.write(`
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.spk_logging.ColoredFormatter"><code class="docutils literal notranslate"><span class="pre">ColoredFormatter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.spk_logging.ColoredFormatter.format"><code class="docutils literal notranslate"><span class="pre">ColoredFormatter.format</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.spk_logging.ESTFormatter"><code class="docutils literal notranslate"><span class="pre">ESTFormatter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.spk_logging.ESTFormatter.formatTime"><code class="docutils literal notranslate"><span class="pre">ESTFormatter.formatTime</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spk2py.spk_logging.configure_logger"><code class="docutils literal notranslate"><span class="pre">configure_logger</span></code></a></li>
-</ul>
-  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">

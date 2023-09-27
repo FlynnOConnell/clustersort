@@ -1,5 +1,5 @@
-SPK2PY
+spk2py
 ======
 
-.. automodule::
-   spkpy.spk2py
+.. automodule:: spk2py
+   :members:
