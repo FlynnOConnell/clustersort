@@ -20,11 +20,6 @@ jobs:
             conda update conda
             conda env create -f environment.yml
             conda activate spk2py
-            pip install sonpy
-      - run:
-          name: Install editable spk2py
-          command: |
-            pip install -e .
       - run:
           name: Build docs
           command: |
