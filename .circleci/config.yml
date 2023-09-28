@@ -13,14 +13,12 @@ jobs:
             wget -O Mambaforge.sh  "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
             bash Mambaforge.sh -b -p "${HOME}/conda"
             echo ". ${HOME}/conda/etc/profile.d/conda.sh" >> $BASH_ENV
-            source "${HOME}/conda/etc/profile.d/conda.sh"
             source "${HOME}/conda/etc/profile.d/mamba.sh"
       - run:
           name: Install deps
           command: |
             conda update conda
             conda env create -f environment.yml
-            echo "export PATH=${HOME}/conda/envs/spk2py/bin:$PATH" >> $BASH_ENV
             conda activate spk2py
             pip install sonpy
       - run:
@@ -29,7 +27,10 @@ jobs:
             pip install -e .
       - run:
           name: Build docs
-          command: cd docs/ && make html
+          command: |
+            cd docs
+            make clean
+            make html
       - persist_to_workspace:
           root: docs/_build
           paths: html

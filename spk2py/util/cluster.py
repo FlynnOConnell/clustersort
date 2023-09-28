@@ -8,8 +8,7 @@ from numba import jit
 from numba.typed import List
 from scipy import linalg
 from scipy.interpolate import interp1d
-from scipy.signal import butter
-from scipy.signal import sosfilt
+from scipy.signal import butter, sosfilt
 from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.decomposition import PCA
