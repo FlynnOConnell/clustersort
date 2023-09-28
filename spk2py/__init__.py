@@ -23,4 +23,7 @@ TAB-completion and introspection capabilities.
 from spk2py import autosort
 from spk2py import extraction
 from spk2py.logging import *
+from spk2py.logging import logger_config
 from spk2py.util.cluster import extract_waveforms, get_lratios, dejitter, scale_waveforms, cluster_gmm
+
+__all__ = ["autosort", "extraction", "logger_config", "extract_waveforms", "get_lratios", "dejitter", "scale_waveforms", "cluster_gmm"]
