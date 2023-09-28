@@ -1,17 +1,13 @@
 from setuptools import find_packages, setup
 
-
-def readfile(name):
-    with open(name) as f:
-        return f.read()
-
 reqs = [
-    'numpy' <=1.23,
+    'numpy<=1.24',
+    'numba',
     'scipy',
     'pandas',
-    'scikit-learn'
+    'scikit-learn',
     'scikit-image',
-    'matplotlib'
+    'matplotlib',
     'openSSL',
     'datashader',
     'pip',
@@ -36,7 +32,7 @@ setup(
     author_email='Flynnoconnell@gmail.com',
     url='https://www.github.com/Flynnoconnell/spk2py',
     packages=find_packages(),
-    install_requires=install_requires,
+    install_requires=reqs,
     extras_require={'docs': docs_extras},
     package_dir={'': 'spk2py'},
     include_package_data=True,
