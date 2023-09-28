@@ -3,7 +3,7 @@
 Data analysis pipeline for electrophysiological data.
 
 [![Documentation](https://img.shields.io/badge/view-Documentation-blue?style=)](https://flynnoconnell.github.io/spk2py/index.html# "Go to project documentation")
-
+[![Documentation Status](https://readthedocs.org/projects/spk2py/badge/?version=latest)](https://spk2py.readthedocs.io/en/latest/?badge=latest)
 ![CircleCI](https://dl.circleci.com/status-badge/img/gh/FlynnOConnell/spk2py/tree/master.svg?style=shield)
 
 ### Default File structure
