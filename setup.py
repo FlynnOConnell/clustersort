@@ -6,7 +6,7 @@ def readfile(name):
         return f.read()
 
 reqs = [
-    'numpy' <=1.23.5,
+    'numpy' <=1.23,
     'scipy',
     'pandas',
     'scikit-learn'
