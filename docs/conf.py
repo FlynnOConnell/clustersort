@@ -13,7 +13,7 @@ docs_path = os.path.abspath('../')
 package_path = os.path.abspath('../../')
 spk2py_package_path = os.path.abspath('../../spk2py')
 
-sys.path.insert(os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, source_path)
 sys.path.insert(0, docs_path)
 sys.path.insert(0, package_path)
