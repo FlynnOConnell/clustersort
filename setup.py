@@ -1,4 +1,32 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
+
+def readfile(name):
+    with open(name) as f:
+        return f.read()
+
+reqs = [
+    'numpy' <=1.23.5,
+    'scipy',
+    'pandas',
+    'scikit-learn'
+    'scikit-image',
+    'matplotlib'
+    'openSSL',
+    'datashader',
+    'pip',
+    'h5py',
+    'pillow',
+    'Opencv',
+    'imageio'
+]
+
+docs_extras = [
+    'Sphinx >= 6.2.1',
+    'sphinx-design',
+    'pydata-sphinx-theme',
+    'numpydoc'
+]
 
 setup(
     name='spk2py',
@@ -8,6 +36,11 @@ setup(
     author_email='Flynnoconnell@gmail.com',
     url='https://www.github.com/Flynnoconnell/spk2py',
     packages=find_packages(),
+    install_requires=install_requires,
+    extras_require={'docs': docs_extras},
+    package_dir={'': 'spk2py'},
+    include_package_data=True,
+    zip_safe=False,
     classifiers = [
         'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
