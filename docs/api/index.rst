@@ -1,14 +1,8 @@
-==========
-spk2py API
-==========
+API Reference
+=============
 
-.. toctree::
-   :maxdepth: 4
-   :caption: Modules
-   :name: modules
+.. autosummary::
+   :toctree: _autosummary
 
-    Autosort <autosort>
-    Extraction <extraction>
-    Util <util>
-    Logging <logger>
-
+   autosort
+   logger
