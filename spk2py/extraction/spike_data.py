@@ -14,13 +14,13 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from sonpy import lib as sp
+# from sonpy import lib as sp
 
-from spk2py.logging.logger_config import configure_logger
-from spk2py.util import extract_waveforms, filter_signal
+# from spk2py.logging.logger_config import configure_logger
+# from spk2py.util import extract_waveforms, filter_signal
 
-logfile = Path().home() / "data" / "spike_data.log"
-logger = configure_logger(__name__, logfile, level=logging.DEBUG)
+# logfile = Path().home() / "data" / "spike_data.log"
+# logger = configure_logger(__name__, logfile, level=logging.DEBUG)
 
 UnitData = namedtuple("UnitData", ["spikes", "times"])
 

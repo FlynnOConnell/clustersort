@@ -16,7 +16,6 @@ from sklearn.mixture import GaussianMixture
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
-logpath = Path().home() / 'autosort' / "cluster.log"
 
 
 def filter_signal(sig, sampling_rate: int | float, freq=(300, 6000), ):

@@ -7,11 +7,6 @@ import math
 import multiprocessing
 from pathlib import Path
 
-from util.spk_io import read_h5
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 def run_autosort(params: spk_config.SpkConfig, parallel: bool = True):
     """
