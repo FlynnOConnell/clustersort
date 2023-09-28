@@ -1,7 +1,14 @@
 """
-==========
+===============
 ``clustersort``
-==========
+===============
+
+.. autosummary::
+   :toctree: _autosummary
+   :template: autosummary.module.rst
+
+   src.autosort
+   src.logger
 
 *spk2py. A full analysis pipeline for spike preprocessing, sorting and post-processing utilities.*
 
@@ -20,7 +27,7 @@ I recommend exploring the docstrings using
 TAB-completion and introspection capabilities.
 
 """
-from spk2py import util
-from spk2py.logger import logger_config
+from . import autosort
+from . import logger
 
-__all__ = ["util", "logger_config"]
+__all__ = ["autosort", "logger"]

@@ -2,7 +2,6 @@
 ========
 Autosort
 ========
-.. currentmodule:: spk2py.autosort
 
 Autosort: A Python package for spike sorting.
 
