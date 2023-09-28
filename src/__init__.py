@@ -3,14 +3,7 @@
 ``clustersort``
 ===============
 
-.. autosummary::
-   :toctree: _autosummary
-   :template: autosummary.module.rst
-
-   src.autosort
-   src.logger
-
-*spk2py. A full analysis pipeline for spike preprocessing, sorting and post-processing utilities.*
+*clustersort. A full analysis pipeline for spike preprocessing, sorting and post-processing utilities.*
 
 spk2py is a Python-based framework for processing and analyzing electrophysiological spike data.
 It extracts spike waveforms from raw Spike2 files using the C++ wrapper SonPy library, and then
@@ -29,5 +22,6 @@ TAB-completion and introspection capabilities.
 """
 from . import autosort
 from . import logger
+from . import utils
 
-__all__ = ["autosort", "logger"]
+__all__ = ["autosort", "logger", "utils"]

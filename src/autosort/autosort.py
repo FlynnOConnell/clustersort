@@ -27,10 +27,10 @@ from .directory_manager import DirectoryManager
 from .spk_config import SpkConfig
 from .wf_shader import waveforms_datashader
 
-import cluster_gmm, get_lratios, scale_waveforms, implement_pca
+from utils import cluster_gmm, get_lratios, scale_waveforms
 
+logpath = ""
 logger = logging.getLogger(__name__)
-logpath = Path().home() / "autosort" / "directory_logs.log"
 logging.basicConfig(filename=logpath, level=logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
@@ -407,7 +407,7 @@ class ProcessChannel:
 
             # Scale the dejittered spikes by the energy of the waveforms and perform PCA
             scaled_slices, energy = scale_waveforms(self.data["spikes"])
-            pca_slices, explained_variance_ratio = implement_pca(scaled_slices)
+            pca_slices, explained_variance_ratio = [], []
             cumulvar = np.cumsum(explained_variance_ratio)
             graphvar = list(cumulvar[0 : np.where(cumulvar > 0.999)[0][0] + 1])
 

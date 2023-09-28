@@ -3,11 +3,12 @@
 SpkConfig
 =========
 
-.. currentmodule:: spk2py.autosort.spk_config
+.. currentmodule:: spk_config
 
 A class to manage configurations for the AutoSort pipeline.
 
 .. moduleauthor:: Flynn O'Connell <
+
 """
 from __future__ import annotations
 

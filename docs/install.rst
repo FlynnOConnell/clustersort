@@ -27,11 +27,11 @@ Installing from source
     echo ". ${HOME}/conda/etc/profile.d/conda.sh" >> ~/.bashrc
     source "${HOME}/conda/etc/profile.d/conda.sh"
 
-.. warning::
-    If you're getting "conda: command not found", you need to add ``conda`` to your path.
-    Look in your home directory, you should have a mambaforge or miniforge3 folder, depending on
-    your method of installation. Add that folder/bin to your path:
-    ```export PATH="/home/username/mambaforge/bin:$PATH"
+
+If you're getting ``conda: command not found``, you need to add ``conda`` to your path.
+Look in your home directory, you should have a mambaforge or miniforge3 folder, depending on
+your method of installation. Add that folder/bin to your path:
+`export PATH="/home/username/mambaforge/bin:$PATH"`
 
 .. code-block:: bash
 

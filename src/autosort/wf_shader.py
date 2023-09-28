@@ -37,11 +37,11 @@ from functools import partial
 
 import datashader as ds
 import datashader.transfer_functions as tf
+from datashader.utils import export_image
 import imageio
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from datashader.utils import export_image
 
 
 def waveforms_datashader(waveforms: np.ndarray, x_values: np.ndarray, dir_name="datashader_temp"):

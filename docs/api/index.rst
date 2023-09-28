@@ -5,5 +5,5 @@ API Reference
    :toctree: _autosummary
    :template: autosummary.module.rst
 
-   src.autosort
-   src.logger
+   autosort
+   logger
