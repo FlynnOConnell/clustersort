@@ -4,6 +4,8 @@ debug/*
 isotools-master/*
 version.txt
 
+_build/
+
 *.iml
 *.ipr
 
