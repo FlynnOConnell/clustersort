@@ -1,5 +1,5 @@
 Logger
 ======
 
-.. automodule:: spk2py.logging
+.. automodule:: spk2py.logger
    :members:

@@ -6,20 +6,11 @@
 import os
 import sys
 import importlib
-from pathlib import Path
 
-source_path = os.path.abspath('.')
-docs_path = os.path.abspath('../')
-package_path = os.path.abspath('../../')
-spk2py_package_path = os.path.abspath('../../spk2py')
-
+sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, source_path)
-sys.path.insert(0, docs_path)
-sys.path.insert(0, package_path)
-sys.path.insert(0, spk2py_package_path)
-os.environ['PYTHONPATH'] = package_path + ':' + os.environ.get('PYTHONPATH', '')
-os.environ['PYTHONPATH'] = spk2py_package_path + ':' + os.environ.get('PYTHONPATH', '')
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -45,7 +36,6 @@ extensions = [
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 source_suffix = '.rst'
 
