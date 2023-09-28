@@ -1,9 +1,11 @@
 =================================
-Welcome to spk2py's Documentation
+Welcome to clustersort's Documentation
 =================================
 
+This Python repository is adapted from the methods and code described in Mukherjee, Wachutka, & Katz (2017) [1]_.
+
 .. note::
-    spk2py is a Python-based framework for processing and analyzing electrophysiological spike data.
+    clustersort is a Python-based framework for processing and analyzing electrophysiological spike data.
     It extracts spike waveforms from raw Spike2 files using the lower-level SonPy library, and then
     performs waveform extraction and spike sorting. It also provides a number of tools for analyzing
     the resulting spike data. Once spikes are sorted, users are able to post-process the spikes using
@@ -31,7 +33,12 @@ Contribute
 Contact
 =======
 
-- GitHub: https://github.com/flynnoconnell/spk2py
+- GitHub: https://github.com/flynnoconnell/clustersort
 - Email: Flynnoconnell@gmail.com
 
 For more in-depth information, consult the API documentation in `docs/api/autosort`.
+
+References
+==========
+
+.. [1] Mukherjee, Narendra & Wachutka, Joseph & Katz, Donald. (2017). Python meets systems neuroscience: affordable, scalable and open-source electrophysiology in awake, behaving rodents. 98-105.

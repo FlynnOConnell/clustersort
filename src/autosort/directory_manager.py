@@ -1,16 +1,15 @@
 """
-file: spk2py/autosort/directory_manager.py
+=================
+Directory Manager
+=================
 
 Class for managing directories produced and utilized when running the autosort pipeline.
+
 """
+
 import logging
 import shutil
 from pathlib import Path
-
-logger = logging.getLogger(__name__)
-logpath = Path().home() / "autosort" / "directory_logs.log"
-logging.basicConfig(filename=logpath, level=logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
 
 
 class DirectoryManager:
@@ -50,6 +49,9 @@ class DirectoryManager:
             self.intermediate,
         ]
         self.idx = 0
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler())
+
 
     @property
     def processed(self):
@@ -105,15 +107,15 @@ class DirectoryManager:
         try:
             for base_dir in self.directories:
                 for f in base_dir.glob("*"):
-                    logger.debug(f"Found base_dir: {f}")
+                    self.logger.debug(f"Found base_dir: {f}")
                     if f.is_file():
-                        logger.debug(f"Deleting file: {f}")
+                        self.logger.debug(f"Deleting file: {f}")
                         f.unlink()
                     elif f.is_dir():
-                        logger.debug(f"Deleting directory: {f}")
+                        self.logger.debug(f"Deleting directory: {f}")
                         shutil.rmtree(f)
         except Exception as e:
-            logger.error(f"Error flushing directories: {e}", exc_info=True)
+            self.logger.error(f"Error flushing directories: {e}", exc_info=True)
 
     def create_channel_directories(self, num_chan):
         """
@@ -128,5 +130,5 @@ class DirectoryManager:
         for base_dir in base_dirs:
             for channel_number in range(1, num_chan + 1):
                 channel_dir = base_dir / f"channel_{channel_number}"
-                logger.debug(f"Creating channel directory: {channel_dir}")
+                self.logger.debug(f"Creating channel directory: {channel_dir}")
                 channel_dir.mkdir(parents=True, exist_ok=True)

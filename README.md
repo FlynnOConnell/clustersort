@@ -1,10 +1,10 @@
-# spk2py
+# clustersort
 
 Data analysis pipeline for electrophysiological data.
 
-[![Documentation](https://img.shields.io/badge/view-Documentation-blue?style=)](https://flynnoconnell.github.io/spk2py/index.html# "Go to project documentation")
-[![Documentation Status](https://readthedocs.org/projects/spk2py/badge/?version=latest)](https://spk2py.readthedocs.io/en/latest/?badge=latest)
-![CircleCI](https://dl.circleci.com/status-badge/img/gh/FlynnOConnell/spk2py/tree/master.svg?style=shield)
+[![Documentation](https://img.shields.io/badge/view-Documentation-blue?style=)](https://flynnoconnell.github.io/clustersort/index.html# "Go to project documentation")
+[![Documentation Status](https://readthedocs.org/projects/clustersort/badge/?version=latest)](https://clustersort.readthedocs.io/en/latest/?badge=latest)
+![CircleCI](https://dl.circleci.com/status-badge/img/gh/FlynnOConnell/clustersort/tree/master.svg?style=shield)
 
 ### Default File structure
 ```
@@ -118,7 +118,7 @@ To initialize a configuration file with default settings, use the `default_confi
 
 ```python
 from pathlib import Path
-from spk2py.autosort.spk_config import default_config
+from clustersort.autosort.spk_config import default_config
 
 default_config(path=Path('/path/to/your/config.ini'))
 ```

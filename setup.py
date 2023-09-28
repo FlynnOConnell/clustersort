@@ -11,7 +11,6 @@ reqs = [
     'pyOpenSSL',
     'datashader',
     'pip',
-    'h5py',
     'pillow',
     'opencv-python',
     'imageio'
@@ -25,12 +24,12 @@ docs_extras = [
 ]
 
 setup(
-    name='spk2py',
+    name='clustersort',
     version='0.0.1',
     description='Spike sorting and processing utilities.',
     author='Flynn OConnell',
     author_email='Flynnoconnell@gmail.com',
-    url='https://www.github.com/Flynnoconnell/spk2py',
+    url='https://www.github.com/Flynnoconnell/clustersort',
     packages=find_packages(),
     install_requires=reqs,
     extras_require={'docs': docs_extras},

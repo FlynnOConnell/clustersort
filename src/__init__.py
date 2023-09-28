@@ -1,6 +1,6 @@
 """
 ==========
-``spk2py``
+``clustersort``
 ==========
 
 *spk2py. A full analysis pipeline for spike preprocessing, sorting and post-processing utilities.*

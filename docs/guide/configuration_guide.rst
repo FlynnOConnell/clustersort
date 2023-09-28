@@ -2,12 +2,10 @@
 Configuration Guide
 ===================
 
-.. currentmodule:: spk2py.autosort.spk_config
-
 Overview
 --------
 
-This class manages configurations for the AutoSort pipeline. It reads from an INI-style configuration file and provides methods to access configurations for various sections.
+This class manages configurations for the clustersort pipeline. It reads from an INI-style configuration file and provides methods to access configurations for various sections.
 
 .. moduleauthor:: Flynn O'Connell
 

@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "spk2py"
+name = "clustersort"
 version = "0.0.1"
 # TODO: add `license-files` once PEP 639 is accepted (see meson-python#88)
 license = {file = "LICENSE.txt"}
@@ -35,6 +35,6 @@ classifiers = [
 ]
 
 [project.urls]
-homepage = "https://www.github.com/Flynnoconnell/spk2py"
-source = "https://www.github.com/Flynnoconnell/spk2py"
+homepage = "https://www.github.com/Flynnoconnell/clustersort"
+source = "https://www.github.com/Flynnoconnell/clustersort"
 

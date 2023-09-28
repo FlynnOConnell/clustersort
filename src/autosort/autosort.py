@@ -27,7 +27,7 @@ from .directory_manager import DirectoryManager
 from .spk_config import SpkConfig
 from .wf_shader import waveforms_datashader
 
-from ..util import cluster_gmm, get_lratios, scale_waveforms, implement_pca
+import cluster_gmm, get_lratios, scale_waveforms, implement_pca
 
 logger = logging.getLogger(__name__)
 logpath = Path().home() / "autosort" / "directory_logs.log"

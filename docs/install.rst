@@ -4,7 +4,7 @@ Installation
 
 This pipeline requires Python 3.9+, and numpy <= 1.3.5 to comply with numba restrictions.
 
-* `spk2py on GitHub <https://github.com/FlynnOConnell/spk2py/>`_
+* `clustersort on GitHub <https://github.com/FlynnOConnell/clustersort/>`_
 
 It is recommended to install using `mambaforge <https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install>`_ this will drastically speed up environment creation:
 
@@ -15,8 +15,8 @@ Installing from source
 
 .. code-block:: bash
 
-    git clone https://github.com/FlynnOConnell/spk2py.git
-    cd path/to/spk2py
+    git clone https://github.com/FlynnOConnell/clustersort.git
+    cd path/to/clustersort
     # This is for MambaForge, but you can use conda if you want
     # Note if you use conda, but want to go the mamba route, you will really want to uninstall miniconda/anaconda first
     wget -O Mambaforge.sh  "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
@@ -27,14 +27,20 @@ Installing from source
     echo ". ${HOME}/conda/etc/profile.d/conda.sh" >> ~/.bashrc
     source "${HOME}/conda/etc/profile.d/conda.sh"
 
+.. warning::
+    If you're getting "conda: command not found", you need to add ``conda`` to your path.
+    Look in your home directory, you should have a mambaforge or miniforge3 folder, depending on
+    your method of installation. Add that folder/bin to your path:
+    ```export PATH="/home/username/mambaforge/bin:$PATH"
+
 .. code-block:: bash
 
     mamba env create -f environment.yml # this will take a while
-    conda activate spk2py
+    conda activate clustersort
     pip install -r requirements.txt
     pip install -e .
 
-Additionally, though not recommended, ``spk2py`` can be installed directly from pip:
+Additionally, though not recommended, ``clustersort`` can be installed directly from pip:
 
 .. warning::
    pip installing has **not** been tested on systems other than linux.
@@ -43,7 +49,8 @@ Additionally, though not recommended, ``spk2py`` can be installed directly from 
 
 .. code-block:: bash
 
-    pip install spk2py
+    pip install clustersort
+
 
 Mamba Installation
 ==================
