@@ -2,11 +2,14 @@
 
 Data analysis pipeline for electrophysiological data.
 
+Heavily inspired by [blechpy](https://github.com/nubs01/blechpy)
+
 [![Documentation](https://img.shields.io/badge/view-Documentation-blue?style=)](https://flynnoconnell.github.io/clustersort/index.html# "Go to project documentation")
 [![Documentation Status](https://readthedocs.org/projects/clustersort/badge/?version=latest)](https://clustersort.readthedocs.io/en/latest/?badge=latest)
 ![CircleCI](https://dl.circleci.com/status-badge/img/gh/FlynnOConnell/clustersort/tree/master.svg?style=shield)
 
 ### Default File structure
+
 ```
 ~/
 ├── autosort
@@ -118,26 +121,9 @@ To initialize a configuration file with default settings, use the `default_confi
 
 ```python
 from pathlib import Path
-from clustersort.autosort.spk_config import default_config
+from clustersort.spk_config import default_config
 
 default_config(path=Path('/path/to/your/config.ini'))
 ```
 ---
 
-## Understanding the Spike2 Data Types
-We are working with data from an Analog-to-Digital Converter (ADC). A bit about what this all
-means:</p>
-<h3>ADC (Analog-to-Digital Converter)</h3>
-<p>An ADC converts continuous analog signals (like electrical voltage) into a digital representation.
-The digital representation is often stored in bits, and in this case, it's stored in 16 bits, which means each measurement (or sample) is represented with 16 bits of data.
-This gives you a range of possible values from -32768 to 32767, which are derived from 2^16 different possible 16-bit values (ranging from 0 to 65535) but offset to allow for negative values.
-</p><h3>Waveform Data</h3><p>This term refers to data representing a wave acquired over time, and it is time-continuous meaning that it has been sampled at regular intervals over time, forming a continuous signal.
-</p>
-<h3>Scale and Offset</h3>
-<p>
-Each ADC channel contains a scale and offset that allows you to transform the recorded integer values into a different range according to the linear transformation equation:
-</p><div class="math math-display"><span class="katex-display" style=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>y</mi><mo>=</mo><mi>m</mi><mi>x</mi><mo>+</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">y = mx + c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.625em; vertical-align: -0.1944em;"></span><span class="mord mathnormal" style="margin-right: 0.03588em;">y</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6667em; vertical-align: -0.0833em;"></span><span class="mord mathnormal">m</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></span></div><p>where:</p><ul><li><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.625em; vertical-align: -0.1944em;"></span><span class="mord mathnormal" style="margin-right: 0.03588em;">y</span></span></span></span></span> is the transformed data value</li><li><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span></span> is the scale factor</li><li><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span></span> is the original data value</li><li><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></span> is the offset</li></ul><p>This transformation allows you to calibrate the data to represent real-world quantities accurately. In the case of Spike2, the scale and offset would be used to convert the ADC counts to a voltage value based on the specifications of the Spike2 hardware used to acquire the data.
-</p><h3>Working with this Data</h3>
-
-<p> Considering the bit-depth of your the signals (16-bit), it allows for a decent range of discrete values, giving us a high-resolution representation of the continuous signals that were measured.
-</p>
