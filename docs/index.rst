@@ -17,8 +17,8 @@ Clustersort is heavily adapted from the methods and code described in Mukherjee,
    :name: gettingstarted
 
    Installation <install>
-   Usage <api/index>
    Guide <guide/index>
+   Api <api/index>
 
 
 Contribute

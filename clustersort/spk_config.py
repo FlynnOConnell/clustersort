@@ -1,14 +1,5 @@
 """
-.. currentmodule: clustersort
-
-=========
-SpkConfig
-=========
-
-A class to manage configurations for the AutoSort pipeline.
-
-.. moduleauthor:: Flynn OConnell
-
+Configuration module for the clustersort package.
 """
 from __future__ import annotations
 
@@ -19,7 +10,7 @@ from typing import Any
 
 class SpkConfig:
     """
-    Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
+    Initialize a new SpkConfig object to manage configurations for the clustersort pipeline.
 
     This class reads from an INI-style configuration file and provides methods
     to access the configurations for different sections. These sections include
@@ -34,7 +25,7 @@ class SpkConfig:
     -----
     The configuration file is an INI-style file with the following sections:
 
-    - `run <../../guide/sort_config_guide:config-ini-run>`_ : dict
+    - run: dict
         Contains configurations related to runtime settings like 'resort-limit', 'cores-used'
     - path : dict
         Contains path settings like directories for `run`, 'results'.
@@ -62,54 +53,13 @@ class SpkConfig:
     >>> print(cfg.run['resort-limit'])
     '5'
 
-    See Also: ``configparser from python std library <https://docs.python.org/3/library/configparser.html>``_
+    See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
 
     """
 
     def __init__(self, cfg_path: Path | str = ""):
         """
         Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
-
-        This class reads from an INI-style configuration file and provides methods
-        to access the configurations for different sections. These sections include
-        'run', 'path', 'cluster', and so on.
-
-        Parameters
-        ----------
-        cfg_path : str or Path, optional
-            The path to the configuration file. Defaults to a pre-defined location.
-
-        Notes
-        -----
-        The configuration file is an INI-style file with the following sections:
-
-        - run : dict
-            Contains configurations related to runtime settings like 'resort-limit', 'cores-used'.
-        - path : dict
-            Contains path settings like directories for 'run', 'results'.
-        - cluster : dict
-            Contains clustering parameters like 'max-clusters', 'max-iterations'.
-        - breach : dict
-            Contains breach analysis parameters like 'disconnect-voltage', 'max-breach-rate'.
-        - filter : dict
-            Contains filter parameters like 'low-cutoff', 'high-cutoff'.
-        - spike : dict
-            Contains spike-related settings like 'pre-time', 'post-time'.
-
-        .. note::
-           Due to the nature of INI files, all values are stored as strings. It is up to the user
-           to convert the values to the appropriate type.
-
-        Examples
-        --------
-        >>> cfg = SpkConfig()
-        >>> run = cfg.run
-        >>> print(type(run), run)
-        <class 'dict'> {'resort-limit': '3', 'cores-used': '8', ...}
-
-        >>> cfg.set('run', 'resort-limit', 5)
-        >>> print(cfg.run['resort-limit'])
-        '5'
         """
         if not cfg_path:
             self.cfg_path = Path().home() / "clustersort" / "autosort_config.ini"
