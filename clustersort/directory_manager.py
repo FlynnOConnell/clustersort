@@ -17,28 +17,27 @@ class DirectoryManager:
     """
     Manages directories for storing processed data, plots, reports, and intermediate files.
 
-    Attributes
-    ----------
-    filename : str
-        Stem of the input filepath.
-    base_path : Path
-        Parent directory for the main categories of directories.
-    base_suffix : str
-        Suffix of the base path.
-    directories : list of Path
-        List of all primary directories managed by this instance.
-    idx : int
-        Index used for channel directory creation, default is 0.
+    .. note::
+
+        Several temporary and permanent directories must be made so save plotting results, and to
+        store data used to create those plots.
+
     """
 
     def __init__(self, filepath: str | Path):
         """
-        Initialize DirectoryManager.
-
         Parameters
         ----------
         filepath : str or Path
             Full filepath of the data file being processed.
+
+        Returns
+        -------
+        None
+
+        .. note::
+            Must delete some directories.
+
         """
         self.filename = Path(filepath).stem
         self.base_path = Path(filepath).parent / self.filename

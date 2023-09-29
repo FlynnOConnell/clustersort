@@ -92,3 +92,72 @@ See Also
 --------
 
 - `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
+
+
+============================
+Configuration Guide In Depth
+============================
+
+.. _config-overview:
+
+Overview
+--------
+
+This class manages configurations for the clustersort pipeline...
+
+.. _config-attributes:
+
+Attributes
+----------
+
+- ``cfg_path``: Path to the configuration file...
+
+.. _config-methods:
+
+Methods
+-------
+
+get_section(section: str)
+    Returns a dictionary containing key-value pairs...
+
+.. _config-ini:
+
+INI Configuration File
+----------------------
+
+.. _config-ini-run:
+
+- ``run``: Contains runtime settings like ``resort-limit``, ``cores-used``.
+  - ``resort-limit``: Integer, default is 3. Explanation...
+  - ``cores-used``: Integer, default is 8. Explanation...
+
+.. _config-ini-path:
+
+- ``path``: Contains path settings like directories for ``run``, ``results``.
+  - ``run``: String, default is "/path/to/run". Explanation...
+  - ``results``: String, default is "/path/to/results". Explanation...
+
+.. _config-ini-cluster:
+
+- ``cluster``: Contains clustering parameters like ``max-clusters``, ``max-iterations``.
+
+... (and so on)
+
+.. _config-example:
+
+Example
+-------
+
+.. code-block:: python
+
+    cfg = SpkConfig()
+    run = cfg.run
+    print(type(run), run)
+
+.. _config-see-also:
+
+See Also
+--------
+
+- `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
+

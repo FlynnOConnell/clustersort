@@ -32,11 +32,11 @@ from numpy import __version__ as numpyversion
 from packaging.version import Version
 
 from .directory_manager import DirectoryManager  # noqa: (API import)
-from .logger import *  # noqa: (API import)
-from .main import *  # noqa: (API import)
-from .sort import *  # noqa: (API import)
 from .spk_config import SpkConfig  # noqa: (API import)
-from .utils import *  # noqa: (API import)
+from .logger import configure_logger  # noqa: (API import)
+from .main import run  # noqa: (API import)
+from .sort import ProcessChannel  # noqa: (API import)
+from .utils import cluster_gmm, get_lratios, scale_waveforms, waveforms_datashader  # noqa: (API import)
 
 if Version(numpyversion) >= Version("1.24.0"):
     raise ImportError(

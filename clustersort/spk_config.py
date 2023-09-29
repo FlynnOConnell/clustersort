@@ -1,11 +1,13 @@
 """
+.. currentmodule: clustersort
+
 =========
 SpkConfig
 =========
 
 A class to manage configurations for the AutoSort pipeline.
 
-.. moduleauthor:: Flynn O'Connell <
+.. moduleauthor:: Flynn OConnell
 
 """
 from __future__ import annotations
@@ -17,7 +19,7 @@ from typing import Any
 
 class SpkConfig:
     """
-    Class to manage configurations for the AutoSort pipeline.
+    Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
 
     This class reads from an INI-style configuration file and provides methods
     to access the configurations for different sections. These sections include
@@ -25,17 +27,17 @@ class SpkConfig:
 
     Parameters
     ----------
-    cfg_path : str or Path, optional
+    config_path : str or Path, optional
         The path to the configuration file. Defaults to a pre-defined location.
 
     Notes
     -----
     The configuration file is an INI-style file with the following sections:
 
-    - run : dict
-        Contains configurations related to runtime settings like 'resort-limit', 'cores-used'.
+    - `run <../../guide/sort_config_guide:config-ini-run>`_ : dict
+        Contains configurations related to runtime settings like 'resort-limit', 'cores-used'
     - path : dict
-        Contains path settings like directories for 'run', 'results'.
+        Contains path settings like directories for `run`, 'results'.
     - cluster : dict
         Contains clustering parameters like 'max-clusters', 'max-iterations'.
     - breach : dict
@@ -43,9 +45,24 @@ class SpkConfig:
     - filter : dict
         Contains filter parameters like 'low-cutoff', 'high-cutoff'.
     - spike : dict
-        Contains spike-extraction settings like 'pre-time', 'post-time'.
+        Contains spike-related settings like 'pre-time', 'post-time'.
 
-    See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
+    .. note::
+       Due to the nature of INI files, all values are stored as strings. It is up to the user
+       to convert the values to the appropriate type.
+
+    Examples
+    --------
+    >>> cfg = SpkConfig()
+    >>> run = cfg.run
+    >>> print(type(run), run)
+    <class 'dict'> {'resort-limit': '3', 'cores-used': '8', ...}
+
+    >>> cfg.set('run', 'resort-limit', 5)
+    >>> print(cfg.run['resort-limit'])
+    '5'
+
+    See Also: ``configparser from python std library <https://docs.python.org/3/library/configparser.html>``_
 
     """
 
@@ -105,18 +122,18 @@ class SpkConfig:
 
     def get_section(self, section: str):
         """
-            Returns a dictionary containing key-value pairs for the given section.
+        Returns a dictionary containing key-value pairs for the given section.
 
-            Parameters
-            ----------
-            section : str
-                The name of the section in the config file.
+        Parameters
+        ----------
+        section : str
+            The name of the section in the config file.
 
-            Returns
-            -------
-            dict
-                Dictionary containing the section's key-value pairs.
-            """
+        Returns
+        -------
+        dict
+            Dictionary containing the section's key-value pairs.
+        """
         return dict(self.config[section])
 
     def set(self, section: str, key: str, value: Any):
@@ -126,12 +143,20 @@ class SpkConfig:
         Parameters
         ----------
         section : str
+            The section of the paremeter being set.
         key : str
-        value : Any
+            The key of the section to be set.
+        value : str
+            The value being set by the user.
 
         Returns
         -------
         None
+
+        .. note::
+
+            All parts of the configuration, section, key and value, are strings. This is how configparser works
+            under the hood. It is up to the user to convert datatypes when needed.
         """
 
         if section not in self.config:
@@ -140,10 +165,13 @@ class SpkConfig:
 
     def get_all(self):
         """
+        Get a dictionary of ``key: value`` pairs for every section, conglomerated.
+
         Returns
         -------
         dict
             A dictionary containing all key-value pairs from all sections.
+
         """
         params = {}
         for section in self.config.sections():
@@ -154,31 +182,39 @@ class SpkConfig:
     @property
     def run(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'run' section.
-            """
+        Get a dictionary containing all ``key: value`` pairs for the ``run`` section.
+
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'run' section.
+        """
         return self.get_section('run')
 
     @property
     def path(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'path' section.
-            """
+        Get a dictionary containing all ``key: value`` pairs for the ``path`` section.
+
+        The path section stores paths for the plots and data produced and used by the clustersorting pipeline.
+
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'path' section.
+        """
         return self.get_section('path')
 
     @property
     def cluster(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'cluster' section.
-            """
+        Get a dictionary containing all ``key: value`` pairs for the ``cluster`` section.
+
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'cluster' section.
+        """
         return self.get_section('cluster')
 
     @property
