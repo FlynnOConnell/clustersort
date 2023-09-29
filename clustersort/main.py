@@ -15,7 +15,7 @@ from .sort import sort
 
 def run(params: spk_config.SpkConfig, parallel: bool = True):
     """
-    Entry point for the autosort package.
+    Entry point for the clustersort package.
     Optionally include a `SpkConfig` object to override the default parameters.
 
     This function iterates over data files, manages directories, and executes sorting either sequentially

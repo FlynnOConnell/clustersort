@@ -1,4 +1,4 @@
 [run]
 branch = True
-include = */src/*
+include = */clustersort/*
 disable_warnings = include-ignored

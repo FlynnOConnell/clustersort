@@ -95,7 +95,7 @@ class SpkConfig:
         '5'
         """
         if not cfg_path:
-            self.cfg_path = Path().home() / "autosort" / "autosort_config.ini"
+            self.cfg_path = Path().home() / "clustersort" / "autosort_config.ini"
             self.set_default_config()
         else:
             self.cfg_path = cfg_path

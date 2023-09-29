@@ -38,3 +38,29 @@ classifiers = [
 homepage = "https://www.github.com/Flynnoconnell/clustersort"
 source = "https://www.github.com/Flynnoconnell/clustersort"
 
+[tool.pyright]
+include = ["clustersort"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.vscode",
+    "**/.git",
+    "**/.DS_Store",
+    "**/*.pyc",
+    "**/*.pyo",
+]
+
+ignore = [
+    "docs/**",
+    "ci/**",
+    "docker/**",
+]
+defineConstant = { DEBUG = true }
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+pythonVersion = "3.9"
+pythonPlatform = "Linux"
+executionEnvironments = [
+  { root = "clustersort" }
+]

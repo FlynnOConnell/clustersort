@@ -51,7 +51,7 @@ def waveforms_datashader(waveforms: np.ndarray, x_values: np.ndarray, dir_name="
         The Matplotlib axes used for plotting.
 
     .. note::
-        This function is intended for use with the ``spk2py.autosort`` module.
+        This function is intended for use with the ``spk2py.clustersort`` module.
         It is not intended for general use.
         It relies on the ``datashader`` and ``matplotlib`` packages.
 

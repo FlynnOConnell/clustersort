@@ -3,7 +3,7 @@
 Directory Manager
 =================
 
-Class for managing directories produced and utilized when running the autosort pipeline.
+Class for managing directories produced and utilized when running the clustersort pipeline.
 
 """
 
