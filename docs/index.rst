@@ -12,19 +12,20 @@ Clustersort is heavily adapted from the methods and code described in Mukherjee,
     a variety of formats for further analysis in other programs.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Getting Started
    :name: gettingstarted
 
    Installation <install>
+   Usage <api/index>
    Guide <guide/index>
-   API <api/index>
+
 
 Contribute
 ==========
 
 1. Fork the repository.
-2. Create your feature branch.
+2. Create your feature bra  nch.
 3. Commit your changes.
 4. Open a pull request.
 

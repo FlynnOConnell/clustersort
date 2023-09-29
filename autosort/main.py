@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+"""
+
+"""
 from __future__ import annotations
 
 import datetime
-import logging
 import math
 import multiprocessing
 from pathlib import Path
+from . import spk_config
+from .directory_manager import DirectoryManager
+from .sort import sort
 
 
-def run_autosort(params: spk_config.SpkConfig, parallel: bool = True):
+def run(params: spk_config.SpkConfig, parallel: bool = True):
     """
     Entry point for the autosort package.
     Optionally include a `SpkConfig` object to override the default parameters.
@@ -34,7 +39,7 @@ def run_autosort(params: spk_config.SpkConfig, parallel: bool = True):
 
     Examples
     --------
-    >>> run_autosort(spk_config.SpkConfig(), parallel=True)
+    >>> sort(spk_config.SpkConfig(), parallel=True)
     """
     if not params:
         params = spk_config.SpkConfig()
@@ -61,7 +66,7 @@ def run_autosort(params: spk_config.SpkConfig, parallel: bool = True):
         dir_manager.flush_directories()
         dir_manager.create_base_directories()
 
-        h5file = read_h5(curr_file)
+        h5file = {}
         unit_data = h5file["unit"]
         num_chan = len(unit_data)
         dir_manager.create_channel_directories(num_chan)
@@ -83,7 +88,7 @@ def run_autosort(params: spk_config.SpkConfig, parallel: bool = True):
                     chan_data = h5file['unit'][chan_name]
                     dir_manager.idx = i
                     p = multiprocessing.Process(
-                        target=run_spk_process, args=(curr_file, chan_data, params, dir_manager, i)
+                        target=sort, args=(curr_file, chan_data, params, dir_manager, i)
                     )
                     p.start()
                     processes.append(p)
@@ -94,10 +99,10 @@ def run_autosort(params: spk_config.SpkConfig, parallel: bool = True):
                     chan_name = [list(h5file['unit'].keys())[i]][0]
                     chan_data = h5file['unit'][chan_name]
                     dir_manager.idx = i
-                    run_spk_process(curr_file, chan_data, params, dir_manager, i)
+                    sort(curr_file, chan_data, params, dir_manager, i)
 
 
 if __name__ == "__main__":
     main_params = spk_config.SpkConfig()
     main_params.set("path", "run", Path.home() / "data" / "combined")
-    run_autosort(main_params, parallel=False)
+    run(main_params, parallel=False)

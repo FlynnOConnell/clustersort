@@ -7,6 +7,7 @@ Class for managing directories produced and utilized when running the autosort p
 
 """
 
+from __future__ import annotations
 import logging
 import shutil
 from pathlib import Path
@@ -30,7 +31,7 @@ class DirectoryManager:
         Index used for channel directory creation, default is 0.
     """
 
-    def __init__(self, filepath):
+    def __init__(self, filepath: str | Path):
         """
         Initialize DirectoryManager.
 
@@ -51,7 +52,6 @@ class DirectoryManager:
         self.idx = 0
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
-
 
     @property
     def processed(self):

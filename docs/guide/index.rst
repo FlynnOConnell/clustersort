@@ -1,6 +1,6 @@
-==========
-spk2py API
-==========
+=================
+clustersort guide
+=================
 
 .. toctree::
    :maxdepth: 1

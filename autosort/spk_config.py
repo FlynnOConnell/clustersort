@@ -3,8 +3,6 @@
 SpkConfig
 =========
 
-.. currentmodule:: spk_config
-
 A class to manage configurations for the AutoSort pipeline.
 
 .. moduleauthor:: Flynn O'Connell <

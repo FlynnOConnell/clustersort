@@ -1,8 +1,4 @@
 """
-===================
-Waveform Datashader
-===================
-
 Create a Datashader image from an array of waveforms.
 
 This function takes in waveform data and their corresponding x-axis values,
@@ -10,27 +6,11 @@ and generates a Datashader image for visualization. It performs downsampling,
 DataFrame creation, Datashader canvas setup, aggregation, and image export.
 The resulting Datashader image is displayed using Matplotlib.
 
-Parameters:
------------
-waveforms : numpy.ndarray
-    Numpy array containing waveform data.
-x_values : numpy.ndarray
-    Numpy array of x-axis values corresponding to the waveform data.
-dir_name : str, optional
-    The directory where temporary files and images are stored.
-    Default is "datashader_temp".
-
-Returns:
---------
-fig : matplotlib.figure.Figure
-    The Matplotlib figure containing the Datashader image.
-ax : matplotlib.axes.Axes
-    The Matplotlib axes used for plotting.
-
 .. note::
-    This function is intended for use with the ``spk2py.autosort`` module.
+    This function is intended for use with the module.
     It is not intended for general use.
     It relies on the ``datashader`` and ``matplotlib`` packages.
+
 """
 import shutil
 from functools import partial

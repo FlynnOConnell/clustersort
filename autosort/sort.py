@@ -25,9 +25,9 @@ from scipy.spatial.distance import mahalanobis
 
 from .directory_manager import DirectoryManager
 from .spk_config import SpkConfig
-from .wf_shader import waveforms_datashader
+from .utils.shader import waveforms_datashader
 
-from utils import cluster_gmm, get_lratios, scale_waveforms
+from .utils import cluster_gmm, get_lratios, scale_waveforms
 
 logpath = ""
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ logger.addHandler(logging.StreamHandler())
 
 
 # Factory
-def run_spk_process(
+def sort(
     filename: str | Path,
     data: dict,
     params: SpkConfig,

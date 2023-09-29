@@ -5,11 +5,8 @@
 
 import os
 import sys
-import importlib
 
-sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, os.path.abspath('../src'))
-sys.path.insert(0, os.path.abspath('../../src'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -27,6 +24,8 @@ author = 'Flynn OConnell'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.coverage',
     'numpydoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
