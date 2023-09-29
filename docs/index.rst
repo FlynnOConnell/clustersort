@@ -1,6 +1,6 @@
-=================================
+=========================
 Clustersort Documentation
-=================================
+=========================
 
 Clustersort is heavily adapted from the methods and code described in Mukherjee, Wachutka, & Katz (2017) [1]_.
 
@@ -25,7 +25,7 @@ Contribute
 ==========
 
 1. Fork the repository.
-2. Create your feature bra  nch.
+2. Create your feature branch.
 3. Commit your changes.
 4. Open a pull request.
 
