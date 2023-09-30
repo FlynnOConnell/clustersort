@@ -155,17 +155,16 @@ images:
 .. _wf_sample:
 
 
-=========================
 Configuration Guide
 =========================
 
 Sections
-========
+--------
 
 .. _run-section:
 
 run
----
+~~~
 Configuration parameters for the runtime of the pipeline.
 
     .. _run-resort-limit-key:
@@ -207,7 +206,7 @@ Configuration parameters for the runtime of the pipeline.
 .. _path-section:
 
 path
-----
+~~~~
 Here we define various paths necessary for the script, set by default to subdirectories in the parent directory of the specified path.
 
     .. _path-run-path-key:
@@ -231,7 +230,7 @@ Here we define various paths necessary for the script, set by default to subdire
 .. _cluster-section:
 
 cluster
--------
+~~~~~~~
 Parameters defining the clustering process:
 
     .. _cluster-max-clusters-key:
@@ -267,7 +266,7 @@ Parameters defining the clustering process:
 .. _breach-section:
 
 breach
-------
+~~~~~~
 Parameters involved in signal preprocessing and spike detection:
 
     .. _breach-disconnect-voltage-key:
@@ -303,7 +302,7 @@ Parameters involved in signal preprocessing and spike detection:
 .. _filter-section:
 
 filter
-------
+~~~~~~
 Filtering parameters to isolate the frequency range of interest:
 
     .. _filter-low-cutoff-key:
@@ -321,7 +320,7 @@ Filtering parameters to isolate the frequency range of interest:
 .. _spike-section:
 
 spike
------
+~~~~~
 Spike detection and extraction parameters:
 
     .. _spike-pre-time-key:
@@ -345,7 +344,7 @@ Spike detection and extraction parameters:
 .. _detection-section:
 
 detection
----------
+~~~~~~~~~
 Standard deviation parameters for spike detection and artifact removal:
 
     .. _detection-spike-detection-key:
@@ -363,7 +362,7 @@ Standard deviation parameters for spike detection and artifact removal:
 .. _pca-section:
 
 pca
----
+~~~
 Parameters defining how principal component analysis (PCA) is conducted on the spike waveforms:
 
     .. _pca-variance-explained-key:
@@ -387,7 +386,7 @@ Parameters defining how principal component analysis (PCA) is conducted on the s
 .. _postprocess-section:
 
 postprocess
------------
+~~~~~~~~~~~
 Post-processing parameters:
 
     .. _postprocess-reanalyze-key:
@@ -413,3 +412,4 @@ Post-processing parameters:
     - temporary-dir
         - Description: The directory to store temporary files during processing.
         - Default: user's home directory followed by '/tmp_python'
+
