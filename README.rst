@@ -164,7 +164,7 @@ Sections
 
 .. _run-section:
 
-. run
+* run
 
 Configuration parameters for the runtime of the pipeline.
 
@@ -206,7 +206,7 @@ Configuration parameters for the runtime of the pipeline.
 
 .. _path-section:
 
-. path
+* path
 
 Here we define various paths necessary for the script, set by default to subdirectories in the parent directory of the specified path.
 
@@ -230,7 +230,7 @@ Here we define various paths necessary for the script, set by default to subdire
 
 .. _cluster-section:
 
-. cluster
+* cluster
 
 Parameters defining the clustering process:
 
@@ -266,7 +266,7 @@ Parameters defining the clustering process:
 
 .. _breach-section:
 
-. breach
+* breach
 
 Parameters involved in signal preprocessing and spike detection:
 
@@ -302,7 +302,7 @@ Parameters involved in signal preprocessing and spike detection:
 
 .. _filter-section:
 
-. filter
+* filter
 
 Filtering parameters to isolate the frequency range of interest:
 
@@ -320,7 +320,7 @@ Filtering parameters to isolate the frequency range of interest:
 
 .. _spike-section:
 
-. spike
+* spike
 
 Spike detection and extraction parameters:
 
@@ -344,7 +344,7 @@ Spike detection and extraction parameters:
 
 .. _detection-section:
 
-. detection
+* detection
 
 Standard deviation parameters for spike detection and artifact removal:
 
@@ -362,7 +362,7 @@ Standard deviation parameters for spike detection and artifact removal:
 
 .. _pca-section:
 
-. pca
+* pca
 
 Parameters defining how principal component analysis (PCA) is conducted on the spike waveforms:
 
@@ -386,7 +386,7 @@ Parameters defining how principal component analysis (PCA) is conducted on the s
 
 .. _postprocess-section:
 
-. postprocess
+* postprocess
 
 Post-processing parameters:
 
