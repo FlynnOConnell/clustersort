@@ -4,15 +4,17 @@ Clustersort Documentation
 
 Clustersort is heavily adapted from the methods and code described in Mukherjee, Wachutka, & Katz (2017) [1]_.
 
+Code used in that publication can be found at `bleckpy on github<https://github.com/nubs01/blechpy>`_.
+
 .. note::
     Clustersort is a Python-based framework for processing and analyzing electrophysiological spike data.
-    performs waveform extraction and spike sorting. It also provides a number of tools for analyzing
-    the resulting spike data. Once spikes are sorted, users are able to post-process the spikes using
+    It also provides a number of tools for analyzing the in-vivo extracellular spike data.
+    Once spikes are sorted, users are able to post-process the spikes using
     plots for mahalanobis distance, ISI, and autocorrelograms. The data can also be exported to
     a variety of formats for further analysis in other programs.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Getting Started
    :name: gettingstarted
 
