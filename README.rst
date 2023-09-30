@@ -159,6 +159,33 @@ images:
 Configuration Guide
 =========================
 
+Configuring the clustersort pipleine is done with an instance
+of SpkConfig:
+
+.. code-block:: python
+
+    import clustersort.SpkConfig
+
+    config = SpkConfig()
+
+You can set parameters with config.set():
+
+.. code-block:: python
+
+   config.set('run', 'resort-limit', '2')
+   print(config.run('resort-limit')
+   >>> '2'
+   print(type(config.run('resort-limit'))
+   >>> 'str'
+
+.. warning::
+
+    configuration parameters must always be sent as strings, and they
+    will be returned as strings. It's up to the user to convert the type
+    after retrieval.
+
+
+
 - Sections
 
 .. _run-section:
