@@ -112,6 +112,8 @@ Additionally, though not recommended, ``clustersort`` can be installed directly 
 Mamba Installation
 ------------------
 
+. Mambaforge (recommended)
+
 We recommend that you start with the `Mambaforge distribution <https://github.com/conda-forge/miniforge#mambaforge>`_.
 Mambaforge comes with the popular ``conda-forge`` channel preconfigured, but you can modify the configuration to use any channel you like.
 Note that Anaconda channels are generally incompatible with conda-forge, so you should not mix them.
@@ -122,8 +124,7 @@ Note that Anaconda channels are generally incompatible with conda-forge, so you 
    Doing so may break ``mamba`` and ``conda`` installation.
 
 
-Existing ``conda`` install (not recommended)
-********************************************
+. Existing ``conda`` install (not recommended)
 
 .. warning::
    This way of installing Mamba is **not recommended**.
@@ -163,8 +164,8 @@ Sections
 
 .. _run-section:
 
-run
-~~~
+. run
+
 Configuration parameters for the runtime of the pipeline.
 
     .. _run-resort-limit-key:
@@ -205,8 +206,8 @@ Configuration parameters for the runtime of the pipeline.
 
 .. _path-section:
 
-path
-~~~~
+. path
+
 Here we define various paths necessary for the script, set by default to subdirectories in the parent directory of the specified path.
 
     .. _path-run-path-key:
@@ -229,8 +230,8 @@ Here we define various paths necessary for the script, set by default to subdire
 
 .. _cluster-section:
 
-cluster
-~~~~~~~
+. cluster
+
 Parameters defining the clustering process:
 
     .. _cluster-max-clusters-key:
@@ -265,8 +266,8 @@ Parameters defining the clustering process:
 
 .. _breach-section:
 
-breach
-~~~~~~
+. breach
+
 Parameters involved in signal preprocessing and spike detection:
 
     .. _breach-disconnect-voltage-key:
@@ -301,8 +302,8 @@ Parameters involved in signal preprocessing and spike detection:
 
 .. _filter-section:
 
-filter
-~~~~~~
+. filter
+
 Filtering parameters to isolate the frequency range of interest:
 
     .. _filter-low-cutoff-key:
@@ -319,8 +320,8 @@ Filtering parameters to isolate the frequency range of interest:
 
 .. _spike-section:
 
-spike
-~~~~~
+. spike
+
 Spike detection and extraction parameters:
 
     .. _spike-pre-time-key:
@@ -343,8 +344,8 @@ Spike detection and extraction parameters:
 
 .. _detection-section:
 
-detection
-~~~~~~~~~
+. detection
+
 Standard deviation parameters for spike detection and artifact removal:
 
     .. _detection-spike-detection-key:
@@ -361,8 +362,8 @@ Standard deviation parameters for spike detection and artifact removal:
 
 .. _pca-section:
 
-pca
-~~~
+. pca
+
 Parameters defining how principal component analysis (PCA) is conducted on the spike waveforms:
 
     .. _pca-variance-explained-key:
@@ -385,8 +386,8 @@ Parameters defining how principal component analysis (PCA) is conducted on the s
 
 .. _postprocess-section:
 
-postprocess
-~~~~~~~~~~~
+. postprocess
+
 Post-processing parameters:
 
     .. _postprocess-reanalyze-key:
