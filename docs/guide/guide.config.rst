@@ -117,7 +117,9 @@ Parameters defining the clustering process:
     .. _cluster-max-iterations-key:
 
     - max-iterations
-        - Maximum number of iterations for the clustering algorithm.
+        - Maximum number of iterations for the gaussian mixture model. This is fed into scipis GMM.
+            See here: https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html
+            This is typically anywhere from 100 to 10000, with 1000 being a typical starting point.
         - Default: 1000
 
     .. _cluster-convergence-criterion-key:
@@ -129,7 +131,9 @@ Parameters defining the clustering process:
     .. _cluster-random-restarts-key:
 
     - random-restarts
-        - Number of random restarts in the clustering process to avoid local minima.
+        - Number of random restarts in the clustering process to avoid local minima. This is typically a value between
+            1 and 10. Because the GMM is stochastic, the results will vary slightly each time and is very sensitive
+            to the random seed. It is recommended to start at 1000, and increase if the results are not satisfactory.
         - Default: 10
 
     .. _cluster-l-ratio-cutoff-key:
