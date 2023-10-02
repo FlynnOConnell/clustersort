@@ -38,7 +38,7 @@ from clustersort.logger import configure_logger  # noqa: (API import)
 from clustersort.main import run  # noqa: (API import)
 from clustersort.sort import ProcessChannel  # noqa: (API import)
 from clustersort.spk_config import SortConfig  # noqa: (API import)
-from clustersort.utils import cluster_gmm, get_lratios, scale_waveforms, waveforms_datashader  # noqa: (API import)
+from clustersort.utils import cluster_gmm, get_lratios, waveforms_datashader  # noqa: (API import)
 
 # TODO: Add version check
 __version__ = "0.1.0"

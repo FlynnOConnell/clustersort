@@ -44,21 +44,13 @@ class DirectoryManager:
         self.base_path = Path(filepath).parent / self.filename
         self.base_suffix = self.base_path.suffix
         self.directories = [
-            self.processed,
             self.plots,
             self.reports,
-            self.intermediate,
+            self.data,
         ]
         self.idx = 0
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
-
-    @property
-    def processed(self):
-        """
-        Path : Directory for storing processed data.
-        """
-        return self.base_path / "Processed"
 
     @property
     def plots(self):
@@ -75,7 +67,7 @@ class DirectoryManager:
         return self.base_path / "Reports"
 
     @property
-    def intermediate(self):
+    def data(self):
         """
         Path : Directory for storing intermediate files.
         """
@@ -126,8 +118,7 @@ class DirectoryManager:
         num_chan : int
             Number of channels for which to create directories.
         """
-        base_dirs = [self.processed, self.plots, self.reports, self.intermediate]
-        for base_dir in base_dirs:
+        for base_dir in self.directories:
             for channel_number in range(1, num_chan + 1):
                 channel_dir = base_dir / f"channel_{channel_number}"
                 self.logger.debug(f"Creating channel directory: {channel_dir}")

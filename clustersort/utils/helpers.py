@@ -99,27 +99,3 @@ def get_lratios(data, predictions):
         lratio = sum(ls) / len(np.where(predictions == ref_cluster)[0])
         lrats[ref_cluster] = lratio
     return lrats
-
-
-def scale_waveforms(slices_dejittered):
-    """
-    Scale the extracted spike waveforms by their energy.
-
-    Parameters
-    ----------
-    slices_dejittered : array-like
-        The dejittered spike waveforms as a 2-D array.
-
-    Returns
-    -------
-    scaled_slices : array-like
-        The scaled spike waveforms as a 2-D array.
-    energy : array-like
-        The energy of each spike waveform as a 1-D array.
-    """
-    energy = np.sqrt(np.sum(slices_dejittered**2, axis=1)) / len(slices_dejittered[0])
-    scaled_slices = np.zeros((len(slices_dejittered), len(slices_dejittered[0])))
-    for i in range(len(slices_dejittered)):
-        scaled_slices[i] = slices_dejittered[i] / energy[i]
-
-    return scaled_slices, energy
