@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 
-class SpkConfig:
+class SortConfig:
     """
     Initialize a new SpkConfig object to manage configurations for the clustersort pipeline.
 
@@ -29,6 +29,9 @@ class SpkConfig:
         Contains configurations related to runtime settings like 'resort-limit', 'cores-used'
     - path : dict
         Contains path settings like directories for `run`, 'results'.
+        The primary path, 'base', is where all of the plots and data will be stored.
+        By default, this is your home directory/clustersort.
+
     - cluster : dict
         Contains clustering parameters like 'max-clusters', 'max-iterations'.
     - breach : dict
@@ -44,7 +47,7 @@ class SpkConfig:
 
     Examples
     --------
-    >>> cfg = SpkConfig()
+    >>> cfg = SortConfig()
     >>> run = cfg.run
     >>> print(type(run), run)
     <class 'dict'> {'resort-limit': '3', 'cores-used': '8', ...}
@@ -61,9 +64,15 @@ class SpkConfig:
         """
         Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
         """
+
+        # Grab the default config from this repository if no path was provided
         if not cfg_path:
-            self.cfg_path = Path().home() / "clustersort" / "autosort_config.ini"
+            self.cfg_path = Path(__file__).parent / "default_config.ini"
             self.set_default_config()
+
+        # if not cfg_path:
+        #     self.cfg_path = Path().home() / "clustersort" / "default_config.ini"
+        #     self.set_default_config()
         else:
             self.cfg_path = cfg_path
         self.config = self.read_config()
@@ -258,7 +267,7 @@ class SpkConfig:
             """
         assert self.cfg_path.parent.is_dir(), f"Parent directory {self.cfg_path.parent} does not exist"
         self.cfg_path.parent.mkdir(parents=True, exist_ok=True)
-        default_data_path = self.cfg_path.parent
+        default_data_path = self.cfg_path.parent / "sort"
         default_run_path = default_data_path / "to_run"
         default_run_path.mkdir(parents=True, exist_ok=True)
         default_results_path = default_data_path / "results"
@@ -335,5 +344,5 @@ class SpkConfig:
 
 
 if __name__ == '__main__':
-    test_cfg = SpkConfig()
+    test_cfg = SortConfig()
     x = 5
