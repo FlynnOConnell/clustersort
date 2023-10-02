@@ -295,7 +295,7 @@ class SortConfig:
             "max-clusters": "7",
             "max-iterations": "1000",
             "convergence-criterion": ".0001",
-            "random-restarts": "10",
+            "restarts": "10",
             "l-ratio-cutoff": ".1",
             "intra-cluster-cutoff": "3",
         }
