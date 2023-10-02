@@ -39,7 +39,7 @@ def cluster_gmm(data, n_clusters, n_iter, restarts, threshold):
     g = []
     bayesian = []
 
-    # Run the GMM
+    # -------- Run the GMM ------------ #
     try:
         for i in range(restarts):
             g.append(
@@ -57,7 +57,6 @@ def cluster_gmm(data, n_clusters, n_iter, restarts, threshold):
             else:
                 del g[-1]
 
-        # print len(akaike)
         bayesian = np.array(bayesian)
         best_fit = np.where(bayesian == np.min(bayesian))[0][0]
 

@@ -15,12 +15,20 @@ from pathlib import Path
 
 class DirectoryManager:
     """
-    Manages directories for storing processed data, plots, reports, and intermediate files.
+    Manages directories for storing processed data, plots, reports, and intermediate files based
+    off of the provided "base" filepath, default is Path().home() / "clustersort".
 
-    .. note::
+    Parameters
+    ----------
+    filepath : str or Path
+        The base path for saving plots and intermediate data.
 
-        Several temporary and permanent directories must be made so save plotting results, and to
-        store data used to create those plots.
+    Notes
+    -----
+    Temporary files are cached according to your operating system.
+        - On Windows, this is typically in the AppData/Local/Temp directory.
+        - On Linux, this is typically in the /tmp directory.
+        - On MacOS, this is typically in the /var/folders directory.
 
     """
 
@@ -30,13 +38,6 @@ class DirectoryManager:
         ----------
         filepath : str or Path
             Full filepath of the data file being processed.
-
-        Returns
-        -------
-        None
-
-        .. note::
-            Must delete some directories.
 
         """
         self.filename = Path(filepath).stem

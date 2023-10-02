@@ -8,12 +8,29 @@ import datetime
 import math
 import multiprocessing
 from pathlib import Path
-from . import spk_config
-from .directory_manager import DirectoryManager
-from .sort import sort
+import h5py
 
+from clustersort.spk_config import SortConfig
+from clustersort.directory_manager import DirectoryManager
+from clustersort.sort import sort
 
-def run(params: spk_config.SpkConfig, parallel: bool = True):
+def __read_group(group: h5py.Group) -> dict:
+    data = {}
+    for attr_name, attr_value in group.attrs.items():
+        data[attr_name] = attr_value
+    for key, item in group.items():
+        if isinstance(item, h5py.Group):
+            data[key] = __read_group(item)
+        elif isinstance(item, h5py.Dataset):
+            data[key] = item[()]
+    return data
+
+def read_h5(filename: str | Path) -> dict:
+    with h5py.File(filename, "r") as f:
+        data = __read_group(f)
+    return data
+
+def run(params: SortConfig, parallel: bool = True):
     """
     Entry point for the clustersort package.
     Optionally include a `SpkConfig` object to override the default parameters.
@@ -23,7 +40,7 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
 
     Parameters
     ----------
-    params : spk_config.SpkConfig
+    params : spk_config.SortConfig
         Configuration parameters for spike sorting. If `None`, default parameters are used.
     parallel : bool, optional
         Whether to run the sorting in parallel. Default is `True`.
@@ -39,10 +56,10 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
 
     Examples
     --------
-    >>> sort(spk_config.SpkConfig(), parallel=True)
+    >>> sort(SortConfig(), parallel=True)
     """
     if not params:
-        params = spk_config.SpkConfig()
+        params = SortConfig()
     else:
         params = params
     # If the script is being run automatically, on Fridays it will run a greater number of files
@@ -59,15 +76,16 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
     runpath = Path(params.path["run"])
     num_cpu = int(params.run["cores-used"]) if parallel else 1
     runfiles = [f for f in runpath.iterdir() if f.is_file()][:n_files]
-    for curr_file in runfiles:  # loop through each file
+
+    for curr_file in runfiles:
 
         # Create the necessary directories
         dir_manager = DirectoryManager(curr_file)
         dir_manager.flush_directories()
         dir_manager.create_base_directories()
 
-        h5file = {}
-        unit_data = h5file["unit"]
+        h5file = read_h5(curr_file)
+        unit_data = h5file["data"]
         num_chan = len(unit_data)
         dir_manager.create_channel_directories(num_chan)
 
@@ -84,11 +102,12 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
             if parallel:
                 processes = []
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file['unit'].keys())[i]][0]
-                    chan_data = h5file['unit'][chan_name]
+                    chan_name = [list(h5file['data'].keys())[i]][0]
+                    chan_data = h5file['data'][chan_name]
+                    sampling_rate = h5file['metadata_channel'][chan_name]['sampling_rate']
                     dir_manager.idx = i
                     p = multiprocessing.Process(
-                        target=sort, args=(curr_file, chan_data, params, dir_manager, i)
+                        target=sort, args=(curr_file, chan_data, sampling_rate, params, dir_manager, i)
                     )
                     p.start()
                     processes.append(p)
@@ -96,13 +115,14 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
                     p.join()
             else:
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file['unit'].keys())[i]][0]
-                    chan_data = h5file['unit'][chan_name]
+                    chan_name = [list(h5file['data'].keys())[i]][0]
+                    chan_data = h5file['data'][chan_name]
+                    sampling_rate = h5file['metadata_channel'][chan_name]['sampling_rate']
                     dir_manager.idx = i
-                    sort(curr_file, chan_data, params, dir_manager, i)
+                    sort(curr_file, chan_data, sampling_rate, params, dir_manager, i)
 
 
 if __name__ == "__main__":
-    main_params = spk_config.SpkConfig()
-    main_params.set("path", "run", Path.home() / "data" / "combined")
+    main_params = SortConfig()
+    main_params.set("path", "run", Path.home() / "spk2extract" / "h5")
     run(main_params, parallel=False)

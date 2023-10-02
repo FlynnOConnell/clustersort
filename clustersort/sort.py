@@ -12,6 +12,7 @@ import shutil
 import warnings
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 
 # External Dependencies
 import cv2
@@ -22,12 +23,12 @@ from PIL import ImageFont, ImageDraw, Image
 from matplotlib import cm
 from scipy import linalg
 from scipy.spatial.distance import mahalanobis
+from sklearn.decomposition import PCA
 
 from .directory_manager import DirectoryManager
-from .spk_config import SpkConfig
-from .utils.shader import waveforms_datashader
-
+from .spk_config import SortConfig
 from .utils import cluster_gmm, get_lratios, scale_waveforms
+from .utils.shader import waveforms_datashader
 
 logpath = ""
 logger = logging.getLogger(__name__)
@@ -38,8 +39,9 @@ logger.addHandler(logging.StreamHandler())
 # Factory
 def sort(
     filename: str | Path,
-    data: dict,
-    params: SpkConfig,
+    data: dict | NamedTuple,
+    sampling_rate: float,
+    params: SortConfig,
     dir_manager: DirectoryManager,
     chan_num: int,
 ):
@@ -56,29 +58,24 @@ def sort(
     Parameters
     ----------
     filename : str or Path
-        Name of the file to be sorted
-    data : dict
-        Dictionary containing the data to be sorted
-    params : SpkConfig
-        Configuration parameters for the spike sorting process
+        Name of the file to be sorted.
+    data : dict or NamedTuple
+        Dictionary or namedtuple containing the data to be sorted.
+    sampling_rate : float
+        Sampling rate for this channel.
+    params : SortConfig
+        Configuration parameters for the spike sorting process.
     dir_manager : DirectoryManager
-        DirectoryManager object for managing the output directories
+        DirectoryManager object for managing the output directories.
     chan_num : int
-        Channel number to be sorted
+        Channel number to be sorted.
     """
-    input_data = {}
-    if isinstance(data, dict):
-        input_data["spikes"] = data["spikes"]
-        input_data["times"] = data["times"]
-    else:
-        raise TypeError("Data must be a dictionary with keys 'spikes' and 'times'")
-
-    proc = ProcessChannel(filename, input_data, params, dir_manager, chan_num)
+    proc = ProcessChannel(filename, data, sampling_rate, params, dir_manager, chan_num)
     proc.process_channel()
 
 
 def infofile(
-    filename: str, path: str | Path, sort_time: float | str, params: SpkConfig
+    filename: str, path: str | Path, sort_time: float | str, params: SortConfig
 ):
     """
     Dumps run info to a .info file.
@@ -91,7 +88,7 @@ def infofile(
         The directory path where the .info file will be saved.
     sort_time : float or str
         Time taken for sorting.
-    params : SpkConfig
+    params : SortConfig
         Instance of SpkConfig with parameters used for sorting.
 
     Returns
@@ -111,6 +108,7 @@ def infofile(
         config.write(info_file)
 
 
+# TODO: Making this a class doesn't accomplish much, refactor to functions
 class ProcessChannel:
     """
     Class for running the spike sorting process on a single channel.
@@ -121,7 +119,7 @@ class ProcessChannel:
         Name of the file to be processed.
     data : ndarray
         Raw data array.
-    params : SpkConfig
+    params : SortConfig
         Instance of SpkConfig holding processing parameters.
     dir_manager : DirectoryManager
         Directory manager object.
@@ -132,8 +130,10 @@ class ProcessChannel:
     ----------
     filename : str
         Name of the file to be processed.
-    data : ndarray
-        Raw data array.
+    spikes : ndarray
+        Array of spike waveforms, from data['spikes'] or data.spikes.
+    times : ndarray
+        Array of spike times, from data['times'] or data.times.
     params : dict
         Dictionary of processing parameters.
     dir_manager : DirectoryManager
@@ -184,7 +184,7 @@ class ProcessChannel:
 
     """
 
-    def __init__(self, filename, data, params, dir_manager, chan_num):
+    def __init__(self, filename, data, sampling_rate, params, dir_manager, chan_num):
         """
         Process a single channel.
 
@@ -192,9 +192,11 @@ class ProcessChannel:
         ----------
         filename : str
             Name of the file to be processed.
-        data : ndarray
-            Raw data array.
-        params : SpkConfig
+        data : dict | NamedTuple
+            Raw data.
+        sampling_rate : float
+            Sampling rate for this channel.
+        params : SortConfig
             SpkConfig instance of processing parameters.
         dir_manager : DirectoryManager
             Directory manager object.
@@ -203,9 +205,16 @@ class ProcessChannel:
 
         """
         self.filename = filename
-        self.data = data
+        if isinstance(data, dict):
+            self.spikes = data["spikes"]
+            self.times = data["times"]
+        elif isinstance(data, NamedTuple):
+            self.spikes = data[0]
+            self.times = data[1]
+        else:
+            raise TypeError("Data must be a dictionary/namedtuple with keys/fields 'spikes' and 'times'")
         self.params = params
-        self.sampling_rate = 18518.52  # TODO: Get this from metadata
+        self.sampling_rate = sampling_rate
         self.chan_num = chan_num
         self.dir_manager = dir_manager
 
@@ -370,7 +379,7 @@ class ProcessChannel:
 
         """
         while True:
-            if self.data["spikes"].size == 0:
+            if self.spikes.size == 0:
                 (
                     self.dir_manager.reports
                     / f"channel_{self.chan_num + 1}"
@@ -389,26 +398,26 @@ class ProcessChannel:
                 ).write_text("Sorting finished. No spikes found")
                 return
 
-            # Dejitter these spike waveforms, and get their maximum amplitudes
-            amplitudes = np.min(self.data["spikes"], axis=1)
+            amplitudes = np.min(self.spikes, axis=1)
 
             np.save(
                 self.dir_manager.intermediate
                 / f"channel_{self.chan_num + 1}"
                 / "spike_waveforms.npy",
-                self.data["spikes"],
+                self.spikes,
             )
             np.save(
                 self.dir_manager.intermediate
                 / f"channel_{self.chan_num + 1}"
                 / "spike_times.npy",
-                self.data["times"],
+                self.times,
             )
 
             # Scale the dejittered spikes by the energy of the waveforms and perform PCA
-            scaled_slices, energy = scale_waveforms(self.data["spikes"])
-            pca_slices, explained_variance_ratio = [], []
-            cumulvar = np.cumsum(explained_variance_ratio)
+            scaled_slices, energy = scale_waveforms(self.spikes)
+            pca = PCA()
+            pca_slices = pca.fit_transform(scaled_slices)
+            cumulvar = np.cumsum(pca.explained_variance_ratio_)
             graphvar = list(cumulvar[0 : np.where(cumulvar > 0.999)[0][0] + 1])
 
             if self.usepvar == 1:
@@ -426,7 +435,7 @@ class ProcessChannel:
                 self.dir_manager.intermediate
                 / f"channel_{self.chan_num + 1}"
                 / "spike_times.npy",
-                self.data["times"],
+                self.times,
             )
             np.save(
                 self.dir_manager.intermediate
@@ -467,10 +476,10 @@ class ProcessChannel:
             data[:, 2:] = pca_slices[:, :n_pc]
             data[:, 0] = energy[:] / np.max(energy)
             data[:, 1] = np.abs(amplitudes) / np.max(np.abs(amplitudes))
-            self.spk_gmm(data, self.data["times"], n_pc, amplitudes)
+            self.spk_gmm(self.spikes, self.times, n_pc, amplitudes)
             break
 
-    def spk_gmm(self, data, times_final, n_pc, amplitudes):
+    def spk_gmm(self, spikes, spike_times, n_pc, amplitudes):
         """
         Perform Gaussian Mixture Model (GMM) clustering on spike waveform data.
 
@@ -480,10 +489,10 @@ class ProcessChannel:
 
         Parameters
         ----------
-        data : array_like
+        spikes : array_like
             A 2D array where each row represents a waveform and each column is a feature
             of the waveform (e.g., amplitude, principal component, etc.).
-        times_final : array_like
+        spike_times : array_like
             A 1D array representing the time stamps for each waveform in `data`.
         n_pc : int
             Number of principal components used in feature extraction.
@@ -517,7 +526,7 @@ class ProcessChannel:
         for i in range(self.max_clusters - 2):
             try:
                 model, predictions, bic = cluster_gmm(
-                    data,
+                    spikes,
                     n_clusters=i + 3,
                     n_iter=self.max_iterations,
                     restarts=self.num_restarts,
@@ -594,11 +603,11 @@ class ProcessChannel:
                 )
                 plots_path.mkdir(parents=True, exist_ok=True)
 
-            # Ignore cm.rainbow type checking because the dynamic __init__.py isn't recognized
             # noinspection PyUnresolvedReferences PyTypeChecker
             colors = cm.rainbow(np.linspace(0, 1, i + 3))
-            for feature1 in range(len(data[0])):
-                for feature2 in range(len(data[0])):
+            # was range len spikes[0]
+            for feature1 in range(30):
+                for feature2 in range(30):
                     if feature1 < feature2:
                         fig = plt.figure()
                         plt_names = []
@@ -606,8 +615,8 @@ class ProcessChannel:
                             plot_data = np.where(predictions[:] == cluster)[0]
                             plt_names.append(
                                 plt.scatter(
-                                    data[plot_data, feature1],
-                                    data[plot_data, feature2],
+                                    spikes[plot_data, feature1],
+                                    spikes[plot_data, feature2],
                                     color=colors[cluster],
                                     s=0.8,
                                 )
@@ -633,14 +642,14 @@ class ProcessChannel:
 
             for ref_cluster in range(i + 3):
                 fig = plt.figure()
-                ref_mean = np.mean(data[np.where(predictions == ref_cluster)], axis=0)
+                ref_mean = np.mean(spikes[np.where(predictions == ref_cluster)], axis=0)
                 ref_covar_i = linalg.inv(
-                    np.cov(data[np.where(predictions == ref_cluster)[0]], rowvar=False)
+                    np.cov(spikes[np.where(predictions == ref_cluster)[0]], rowvar=False)
                 )
                 xsave = None
                 for other_cluster in range(i + 3):
                     mahalanobis_dist = [
-                        mahalanobis(data[point, :], ref_mean, ref_covar_i)
+                        mahalanobis(spikes[point, :], ref_mean, ref_covar_i)
                         for point in np.where(predictions[:] == other_cluster)[0]
                     ]
                     # Plot histogram of Mahalanobis distances
@@ -675,12 +684,12 @@ class ProcessChannel:
                 )
                 clust_path.mkdir(parents=True, exist_ok=True)
 
-            x = np.arange(len(self.data["spikes"][0]) / 10) + 1
+            x = np.arange(len(self.spikes[0]) / 10) + 1
             isi_list = []
             for cluster in range(i + 3):
                 cluster_points = np.where(predictions[:] == cluster)[0]
                 fig, ax = waveforms_datashader(
-                    self.data["spikes"][cluster_points, :],
+                    self.spikes[cluster_points, :],
                     x,
                     self.dir_manager.filename
                     + "_datashader_temp_el"
@@ -700,23 +709,15 @@ class ProcessChannel:
                 plt.close("all")
 
                 fig = plt.figure()
-                cluster_times = times_final[cluster_points]
+                cluster_times = spike_times[cluster_points]
                 isi = np.ediff1d(np.sort(cluster_times))
                 isi = isi / 40.0
+
+                # turn off black formatting, so each bin isn't on a new row
+                # fmt: off
                 plt.hist(
                     isi,
-                    bins=[
-                        0.0,
-                        1.0,
-                        2.0,
-                        3.0,
-                        4.0,
-                        5.0,
-                        6.0,
-                        7.0,
-                        8.0,
-                        9.0,
-                        10.0,
+                    bins=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0,
                         np.max(isi),
                     ],
                 )
@@ -752,7 +753,7 @@ class ProcessChannel:
                 )
 
             # Get isolation statistics for each solution
-            l_ratios = get_lratios(data, predictions)
+            l_ratios = get_lratios(spikes, predictions)
 
             isodf = pd.DataFrame(
                 {
@@ -837,7 +838,7 @@ class ProcessChannel:
         Returns
         -------
         None
-            This function doesn't return any value; it creates superplots as side-effects.
+            This function doesn't return any value; it creates superplots as side effects.
 
         Raises
         ------
