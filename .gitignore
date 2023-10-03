@@ -231,3 +231,4 @@ cython_debug/
 #.idea/
 
 !/scripts/
+!/default_config.ini
