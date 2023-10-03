@@ -6,8 +6,7 @@ import numpy as np
 from scipy.spatial.distance import mahalanobis
 from scipy.stats import chi2
 from sklearn.mixture import GaussianMixture
-from ..logger import configure_logger
-
+from clustersort import logger
 
 def cluster_gmm(data, n_clusters, n_iter, restarts, threshold):
     """

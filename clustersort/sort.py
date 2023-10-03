@@ -7,7 +7,6 @@ from __future__ import annotations
 # Standard Library Imports
 import configparser
 import itertools
-import logging
 import os
 import shutil
 import warnings
@@ -23,13 +22,12 @@ import pandas as pd
 from PIL import ImageFont, ImageDraw, Image
 from sklearn.decomposition import PCA
 
+from clustersort.logger import logger
 import cluster as clust  # avoid naming conflicts
 from .directory_manager import DirectoryManager
 from .plot import plot_cluster_features, plot_mahalanobis_to_cluster
 from .spk_config import SortConfig
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 # Factory
@@ -218,6 +216,16 @@ class ProcessChannel:
         self.chan_num = chan_num
         self.dir_manager = dir_manager
         self.overwrite = overwrite
+        self.status_path = self.dir_manager.base_path / "status.npy"
+
+    def load_status(self):
+        if self.status_path.is_file():
+            return np.load(self.status_path, allow_pickle=True).item()
+        else:
+            return {}
+
+    def save_status(self, status):
+        np.save(self.status_path, np.array([status], dtype=object))
 
     def get_chan(self):
         """The channel number to use when saving."""
@@ -230,7 +238,7 @@ class ProcessChannel:
     @property
     def pvar(self):
         """
-        Returns the percent variance explained by the principal components.
+        Returns the percent of variance-explained at which to cut off the principal components.
         """
         return float(self.params.pca["variance-explained"])
 
@@ -485,7 +493,7 @@ class ProcessChannel:
 
         spikes_per_clust = []  # 2, 3, 4 ,5 etc.. clusters
         for num_clust in tested_clusters:
-            logging.info(f"For {num_clust} in tested_clusters -> {tested_clusters}")
+            logger.info(f"For {num_clust} in tested_clusters -> {tested_clusters}")
             cluster_data_path = (
                 self.dir_manager.data / self.get_chan_str() / f"{num_clust}_clusters"
             )

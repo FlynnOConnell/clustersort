@@ -106,8 +106,14 @@ class SortConfig:
                 self.set_default_config()
 
         self.config = self.read_config()
-        self.params = self.get_all()
+        self.all_params = self.get_all()
         self._validate_config()
+
+    def __getitem__(self, item):
+        return self.all_params[item]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
 
     def get_section(self, section: str):
         """
@@ -277,22 +283,6 @@ class SortConfig:
         config.read(self.cfg_path)
         return config
 
-    def set_config(self, default=False):
-        """
-        Parameters
-        ----------
-        default : bool, optional
-            If True, sets the configuration to its default settings. Defaults to False.
-        """
-        if default:
-            self.set_default_config()
-
-        if not self.cfg_path.is_file() or default:
-            self.set_default_config()
-            print(
-                f"Default configuration file has been created. You can find it in {self.cfg_path}"
-            )
-
     def set_default_config(self) -> None:
         """
         Sets the default configurations for all sections. Writes these to the configuration file.
@@ -300,8 +290,6 @@ class SortConfig:
         assert (
             self.cfg_path.is_file()
         ), f"Parent directory {self.cfg_path} does not exist"  # this should never fail
-
-        ini_files = list(Path(self.base_path).glob("*.ini"))
 
         config = configparser.ConfigParser()
 
@@ -312,6 +300,7 @@ class SortConfig:
         }
 
         config["run"] = {
+            "overwrite": "0",
             "resort-limit": "3",
             "cores-used": "8",
             "weekday-run": "2",
@@ -321,6 +310,7 @@ class SortConfig:
         }
 
         config["cluster"] = {
+            "min-clusters": "2",  # must be >= 2
             "max-clusters": "7",
             "max-iterations": "1000",
             "convergence-criterion": ".0001",
@@ -363,7 +353,7 @@ class SortConfig:
 
     def reload_from_ini(self):
         self.config = self.read_config()
-        self.params = self.get_all()
+        self.all_params = self.get_all()
 
     def save_to_ini(self):
         with open(self.cfg_path, "w") as configfile:
@@ -388,3 +378,6 @@ class SortConfig:
         assert self.path["data"] != "None", (
             "Data path contains no files. Please check that your data path is correct."
         )
+        if self.cluster["min-clusters"] < 2:
+            self.set("cluster", "min-clusters", 2)
+            self.save_to_ini()

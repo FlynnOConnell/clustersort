@@ -8,7 +8,6 @@ import datetime
 import math
 import multiprocessing
 from pathlib import Path
-import logging
 import h5py
 
 from clustersort.spk_config import SortConfig
@@ -16,7 +15,6 @@ from clustersort.directory_manager import DirectoryManager
 from clustersort.sort import sort
 
 from clustersort.logger import logger
-
 
 def __read_group(group: h5py.Group) -> dict:
     data = {}
@@ -28,7 +26,6 @@ def __read_group(group: h5py.Group) -> dict:
         elif isinstance(item, h5py.Dataset):
             data[key] = item[()]
     return data
-
 
 def read_h5(filename: str | Path) -> dict:
     with h5py.File(filename, "r") as f:
@@ -90,7 +87,7 @@ def run(params: SortConfig, parallel: bool = True):
         logger.info(f"Processing file: {curr_file}")
 
         # Create the necessary directories
-        dir_manager = DirectoryManager(curr_file)
+        dir_manager = DirectoryManager(curr_file, params)
         dir_manager.flush_directories()
         dir_manager.create_base_directories()
 
@@ -143,6 +140,7 @@ def run(params: SortConfig, parallel: bool = True):
 
 
 if __name__ == "__main__":
+    logger.setLevel("INFO")
     main_params = SortConfig()
     my_data = Path.home() / "spk2extract" / "h5"
     main_params.set("path", "data", my_data)

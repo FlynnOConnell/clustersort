@@ -51,9 +51,9 @@ sortdir = Path().home() / "clustersort"
 if not sortdir.exists():
     sortdir.mkdir(exist_ok=True)
 
-cache_dir = user_cache_dir(__name__, __author__)  # Cache, temp files
-config_dir = user_config_dir(__name__, __author__)  # Config, parameters and options
-log_dir = user_log_dir(__name__, __author__)  # Logs, .log files primarily
+cache_dir = user_cache_dir(__name__,)  # Cache, temp files
+config_dir = user_config_dir(__name__,)  # Config, parameters and options
+log_dir = user_log_dir(__name__,)  # Logs, .log files primarily
 
 if Version(numpyversion) >= Version("1.24.0"):
     raise ImportError(
