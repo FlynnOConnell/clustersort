@@ -84,22 +84,10 @@ path
 ~~~~
 Here we define various paths necessary for the script, set by default to subdirectories in the parent directory of the specified path.
 
-    .. _path-run-path-key:
+    .. _path-data-path-key:
 
-    - run-path
-        - Path to the directory where files to be processed are stored.
-        - Default: None specified
-
-    .. _path-results-path-key:
-
-    - results-path
-        - Path to the directory where results will be stored.
-        - Default: None specified
-
-    .. _path-completed-path-key:
-
-    - completed-path
-        - Path where completed files will be moved.
+    - data
+        - Path to the directory where the data to be processed is located.
         - Default: None specified
 
 .. _cluster-section:
@@ -253,7 +241,7 @@ Parameters defining how principal component analysis (PCA) is conducted on the s
     .. _pca-use-percent-variance-key:
 
     - use-percent-variance
-        - Whether to use percent variance to determine the number of components to retain.
+        - Whether to use percent variance to determine the number of components to retain. If 0, use all components.
         - Default: 1
 
     .. _pca-principal-component-n-key:
