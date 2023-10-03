@@ -19,7 +19,7 @@ jobs:
           command: |
             conda update conda
             conda env create -f environment.yml
-            conda activate spk2py
+            conda activate clustersort
       - run:
           name: Build docs
           command: |
