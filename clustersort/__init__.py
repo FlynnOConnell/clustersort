@@ -27,14 +27,14 @@ I recommend exploring the docstrings using
 TAB-completion and introspection capabilities.
 
 """
-from numpy import __version__ as numpyversion
-from packaging.version import Version
 from pathlib import Path
 
+from numpy import __version__ as numpyversion
+from packaging.version import Version
 from platformdirs import *
 
+from clustersort import logger  # noqa: (API import)
 from clustersort.directory_manager import DirectoryManager  # noqa: (API import)
-from clustersort.logger import configure_logger  # noqa: (API import)
 from clustersort.main import run  # noqa: (API import)
 from clustersort.sort import ProcessChannel  # noqa: (API import)
 from clustersort.spk_config import SortConfig  # noqa: (API import)
