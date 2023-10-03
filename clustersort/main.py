@@ -8,11 +8,15 @@ import datetime
 import math
 import multiprocessing
 from pathlib import Path
+import logging
 import h5py
 
 from clustersort.spk_config import SortConfig
 from clustersort.directory_manager import DirectoryManager
 from clustersort.sort import sort
+
+from clustersort.logger import logger
+
 
 def __read_group(group: h5py.Group) -> dict:
     data = {}
@@ -25,10 +29,12 @@ def __read_group(group: h5py.Group) -> dict:
             data[key] = item[()]
     return data
 
+
 def read_h5(filename: str | Path) -> dict:
     with h5py.File(filename, "r") as f:
         data = __read_group(f)
     return data
+
 
 def run(params: SortConfig, parallel: bool = True):
     """
@@ -59,9 +65,12 @@ def run(params: SortConfig, parallel: bool = True):
     >>> sort(SortConfig(), parallel=True)
     """
     if not params:
+        logger.info("No parameters provided. Using default parameters.")
         params = SortConfig()
     else:
+        logger.info("Using provided parameters:")
         params = params
+        logger.info(f"{params.get_section('path')}")
     # If the script is being run automatically, on Fridays it will run a greater number of files
     if params.run["run-type"] == "Auto":
         if datetime.datetime.weekday(datetime.date.today()) == 4:
@@ -73,11 +82,12 @@ def run(params: SortConfig, parallel: bool = True):
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
-    runpath = Path(params.path["run"])
+    runpath = Path(params.path["data"])
     num_cpu = int(params.run["cores-used"]) if parallel else 1
     runfiles = [f for f in runpath.iterdir() if f.is_file()][:n_files]
 
     for curr_file in runfiles:
+        logger.info(f"Processing file: {curr_file}")
 
         # Create the necessary directories
         dir_manager = DirectoryManager(curr_file)
@@ -91,9 +101,7 @@ def run(params: SortConfig, parallel: bool = True):
 
         runs = math.ceil(num_chan / num_cpu)
         for n in range(runs):
-            channels_per_run = (
-                num_chan // runs
-            )
+            channels_per_run = num_chan // runs
             chan_start = n * channels_per_run
             chan_end = (n + 1) * channels_per_run if n < (runs - 1) else num_chan
             if chan_end > num_chan:
@@ -102,12 +110,22 @@ def run(params: SortConfig, parallel: bool = True):
             if parallel:
                 processes = []
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file['data'].keys())[i]][0]
-                    chan_data = h5file['data'][chan_name]
-                    sampling_rate = h5file['metadata_channel'][chan_name]['sampling_rate']
+                    chan_name = [list(h5file["data"].keys())[i]][0]
+                    chan_data = h5file["data"][chan_name]
+                    sampling_rate = h5file["metadata_channel"][chan_name][
+                        "sampling_rate"
+                    ]
                     dir_manager.idx = i
                     p = multiprocessing.Process(
-                        target=sort, args=(curr_file, chan_data, sampling_rate, params, dir_manager, i)
+                        target=sort,
+                        args=(
+                            curr_file,
+                            chan_data,
+                            sampling_rate,
+                            params,
+                            dir_manager,
+                            i,
+                        ),
                     )
                     p.start()
                     processes.append(p)
@@ -115,14 +133,17 @@ def run(params: SortConfig, parallel: bool = True):
                     p.join()
             else:
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file['data'].keys())[i]][0]
-                    chan_data = h5file['data'][chan_name]
-                    sampling_rate = h5file['metadata_channel'][chan_name]['sampling_rate']
+                    chan_name = [list(h5file["data"].keys())[i]][0]
+                    chan_data = h5file["data"][chan_name]
+                    sampling_rate = h5file["metadata_channel"][chan_name][
+                        "sampling_rate"
+                    ]
                     dir_manager.idx = i
                     sort(curr_file, chan_data, sampling_rate, params, dir_manager, i)
 
 
 if __name__ == "__main__":
     main_params = SortConfig()
-    main_params.set("path", "run", Path.home() / "spk2extract" / "h5")
+    my_data = Path.home() / "spk2extract" / "h5"
+    main_params.set("path", "data", my_data)
     run(main_params, parallel=False)

@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import ImageFont, ImageDraw, Image
-from matplotlib import cm
 from sklearn.decomposition import PCA
 
 import cluster as clust  # avoid naming conflicts
@@ -30,7 +29,8 @@ from .plot import plot_cluster_features, plot_mahalanobis_to_cluster
 from .spk_config import SortConfig
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
+
 
 # Factory
 def sort(
@@ -180,7 +180,7 @@ class ProcessChannel:
 
     """
 
-    def __init__(self, filename, data, sampling_rate, params, dir_manager, chan_num):
+    def __init__(self, filename, data, sampling_rate, params, dir_manager, chan_num, overwrite=False):
         """
         Process a single channel.
 
@@ -198,6 +198,8 @@ class ProcessChannel:
             Directory manager object.
         chan_num : int
             Channel number to be processed.
+        overwrite : bool
+            Whether to overwrite existing files.
 
         """
         self.filename = filename
@@ -215,7 +217,7 @@ class ProcessChannel:
         self.sampling_rate = sampling_rate
         self.chan_num = chan_num
         self.dir_manager = dir_manager
-
+        self.overwrite = overwrite
 
     def get_chan(self):
         """The channel number to use when saving."""
@@ -386,15 +388,19 @@ class ProcessChannel:
 
         """
         while True:
+            logger.info(f"|- --- Analyzing channel {self.chan_num + 1} --- -|")
             if self.spikes.size == 0:
-                (self.dir_manager.reports / self.get_chan_str() / "no_spikes.txt").write_text(
+                (
+                    self.dir_manager.reports / self.get_chan_str() / "no_spikes.txt"
+                ).write_text(
                     "No spikes were found on this channel."
                     " The most likely cause is an early recording cutoff."
                 )
                 warnings.warn(
                     "No spikes were found on this channel. The most likely cause is an early recording cutoff."
                 )
-                (self.dir_manager.reports / self.get_chan_str() / "success.txt"
+                (
+                    self.dir_manager.reports / self.get_chan_str() / "success.txt"
                 ).write_text("Sorting finished. No spikes found")
                 return
 
@@ -404,15 +410,33 @@ class ProcessChannel:
             pca_slices = pca.fit_transform(scaled_slices)
             cumulvar = np.cumsum(pca.explained_variance_ratio_)
             graphvar = list(cumulvar[0 : np.where(cumulvar > 0.999)[0][0] + 1])
-            n_pc = np.where(cumulvar > self.pvar)[0][0] + 1 if self.usepvar == 1 else self.userpc
+            n_pc = (
+                np.where(cumulvar > self.pvar)[0][0] + 1
+                if self.usepvar == 1
+                else self.userpc
+            )
             variance_explained = float(cumulvar[n_pc - 1])
 
-            self.metrics, self.data_columns = clust.compute_waveform_metrics(self.spikes, n_pc, True)
+            self.metrics, self.data_columns = clust.compute_waveform_metrics(
+                self.spikes, n_pc, True
+            )
 
-            np.save(self.dir_manager.data / self.get_chan_str() / "raw_waveforms.npy", self.spikes, )
-            np.save(self.dir_manager.data / self.get_chan_str() / "raw_waveforms_pca.npy", pca_slices, )
-            np.save(self.dir_manager.data / self.get_chan_str() / "raw_times.npy", self.times, )
-            np.save(self.dir_manager.data / self.get_chan_str() / "metrics.npy", self.metrics)
+            np.save(
+                self.dir_manager.data / self.get_chan_str() / "raw_waveforms.npy",
+                self.spikes,
+            )
+            np.save(
+                self.dir_manager.data / self.get_chan_str() / "raw_waveforms_pca.npy",
+                pca_slices,
+            )
+            np.save(
+                self.dir_manager.data / self.get_chan_str() / "raw_times.npy",
+                self.times,
+            )
+            np.save(
+                self.dir_manager.data / self.get_chan_str() / "metrics.npy",
+                self.metrics,
+            )
 
             fig = plt.figure()
             x = np.arange(0, len(graphvar) + 1)
@@ -429,7 +453,10 @@ class ProcessChannel:
             plt.title("Variance ratios explained by PCs (cumulative)")
             plt.xlabel("PC #")
             plt.ylabel("Explained variance ratio")
-            fig.savefig(self.dir_manager.plots / self.get_chan_str() / "pca_variance.png", bbox_inches="tight",)
+            fig.savefig(
+                self.dir_manager.plots / self.get_chan_str() / "pca_variance.png",
+                bbox_inches="tight",
+            )
             plt.close("all")
 
             self.iter_clusters(self.times, n_pc)
@@ -454,41 +481,69 @@ class ProcessChannel:
             columns=["clusters", "converged", "BIC", "spikes_per_cluster"],
             index=tested_clusters,
         )
+        logger.info(f"Testing {len(tested_clusters)} clusters")
 
-        spikes_per_clust = []
+        spikes_per_clust = []  # 2, 3, 4 ,5 etc.. clusters
         for num_clust in tested_clusters:
-            # Setup directories for each cluster
-            cluster_data_path = self.dir_manager.data / self.get_chan_str() / f"{num_clust}_clusters"
+            logging.info(f"For {num_clust} in tested_clusters -> {tested_clusters}")
+            cluster_data_path = (
+                self.dir_manager.data / self.get_chan_str() / f"{num_clust}_clusters"
+            )
             cluster_data_path.mkdir(parents=True, exist_ok=True)
-            cluster_plot_path = self.dir_manager.plots / self.get_chan_str() / f"{num_clust}_clusters"
+            cluster_plot_path = (
+                self.dir_manager.plots / self.get_chan_str() / f"{num_clust}_clusters"
+            )
             cluster_plot_path.mkdir(parents=True, exist_ok=True)
             try:
-                model, predictions, bic = ClusterGMM(self.params).fit(self.metrics, num_clust)
+                model, predictions, bic = ClusterGMM(self.params).fit(
+                    self.metrics, num_clust
+                )
+
             except Exception as e:
                 logger.warning(f"Error in cluster_gmm: {e}", exc_info=True)
                 continue
 
             if model is None:
                 clust_results.loc[num_clust] = [num_clust, bic, False, [0]]
-                # Nothing converged
                 continue
 
             # If there are too few waveforms
             if np.any(
                 # no fmt
-                [len(np.where(predictions[:] == cluster)[0]) <= n_pc + 2 for cluster in range(num_clust)]
+                [
+                    len(np.where(predictions[:] == cluster)[0]) <= n_pc + 2
+                    for cluster in range(num_clust)
+                ]
             ):
-                logger.warning(f"There are too few waveforms to properly sort cluster {num_clust + 3}")
-                with open(self.dir_manager.plots / self.get_chan_str() / "invalid_sort.txt", "w+",) as f:
-                    f.write("There are too few waveforms to properly sort this clustering")
+                logger.warning(
+                    f"There are too few waveforms to properly sort cluster {num_clust + 3}"
+                )
                 with open(
-                    self.dir_manager.plots / self.get_chan_str() / "invalid_sort.txt", "w+",) as f:
-                    f.write("There are too few waveforms to properly sort this clustering")
+                    self.dir_manager.plots / self.get_chan_str() / "invalid_sort.txt",
+                    "w+",
+                ) as f:
+                    f.write(
+                        "There are too few waveforms to properly sort this clustering"
+                    )
+                with open(
+                    self.dir_manager.plots / self.get_chan_str() / "invalid_sort.txt",
+                    "w+",
+                ) as f:
+                    f.write(
+                        "There are too few waveforms to properly sort this clustering"
+                    )
                 continue
             # Sometimes large amplitude noise interrupts the gmm because the amplitude has
             # been factored out of the scaled spikes. Run through the clusters and find the waveforms that are more than
             # wf_amplitude_sd_cutoff larger than the cluster mean.
+
             for cluster in range(num_clust):
+                logger.info(f"{cluster}")
+                this_clust_data = cluster_data_path / f"cluster_{cluster}"
+                this_clust_plot = cluster_plot_path / f"cluster_{cluster}"
+                this_clust_data.mkdir(parents=True, exist_ok=True)
+                this_clust_plot.mkdir(parents=True, exist_ok=True)
+
                 idx = np.where(predictions[:] == cluster)[0]
                 cluster_amplitudes = self.metrics[:, 0][idx]
                 cluster_amplitude_mean = np.mean(cluster_amplitudes)
@@ -504,18 +559,27 @@ class ProcessChannel:
                 spikes_per_clust.append(len(idx))
                 if len(idx) == 0:
                     continue
-                isi, v1ms, v2ms = clust.get_ISI_and_violations(self.times, self.sampling_rate)
+                isi, v1ms, v2ms = clust.get_ISI_and_violations(
+                    self.times, self.sampling_rate
+                )
                 cluster_spikes = self.spikes[idx]
                 cluster_times = self.times[idx]
 
-                np.save(cluster_data_path / "predictions.npy", predictions)
-                np.save(cluster_data_path / "bic.npy", bic)
-                np.save(cluster_data_path / "cluster_spikes.npy", cluster_spikes)
-                np.save(cluster_data_path / "cluster_times.npy", cluster_times)
+                logger.info("--Saving data--")
+                np.save(this_clust_data / "predictions.npy", predictions)
+                np.save(this_clust_data / "bic.npy", bic)
+                np.save(this_clust_data / "cluster_spikes.npy", cluster_spikes)
+                np.save(this_clust_data / "cluster_times.npy", cluster_times)
+                np.save(this_clust_data / "cluster_isi.npy", isi)
+                np.save(this_clust_data / "cluster_1ms_v.npy", v1ms)
+                np.save(this_clust_data / "cluster_2ms_v.npy", v2ms)
 
             clust_results.loc[num_clust] = [num_clust, True, bic, spikes_per_clust]
-            feature_pairs = itertools.combinations(list(range(self.metrics.shape[1])), 2)
+            feature_pairs = itertools.combinations(
+                list(range(self.metrics.shape[1])), 2
+            )
             for f1, f2 in feature_pairs:
+                logger.info(f"Plotting {(f1, f2)}")
                 fn = "%sVS%s.png" % (self.data_columns[f1], self.data_columns[f2])
                 feat_str = f"{self.data_columns[f1]}_vs_{self.data_columns[f2]}"
                 feat_str = feat_str.replace(" ", "")
@@ -528,13 +592,13 @@ class ProcessChannel:
                     save_file=str(savename),
                 )
 
-            for other_cluster in range(num_clust):
-                savename = cluster_plot_path / f"Mahalonobis_cluster_{other_cluster}.png"
-                mahalanobis_dist = clust.get_mahalanobis_distances_to_cluster(self.metrics, model,
-                                                                              predictions, other_cluster)
-                title = "Mahalanobis distance to cluster %i" % other_cluster
+            for this_cluster in range(num_clust):
+                savename = cluster_plot_path / f"Mahalonobis_cluster_{this_cluster}.png"
+                mahalanobis_dist = clust.get_mahalanobis_distances_to_cluster(
+                    self.metrics, model, predictions, this_cluster
+                )
+                title = "Mahalanobis distance to cluster %i" % this_cluster
                 plot_mahalanobis_to_cluster(mahalanobis_dist, title, str(savename))
-
 
             # noinspection PyUnresolvedReferences PyTypeChecker
             # colors = cm.rainbow(np.linspace(0, 1, num_clust + 3))
