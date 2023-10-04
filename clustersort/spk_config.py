@@ -378,6 +378,6 @@ class SortConfig:
         assert self.path["data"] != "None", (
             "Data path contains no files. Please check that your data path is correct."
         )
-        if self.cluster["min-clusters"] < 2:
+        if int(self.cluster["min-clusters"]) < 2:
             self.set("cluster", "min-clusters", 2)
             self.save_to_ini()

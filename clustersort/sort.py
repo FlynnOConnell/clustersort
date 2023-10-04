@@ -257,9 +257,16 @@ class ProcessChannel:
         return int(self.params.pca["principal-component-n"])
 
     @property
+    def min_clusters(self):
+        """
+        The minimum number of clusters to be sorted.
+        """
+        return int(self.params.cluster["min-clusters"])
+
+    @property
     def max_clusters(self):
         """
-        The total number of clusters to be sorted.
+        The maximum number of clusters to be sorted.
         """
         return int(self.params.cluster["max-clusters"])
 
@@ -484,7 +491,8 @@ class ProcessChannel:
         """
         from cluster import ClusterGMM
 
-        tested_clusters = np.arange(2, self.max_clusters + 1)
+        # Be careful with cluster numbers, they are 0-indexed
+        tested_clusters = np.arange(self.min_clusters, self.max_clusters)
         clust_results = pd.DataFrame(
             columns=["clusters", "converged", "BIC", "spikes_per_cluster"],
             index=tested_clusters,
@@ -493,6 +501,8 @@ class ProcessChannel:
 
         spikes_per_clust = []  # 2, 3, 4 ,5 etc.. clusters
         for num_clust in tested_clusters:
+            if not self.dir_manager.should_process(self.chan_num, num_clust):
+                continue
             logger.info(f"For {num_clust} in tested_clusters -> {tested_clusters}")
             cluster_data_path = (
                 self.dir_manager.data / self.get_chan_str() / f"{num_clust}_clusters"
@@ -545,8 +555,9 @@ class ProcessChannel:
             # been factored out of the scaled spikes. Run through the clusters and find the waveforms that are more than
             # wf_amplitude_sd_cutoff larger than the cluster mean.
 
-            for cluster in range(num_clust):
+            for cluster in range(1, num_clust):
                 logger.info(f"{cluster}")
+                proc_flag = self.dir_manager.should_process(self.chan_num, cluster)
                 this_clust_data = cluster_data_path / f"cluster_{cluster}"
                 this_clust_plot = cluster_plot_path / f"cluster_{cluster}"
                 this_clust_data.mkdir(parents=True, exist_ok=True)
@@ -573,7 +584,6 @@ class ProcessChannel:
                 cluster_spikes = self.spikes[idx]
                 cluster_times = self.times[idx]
 
-                logger.info("--Saving data--")
                 np.save(this_clust_data / "predictions.npy", predictions)
                 np.save(this_clust_data / "bic.npy", bic)
                 np.save(this_clust_data / "cluster_spikes.npy", cluster_spikes)
@@ -600,7 +610,7 @@ class ProcessChannel:
                     save_file=str(savename),
                 )
 
-            for this_cluster in range(num_clust):
+            for this_cluster in range(1, num_clust):
                 savename = cluster_plot_path / f"Mahalonobis_cluster_{this_cluster}.png"
                 mahalanobis_dist = clust.get_mahalanobis_distances_to_cluster(
                     self.metrics, model, predictions, this_cluster
@@ -789,6 +799,9 @@ class ProcessChannel:
             #         temp_filename,
             #         isoimg,
             #     )  # save the image
+
+                # Channel is 0 indexed, add 1
+            self.dir_manager.save_status(self.get_chan(), num_clust)
 
     def superplots(self, maxclust: int):
         """

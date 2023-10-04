@@ -8,13 +8,14 @@ import datetime
 import math
 import multiprocessing
 from pathlib import Path
+
 import h5py
 
-from clustersort.spk_config import SortConfig
 from clustersort.directory_manager import DirectoryManager
-from clustersort.sort import sort
-
 from clustersort.logger import logger
+from clustersort.sort import sort
+from clustersort.spk_config import SortConfig
+
 
 def __read_group(group: h5py.Group) -> dict:
     data = {}
@@ -31,7 +32,6 @@ def read_h5(filename: str | Path) -> dict:
     with h5py.File(filename, "r") as f:
         data = __read_group(f)
     return data
-
 
 def run(params: SortConfig, parallel: bool = True):
     """
@@ -86,15 +86,15 @@ def run(params: SortConfig, parallel: bool = True):
     for curr_file in runfiles:
         logger.info(f"Processing file: {curr_file}")
 
-        # Create the necessary directories
-        dir_manager = DirectoryManager(curr_file, params)
-        dir_manager.flush_directories()
-        dir_manager.create_base_directories()
-
         h5file = read_h5(curr_file)
         unit_data = h5file["data"]
         num_chan = len(unit_data)
-        dir_manager.create_channel_directories(num_chan)
+
+        # Create the necessary directories
+        dir_manager = DirectoryManager(curr_file, num_chan, params,)
+        dir_manager.flush_directories()
+        dir_manager.create_base_directories()
+        dir_manager.create_channel_directories()
 
         runs = math.ceil(num_chan / num_cpu)
         for n in range(runs):

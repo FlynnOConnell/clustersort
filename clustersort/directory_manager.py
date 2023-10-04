@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+
 import numpy as np
 
-from clustersort.spk_config import SortConfig
 from clustersort.logger import logger
+from clustersort.spk_config import SortConfig
 
 
 class DirectoryManager:
@@ -40,7 +41,7 @@ class DirectoryManager:
 
     """
 
-    def __init__(self, filepath: str | Path, params: SortConfig):
+    def __init__(self, filepath: str | Path, num_chan, params: SortConfig):
         """
         Parameters
         ----------
@@ -50,40 +51,53 @@ class DirectoryManager:
         self.filename = Path(filepath).stem
         self.filetype = Path(filepath).suffix  # .h5, .nwb, .npy
         self.params = params
-        self.base_path = params.base_path
-        self.status_path = self.base_path / "status.npy"
-        self.overwrite = params.get_section("run")["overwrite"]
+        self.base_path = params.base_path / self.filename
         self.directories = [
             self.plots,
             self.reports,
             self.data,
         ]
+        self.num_channels = num_chan
         self.idx = 0  # not used, could hold index for sorting each channel
 
-    def load_status(self) -> dict:
+        self.status_path = self.base_path / "status.npy"
+        self.overwrite = params.get_section("run")["overwrite"]
+        self.min_clusters = int(params.get_section("cluster")["min-clusters"])
+        self.max_clusters = int(params.get_section("cluster")["max-clusters"])
+        # Channel x Cluster boolean array
+        self.status_data = np.zeros(
+            (self.num_channels, (self.max_clusters - 1)),
+            dtype=bool,
+        )
+        self.load_status()
+
+    def check_processed(
+        self,
+    ):
+        # If a channel is missing, just redo all of them (for now)
+        return np.any(self.status_data == False)
+
+    def load_status(self):
         if self.status_path.is_file():
-            return np.load(self.status_path, allow_pickle=True).item()
+            logger.info(f"Loading status file: {self.status_path}")
+            self.status_data = np.load(self.status_path)
         else:
-            logger.warning(
-                f"Status file not found: {self.status_path} \n"
-                f"Returning an empty dictionary."
-            )
-            return {}
+            logger.warning(f"Status file not found: {self.status_path}")
 
-    def save_status(self, status):
-        if self.overwrite:
-            np.save(self.status_path, np.array([status], dtype=object))
-        else:
-            status.update(self.load_status())
-            np.save(self.status_path, np.array([status], dtype=object))
+    def save_status(self, channel, cluster):
+        channel_idx = channel - 1 # Account for 0 indexing here, rather than in main script
+        cluster_idx = cluster - 1
+        self.status_data[channel_idx, cluster_idx] = True
+        np.save(self.status_path, self.status_data)
 
-    def should_process(self, cluster_num,):
+    def should_process(
+        self,
+        channel,
+        cluster,
+    ):
         if self.overwrite:
             return True
-        status = self.load_status()
-        if cluster_num in status and not self.overwrite:
-            return False
-        return True
+        return not self.status_data[channel, cluster]
 
     @property
     def plots(self):
@@ -104,7 +118,7 @@ class DirectoryManager:
         """
         Path : Directory for storing intermediate files.
         """
-        return self.base_path / "Intermediate"
+        return self.base_path / "Data"
 
     @property
     def channel(self):
@@ -143,17 +157,12 @@ class DirectoryManager:
         except Exception as e:
             logger.error(f"Error flushing directories: {e}", exc_info=True)
 
-    def create_channel_directories(self, num_chan):
+    def create_channel_directories(self):
         """
         Creates a set of subdirectories for a specific channel under each base directory.
-
-        Parameters
-        ----------
-        num_chan : int
-            Number of channels for which to create directories.
         """
         for base_dir in self.directories:
-            for channel_number in range(1, num_chan + 1):
+            for channel_number in range(1, self.num_channels + 1):
                 channel_dir = base_dir / f"channel_{channel_number}"
                 logger.debug(f"Creating channel directory: {channel_dir}")
                 channel_dir.mkdir(parents=True, exist_ok=True)
