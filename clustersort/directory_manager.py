@@ -85,7 +85,8 @@ class DirectoryManager:
             logger.warning(f"Status file not found: {self.status_path}")
 
     def save_status(self, channel, cluster):
-        channel_idx = channel - 1 # Account for 0 indexing here, rather than in main script
+        # Account for 0 indexing here, rather than in main script
+        channel_idx = channel - 1
         cluster_idx = cluster - 1
         self.status_data[channel_idx, cluster_idx] = True
         np.save(self.status_path, self.status_data)
