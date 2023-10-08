@@ -27,7 +27,7 @@ import cluster as clust  # avoid naming conflicts
 from .directory_manager import DirectoryManager
 from .plot import plot_cluster_features, plot_mahalanobis_to_cluster
 from .spk_config import SortConfig
-
+from .utils.progress import ProgressBarManager
 
 
 # Factory
@@ -38,6 +38,7 @@ def sort(
     params: SortConfig,
     dir_manager: DirectoryManager,
     chan_num: int,
+    overwrite: bool = False,
 ):
     """
     Factory method for running the spike sorting process on a single channel.
@@ -63,8 +64,10 @@ def sort(
         DirectoryManager object for managing the output directories.
     chan_num : int
         Channel number to be sorted.
+    overwrite : bool
+        Whether to overwrite existing files. Default is False.
     """
-    proc = ProcessChannel(filename, data, sampling_rate, params, dir_manager, chan_num)
+    proc = ProcessChannel(filename, data, sampling_rate, params, dir_manager, chan_num, overwrite=overwrite)
     proc.process_channel()
 
 
@@ -100,7 +103,6 @@ def infofile(
         path + "/" + os.path.splitext(filename)[0] + "_" + "sort.info", "w"
     ) as info_file:
         config.write(info_file)
-
 
 # TODO: Making this a class doesn't accomplish much, refactor to functions
 class ProcessChannel:
@@ -500,9 +502,11 @@ class ProcessChannel:
         logger.info(f"Testing {len(tested_clusters)} clusters")
 
         spikes_per_clust = []  # 2, 3, 4 ,5 etc.. clusters
+        pbm = ProgressBarManager()
+        pbm.init_cluster_bar(len(tested_clusters))
         for num_clust in tested_clusters:
-            if not self.dir_manager.should_process(self.chan_num, num_clust):
-                continue
+            # if not self.dir_manager.should_process(self.chan_num, num_clust):
+            #     continue
             logger.info(f"For {num_clust} in tested_clusters -> {tested_clusters}")
             cluster_data_path = (
                 self.dir_manager.data / self.get_chan_str() / f"{num_clust}_clusters"
@@ -526,13 +530,11 @@ class ProcessChannel:
                 continue
 
             # If there are too few waveforms
-            if np.any(
-                # no fmt
-                [
+            # no fmt
+            if np.any([
                     len(np.where(predictions[:] == cluster)[0]) <= n_pc + 2
                     for cluster in range(num_clust)
-                ]
-            ):
+                ]):
                 logger.warning(
                     f"There are too few waveforms to properly sort cluster {num_clust + 3}"
                 )
@@ -551,13 +553,12 @@ class ProcessChannel:
                         "There are too few waveforms to properly sort this clustering"
                     )
                 continue
+
             # Sometimes large amplitude noise interrupts the gmm because the amplitude has
             # been factored out of the scaled spikes. Run through the clusters and find the waveforms that are more than
             # wf_amplitude_sd_cutoff larger than the cluster mean.
-
-            for cluster in range(1, num_clust):
+            for cluster in range(num_clust):
                 logger.info(f"{cluster}")
-                proc_flag = self.dir_manager.should_process(self.chan_num, cluster)
                 this_clust_data = cluster_data_path / f"cluster_{cluster}"
                 this_clust_plot = cluster_plot_path / f"cluster_{cluster}"
                 this_clust_data.mkdir(parents=True, exist_ok=True)
@@ -610,198 +611,16 @@ class ProcessChannel:
                     save_file=str(savename),
                 )
 
-            for this_cluster in range(1, num_clust):
+            # Plot Mahalanobis distances between cluster pairs
+            for this_cluster in range(num_clust):
                 savename = cluster_plot_path / f"Mahalonobis_cluster_{this_cluster}.png"
                 mahalanobis_dist = clust.get_mahalanobis_distances_to_cluster(
                     self.metrics, model, predictions, this_cluster
                 )
                 title = "Mahalanobis distance to cluster %i" % this_cluster
                 plot_mahalanobis_to_cluster(mahalanobis_dist, title, str(savename))
-
-            # noinspection PyUnresolvedReferences PyTypeChecker
-            # colors = cm.rainbow(np.linspace(0, 1, num_clust + 3))
-            # # was range len spikes[0]
-            # for feature1 in range(30):
-            #     for feature2 in range(30):
-            #         if feature1 < feature2:
-            #             fig = plt.figure()
-            #             plt_names = []
-            #             for cluster in range(num_clust + 3):
-            #                 plot_data = np.where(predictions[:] == cluster)[0]
-            #                 plt_names.append(
-            #                     plt.scatter(
-            #                         data_features[plot_data, feature1],
-            #                         data_features[plot_data, feature2],
-            #                         color=colors[cluster],
-            #                         s=0.8,
-            #                     )
-            #                 )
-            #
-            #             plt.xlabel("Feature %i" % feature1)
-            #             plt.ylabel("Feature %i" % feature2)
-            #             # Produce figure legend
-            #             plt.legend(
-            #                 tuple(plt_names),
-            #                 tuple("Cluster %i" % cluster for cluster in range(num_clust + 3)),
-            #                 scatterpoints=1,
-            #                 loc="lower left",
-            #                 ncol=3,
-            #                 fontsize=8,
-            #             )
-            #             plt.title("%i clusters" % (num_clust + 3))
-            #             fig.savefig(
-            #                 self.dir_manager.plots
-            #                 / f"channel_{self.chan_num + 1}/{num_clust + 3}_clusters/feature{feature2}vs{feature1}.png",
-            #             )
-            #             plt.close("all")
-            #
-            #
-            # # Create file, and plot spike waveforms for the different clusters. Plot 10 times downsampled
-            # # dejittered/smoothed waveforms. Plot the ISI distribution of each hpc_cluster
-            # for cluster in range(num_clust + 3):
-            #     clust_path = (
-            #         self.dir_manager.plots
-            #         / f"channel_{self.chan_num + 1}/{num_clust + 3}_clusters_waveforms_ISIs"
-            #     )
-            #     clust_path.mkdir(parents=True, exist_ok=True)
-            #
-            # x = np.arange(len(self.spikes[0]) / 10) + 1
-            # isi_list = []
-            # for cluster in range(num_clust + 3):
-            #     idx = np.where(predictions[:] == cluster)[0]
-            #     fig, ax = waveforms_datashader(
-            #         self.spikes[idx, :],
-            #         x,
-            #         self.dir_manager.filename
-            #         + "_datashader_temp_el"
-            #         + str(self.chan_num + 1),
-            #     )
-            #     ax.set_xlabel(
-            #         "Sample ({:d} samples per ms)".format(
-            #             int(self.sampling_rate / 1000)
-            #         )
-            #     )
-            #     ax.set_ylabel("Voltage (microvolts)")
-            #     ax.set_title("Cluster%i" % cluster)
-            #     fig.savefig(
-            #         self.dir_manager.plots
-            #         / f"channel_{self.chan_num + 1}/{num_clust + 3}_clusters_waveforms_ISIs/Cluster{cluster}_waveforms"
-            #     )
-            #     plt.close("all")
-            #
-            #     fig = plt.figure()
-            #     cluster_times = spike_times[idx]
-            #     isi = np.ediff1d(np.sort(cluster_times))
-            #     isi = isi / 40.0
-            #
-            #     # turn off black formatting, so each bin isn't on a new row
-            #     # fmt: off
-            #     plt.hist(
-            #         isi,
-            #         bins=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0,
-            #             np.max(isi),
-            #         ],
-            #     )
-            #     plt.xlim([0.0, 10.0])
-            #     plt.title(
-            #         "2ms ISI violations = %.1f percent (%i/%i)"
-            #         % (
-            #             (float(len(np.where(isi < 2.0)[0])) / float(len(cluster_times)))
-            #             * 100.0,
-            #             len(np.where(isi < 2.0)[0]),
-            #             len(cluster_times),
-            #         )
-            #         + "\n"
-            #         + "1ms ISI violations = %.1f percent (%i/%i)"
-            #         % (
-            #             (float(len(np.where(isi < 1.0)[0])) / float(len(cluster_times)))
-            #             * 100.0,
-            #             len(np.where(isi < 1.0)[0]),
-            #             len(cluster_times),
-            #         )
-            #     )
-            #     fig.savefig(
-            #         self.dir_manager.plots
-            #         / f"channel_{self.chan_num + 1}/{num_clust + 3}_clusters_waveforms_ISIs/Cluster{cluster}_ISIs"
-            #     )
-            #     plt.close("all")
-            #     isi_list.append(
-            #         "%.1f"
-            #         % (
-            #             (float(len(np.where(isi < 1.0)[0])) / float(len(cluster_times)))
-            #             * 100.0
-            #         )
-            #     )
-            #
-            # # Get isolation statistics for each solution
-            # l_ratios = get_lratios(data_features, predictions)
-            #
-            # isodf = pd.DataFrame(
-            #     {
-            #         "IsoRating": "TBD",
-            #         "File": self.dir_manager.filename,
-            #         "Channel": self.chan_num + 1,
-            #         "Solution": num_clust + 3,
-            #         "Cluster": range(num_clust + 3),
-            #         "wf count": [
-            #             len(np.where(predictions[:] == cluster)[0])
-            #             for cluster in range(num_clust + 3)
-            #         ],
-            #         "ISIs (%)": isi_list,
-            #         "L-Ratio": [round(l_ratios[cl], 3) for cl in range(num_clust + 3)],
-            #     }
-            # )
-            # cluster_path = (
-            #     self.dir_manager.reports
-            #     / f"channel_{self.chan_num + 1}"
-            #     / f"clusters_{num_clust + 3}"
-            # )
-            # cluster_path.mkdir(parents=True, exist_ok=True)
-            # isodf.to_csv(
-            #     cluster_path / "isoinfo.csv",
-            #     index=False,
-            # )
-            # # output this all in a plot in the plots folder and replace the ISI plot in superplots
-            # for cluster in range(num_clust + 3):
-            #     text = (
-            #         "wf count: \n1 ms ISIs: \nL-Ratio: "  # package text to be plotted
-            #     )
-            #     text2 = "{}\n{}%\n{}".format(
-            #         isodf["wf count"][cluster],
-            #         isodf["ISIs (%)"][cluster],
-            #         isodf["L-Ratio"][cluster],
-            #     )
-            #     blank = (
-            #         np.ones((480, 640, 3), np.uint8) * 255
-            #     )  # initialize empty white image
-            #
-            #     cv2_im_rgb = cv2.cvtColor(
-            #         blank, cv2.COLOR_BGR2RGB
-            #     )  # convert to color space pillow can use
-            #     pil_im = Image.fromarray(cv2_im_rgb)  # get pillow image
-            #     draw = ImageDraw.Draw(pil_im)  # create draw object for text
-            #     draw.multiline_text(
-            #         (90, 100),
-            #         text,
-            #         fill=(0, 0, 0, 255),
-            #         spacing=50,
-            #         align="left",
-            #     )
-            #     draw.multiline_text((380, 100), text2, fill=(0, 0, 0, 255), spacing=50)
-            #     isoimg = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
-            #     temp_filename = str(
-            #         self.dir_manager.plots
-            #         / f"channel_{self.chan_num + 1}"
-            #         / f"clusters_{num_clust + 3}"
-            #         / f"cluser_{cluster}_isoimg.png"
-            #     )
-            #     cv2.imwrite(
-            #         temp_filename,
-            #         isoimg,
-            #     )  # save the image
-
-                # Channel is 0 indexed, add 1
             self.dir_manager.save_status(self.get_chan(), num_clust)
+            pbm.update_cluster_bar()
 
     def superplots(self, maxclust: int):
         """
