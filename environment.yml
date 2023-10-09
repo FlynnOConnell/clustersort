@@ -1,7 +1,7 @@
 # To use:
-#
-#   $ conda env create -f environment.yml  # `mamba` works too for this command
-#   $ conda activate spk2py-dev
+#   $ conda env create -f environment.yml  # `camba`, or use mamba:
+#   $ mamba env create -f environment.yml  # `conda` works too for this command
+#   $ conda activate clustersort # conda or mamba doesn't matter here
 
 name: clustersort
 channels:
@@ -11,26 +11,19 @@ dependencies:
   - black
   - pyopenssl
   - packaging
-  - datashader # needs the default channel
-  - markupsafe=2.1.3=py39hd1e30aa_1
-  - matplotlib=3.8.0=py39hf3d152e_1
-  - matplotlib-base=3.8.0=py39he9076e7_1
+  - datashader
+  - matplotlib
+  - vispy
   - mypy=1.5.1=py39hd1e30aa_1
-  - mypy_extensions=1.0.0=pyha770c72_0
   - numba=0.57.1=py39hb75a051_0
   - numpy=1.23.5=py39h3d75532_0
   - numpydoc=1.4.0=pyhd8ed1ab_1
-  - openblas=0.3.24=pthreads_h7a3da1a_0
   - opencv=4.8.0=py39hf3d152e_4
-  - openh264=2.3.1=hcb278e6_2
-  - openjpeg=2.5.0=h488ebb8_3
   - openpyxl=3.1.2=py39hd1e30aa_1
   - openssl=3.1.3=hd590300_0
   - pandas=2.1.1=py39hddac248_0
-  - param=1.13.0=pyh1a96a4e_0
   - pillow=10.0.1=py39h444a776_1
   - pip=23.2.1=pyhd8ed1ab_0
-  - psutil=5.9.5=py39hd1e30aa_1
   - py-opencv=4.8.0=py39h8003fee_4
   - pyct=0.4.6=py_0
   - pyct-core=0.4.6=py_0
@@ -41,8 +34,6 @@ dependencies:
   - python-dateutil=2.8.2=pyhd8ed1ab_0
   - python-tzdata=2023.3=pyhd8ed1ab_0
   - python_abi=3.9=4_cp39
-  - pytz=2023.3.post1=pyhd8ed1ab_0
-  - pywavelets=1.4.1=py39h44dd56e_1
   - pyyaml=6.0.1=py39hd1e30aa_1
   - scikit-image=0.21.0=py39h3d6467e_0
   - scikit-learn=1.3.1=py39ha22ef79_0
@@ -50,14 +41,7 @@ dependencies:
   - setuptools=68.2.2=pyhd8ed1ab_0
   - sphinx=6.2.1=pyhd8ed1ab_0
   - sphinx-design=0.5.0=pyhd8ed1ab_0
-  - sphinxcontrib-applehelp=1.0.7=pyhd8ed1ab_0
-  - sphinxcontrib-devhelp=1.0.5=pyhd8ed1ab_0
-  - sphinxcontrib-htmlhelp=2.0.4=pyhd8ed1ab_0
-  - sphinxcontrib-jsmath=1.0.1=pyhd8ed1ab_0
-  - sphinxcontrib-qthelp=1.0.6=pyhd8ed1ab_0
-  - sphinxcontrib-serializinghtml=1.1.9=pyhd8ed1ab_0
   - tifffile=2023.9.26=pyhd8ed1ab_0
-  - tk=8.6.13=h2797004_0
   - toml=0.10.2=pyhd8ed1ab_0
   - wheel=0.41.2=pyhd8ed1ab_0
   - yaml=0.2.5=h7f98852_2
