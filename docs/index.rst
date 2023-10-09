@@ -19,8 +19,8 @@ Code used in that publication can be found at `bleckpy on github<https://github.
    :name: gettingstarted
 
    Installation <install>
-   Usage <api/index>
    Guide <guide/index>
+   Api <api/index>
 
 
 Contribute

@@ -8,12 +8,35 @@ import datetime
 import math
 import multiprocessing
 from pathlib import Path
-from . import spk_config
-from .directory_manager import DirectoryManager
-from .sort import sort
+
+import h5py
+
+from clustersort.directory_manager import DirectoryManager
+from clustersort.logger import logger
+from clustersort.sort import sort
+from clustersort.spk_config import SortConfig
+from clustersort.utils.progress import ProgressBarManager
 
 
-def run(params: spk_config.SpkConfig, parallel: bool = True):
+def __read_group(group: h5py.Group) -> dict:
+    data = {}
+    for attr_name, attr_value in group.attrs.items():
+        data[attr_name] = attr_value
+    for key, item in group.items():
+        if isinstance(item, h5py.Group):
+            data[key] = __read_group(item)
+        elif isinstance(item, h5py.Dataset):
+            data[key] = item[()]
+    return data
+
+
+def read_h5(filename: str | Path) -> dict:
+    with h5py.File(filename, "r") as f:
+        data = __read_group(f)
+    return data
+
+
+def run(params: SortConfig, parallel: bool = True, overwrite: bool = False):
     """
     Entry point for the clustersort package.
     Optionally include a `SpkConfig` object to override the default parameters.
@@ -23,10 +46,12 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
 
     Parameters
     ----------
-    params : spk_config.SpkConfig
+    params : spk_config.SortConfig
         Configuration parameters for spike sorting. If `None`, default parameters are used.
     parallel : bool, optional
         Whether to run the sorting in parallel. Default is `True`.
+    overwrite : bool, optional
+        Whether to overwrite existing files. Default is `False`.
 
     Returns
     -------
@@ -39,12 +64,17 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
 
     Examples
     --------
-    >>> sort(spk_config.SpkConfig(), parallel=True)
+    >>> sort(SortConfig(), parallel=True)
     """
+
+    pbm = ProgressBarManager()
     if not params:
-        params = spk_config.SpkConfig()
+        logger.info("No parameters provided. Using default parameters.")
+        params = SortConfig()
     else:
+        logger.info("Using provided parameters:")
         params = params
+        logger.info(f"{params.get_section('path')}")
     # If the script is being run automatically, on Fridays it will run a greater number of files
     if params.run["run-type"] == "Auto":
         if datetime.datetime.weekday(datetime.date.today()) == 4:
@@ -56,26 +86,32 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
     else:
         raise Exception('Run type choice is not valid. Options are "Manual" or "Auto"')
 
-    runpath = Path(params.path["run"])
+    runpath = Path(params.path["data"])
     num_cpu = int(params.run["cores-used"]) if parallel else 1
     runfiles = [f for f in runpath.iterdir() if f.is_file()][:n_files]
-    for curr_file in runfiles:  # loop through each file
+    pbm.init_file_bar(len(runfiles))
+
+    for curr_file in runfiles:
+        logger.info(f"Processing file: {curr_file}")
+
+        h5file = read_h5(curr_file)
+        unit_data = h5file["data"]
+        num_chan = len(unit_data)
 
         # Create the necessary directories
-        dir_manager = DirectoryManager(curr_file)
+        dir_manager = DirectoryManager(
+            curr_file,
+            num_chan,
+            params,
+        )
         dir_manager.flush_directories()
         dir_manager.create_base_directories()
-
-        h5file = {}
-        unit_data = h5file["unit"]
-        num_chan = len(unit_data)
-        dir_manager.create_channel_directories(num_chan)
+        dir_manager.create_channel_directories()
 
         runs = math.ceil(num_chan / num_cpu)
+        pbm.init_channel_bar(runs)
         for n in range(runs):
-            channels_per_run = (
-                num_chan // runs
-            )
+            channels_per_run = num_chan // runs
             chan_start = n * channels_per_run
             chan_end = (n + 1) * channels_per_run if n < (runs - 1) else num_chan
             if chan_end > num_chan:
@@ -84,11 +120,22 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
             if parallel:
                 processes = []
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file['unit'].keys())[i]][0]
-                    chan_data = h5file['unit'][chan_name]
+                    chan_name = [list(h5file["data"].keys())[i]][0]
+                    chan_data = h5file["data"][chan_name]
+                    sampling_rate = h5file["metadata_channel"][chan_name][
+                        "sampling_rate"
+                    ]
                     dir_manager.idx = i
                     p = multiprocessing.Process(
-                        target=sort, args=(curr_file, chan_data, params, dir_manager, i)
+                        target=sort,
+                        args=(
+                            curr_file,
+                            chan_data,
+                            sampling_rate,
+                            params,
+                            dir_manager,
+                            i,
+                        ),
                     )
                     p.start()
                     processes.append(p)
@@ -96,13 +143,30 @@ def run(params: spk_config.SpkConfig, parallel: bool = True):
                     p.join()
             else:
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file['unit'].keys())[i]][0]
-                    chan_data = h5file['unit'][chan_name]
+                    chan_name = [list(h5file["data"].keys())[i]][0]
+                    chan_data = h5file["data"][chan_name]
+                    sampling_rate = h5file["metadata_channel"][chan_name][
+                        "sampling_rate"
+                    ]
                     dir_manager.idx = i
-                    sort(curr_file, chan_data, params, dir_manager, i)
+                    sort(
+                        curr_file,
+                        chan_data,
+                        sampling_rate,
+                        params,
+                        dir_manager,
+                        i,
+                        overwrite=overwrite,
+                    )
+            pbm.update_channel_bar()
+        pbm.update_file_bar()
+    pbm.close_channel_bar()
+    pbm.close_file_bar()
 
 
 if __name__ == "__main__":
-    main_params = spk_config.SpkConfig()
-    main_params.set("path", "run", Path.home() / "data" / "combined")
-    run(main_params, parallel=False)
+    logger.setLevel("WARNING")
+    main_params = SortConfig()
+    my_data = Path.home() / "spk2extract" / "h5"
+    main_params.set("path", "data", my_data)
+    run(main_params, parallel=False, overwrite=False)

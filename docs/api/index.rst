@@ -1,10 +1,12 @@
 .. currentmodule:: clustersort
 
-Usage
-=====
+.. _api-doc:
 
-1. Configuration
-****************
+API Documentation
+=================
+
+DirectoryManager
+----------------
 
 The clustersort pipeline manages directories for 2 primary purposes:
 
@@ -13,31 +15,37 @@ The clustersort pipeline manages directories for 2 primary purposes:
 
 Both of these use cases are handled via the :class:`~clustersort.DirectoryManager`.
 
-For the actual sorting, there are a variety of paramters that can be tuned based on the type
-of data the user is working with. This is managed by :class:`~clustersort.SpkConfig`. These parameters are covered in detail in the clustersort
-configuration guide. :ref:`config <config-module>`
-
 .. admonition:: Example
 
-    from clustersort import DirectoryManager as dm
-    from clustersort import SpkConfig as config
-    # create a directory manager
-    dm = dm('path/to/data', 'path/to/output')
+    .. code-block:: python
 
-    # create a configuration object
-    config = config()
+        from clustersort import DirectoryManager as dm
+        from clustersort import SpkConfig as config
+        # create a directory manager
+        dm = dm('path/to/data', 'path/to/output')
 
-    # set the parameters
-    config.n_channels = 32
-    config.n_features = 3
-    config.n_clusters = 5
+        # create a configuration object
+        config = config()
 
-    # save the configuration
-    config.save(dm.config_path)
+        # set the parameters
+        config.n_channels = 32
+        config.n_features = 3
+        config.n_clusters = 5
 
+        # save the configuration
+        config.save(dm.config_path)
 
-.. currentmodule:: clustersort
-
-.. automodule:: clustersort
+.. autoclass:: clustersort.DirectoryManager
     :members:
-    :inherited-members:
+    :noindex:
+
+SpkConfig
+---------------------
+
+For the actual sorting, there are a variety of paramters that can be tuned based on the type
+of data the user is working with. This is managed by :class:`~clustersort.SpkConfig`.
+These parameters are covered in detail in the :ref:`configuration guide <config-module>`.
+
+.. autoclass:: clustersort.SpkConfig
+    :members:
+    :noindex:

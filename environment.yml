@@ -14,6 +14,12 @@ dependencies:
   - datashader
   - matplotlib
   - vispy
+  - statsmodels
+  - umap-learn
+  - datashader # needs the default channel
+  - markupsafe=2.1.3=py39hd1e30aa_1
+  - matplotlib=3.8.0=py39hf3d152e_1
+  - matplotlib-base=3.8.0=py39he9076e7_1
   - mypy=1.5.1=py39hd1e30aa_1
   - numba=0.57.1=py39hb75a051_0
   - numpy=1.23.5=py39h3d75532_0

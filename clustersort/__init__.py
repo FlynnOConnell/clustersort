@@ -1,5 +1,5 @@
 """
-===============
+
 ``clustersort``
 ===============
 
@@ -10,15 +10,14 @@ Once spikes are sorted, users are able to post-process the spikes using
 plots for mahalanobis distance, ISI, and autocorrelograms. The spike data can also be exported to
 a variety of formats for further analysis in other programs.
 
-The pipeline is as follows:
+Pipeline
+--------
 
-1. Read in the data from the pl2 file.
-2. Filter the data.
-3. Extract spikes from the filtered data.
-4. Cluster the spikes.
-5. Perform breach analysis on the clusters.
-6. Resort the clusters based on the breach analysis.
-7. Save the data to an HDF5 file, and graphs to given plotting folders.
+1. Read in the data from a h5, npy, or nwb file.
+2. Cluster the spikes.
+3. Perform breach analysis on the clusters.
+4. Resort the clusters based on the breach analysis.
+5. Save the data to an HDF5 file, and graphs to given plotting folders.
 
 Documentation Guide
 -------------------
@@ -28,15 +27,33 @@ I recommend exploring the docstrings using
 TAB-completion and introspection capabilities.
 
 """
+from pathlib import Path
+
 from numpy import __version__ as numpyversion
 from packaging.version import Version
+from platformdirs import *
 
-from .directory_manager import DirectoryManager  # noqa: (API import)
-from .spk_config import SpkConfig  # noqa: (API import)
-from .logger import configure_logger  # noqa: (API import)
-from .main import run  # noqa: (API import)
-from .sort import ProcessChannel  # noqa: (API import)
-from .utils import cluster_gmm, get_lratios, scale_waveforms, waveforms_datashader  # noqa: (API import)
+from clustersort import logger  # noqa: (API import)
+from clustersort.directory_manager import DirectoryManager  # noqa: (API import)
+from clustersort.main import run  # noqa: (API import)
+from clustersort.sort import ProcessChannel  # noqa: (API import)
+from clustersort.spk_config import SortConfig  # noqa: (API import)
+from clustersort.utils import cluster_gmm, get_lratios, waveforms_datashader  # noqa: (API import)
+
+# TODO: Add version check
+__version__ = "0.1.0"
+
+version = __version__
+__name__ = "clustersort"
+__author__ = "Flynn OConnell"
+
+sortdir = Path().home() / "clustersort"
+if not sortdir.exists():
+    sortdir.mkdir(exist_ok=True)
+
+cache_dir = user_cache_dir(__name__,)  # Cache, temp files
+config_dir = user_config_dir(__name__,)  # Config, parameters and options
+log_dir = user_log_dir(__name__,)  # Logs, .log files primarily
 
 if Version(numpyversion) >= Version("1.24.0"):
     raise ImportError(

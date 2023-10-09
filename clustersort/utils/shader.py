@@ -75,10 +75,13 @@ def waveforms_datashader(waveforms: np.ndarray, x_values: np.ndarray, dir_name="
     # Datashader function for exporting the temporary image with the waveforms
     export = partial(export_image, background="white", export_path=dir_name)
 
-    # Produce a datashader canvas
+    # Use the 5th and 95th percentiles for the y-axis range
+    y_min = np.percentile(df["y"], 5)
+    y_max = np.percentile(df["y"], 95)
+
     canvas = ds.Canvas(
         x_range=(np.min(x_values), np.max(x_values)),
-        y_range=(df["y"].min() - 10, df["y"].max() + 10),
+        y_range=(y_min, y_max),
         plot_height=1200,
         plot_width=1600,
     )

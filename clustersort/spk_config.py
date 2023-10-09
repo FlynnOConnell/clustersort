@@ -1,43 +1,44 @@
 """
-.. currentmodule: clustersort
-
-=========
-SpkConfig
-=========
-
-A class to manage configurations for the AutoSort pipeline.
-
-.. moduleauthor:: Flynn OConnell
-
+Configuration module for the clustersort package.
 """
 from __future__ import annotations
 
 import configparser
+import shutil
 from pathlib import Path
 from typing import Any
 
 
-class SpkConfig:
+class SortConfig:
     """
-    Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
+    Initialize a new SpkConfig object to manage configurations for the clustersort pipeline.
 
-    This class reads from an INI-style configuration file and provides methods
-    to access the configurations for different sections. These sections include
-    'run', 'path', 'cluster', and so on.
+    If no config path is specified, the following occurs:
+    1) Checks your base_path (normally users/home/sort) for any .ini files.
+        If none are found, a default configuration file is created.
+
+    2) If a default configuration file is found, it is copied to your base_path.
+        If no default configuration file is found, one is created and copied to your base_path.
+
+    3) The configuration file is read and stored in a ConfigParser object.
 
     Parameters
     ----------
     config_path : str or Path, optional
         The path to the configuration file. Defaults to a pre-defined location.
+    base_path : str or Path, optional
+        The path to the base directory for the clustersort pipeline. Defaults to your home directory.
+
 
     Notes
     -----
     The configuration file is an INI-style file with the following sections:
-
-    - `run <../../guide/sort_config_guide:config-ini-run>`_ : dict
-        Contains configurations related to runtime settings like 'resort-limit', 'cores-used'
+    -base: str
+        Contains the base path for the clustersort pipeline. This is where results are saved, data and figures.
     - path : dict
-        Contains path settings like directories for `run`, 'results'.
+        Contains paths for the data and figures produced and used by the clustersort pipeline.
+    - run: dict
+        Contains configurations related to runtime settings like 'resort-limit', 'cores-used'
     - cluster : dict
         Contains clustering parameters like 'max-clusters', 'max-iterations'.
     - breach : dict
@@ -53,7 +54,7 @@ class SpkConfig:
 
     Examples
     --------
-    >>> cfg = SpkConfig()
+    >>> cfg = SortConfig()
     >>> run = cfg.run
     >>> print(type(run), run)
     <class 'dict'> {'resort-limit': '3', 'cores-used': '8', ...}
@@ -62,63 +63,57 @@ class SpkConfig:
     >>> print(cfg.run['resort-limit'])
     '5'
 
-    See Also: ``configparser from python std library <https://docs.python.org/3/library/configparser.html>``_
+    See Also: `configparser from python std library <https://docs.python.org/3/library/configparser.html>`_
 
     """
 
-    def __init__(self, cfg_path: Path | str = ""):
+    def __init__(self, cfg_path: Path | str = "", base_path: Path | str = ""):
         """
         Initialize a new SpkConfig object to manage configurations for the AutoSort pipeline.
-
-        This class reads from an INI-style configuration file and provides methods
-        to access the configurations for different sections. These sections include
-        'run', 'path', 'cluster', and so on.
 
         Parameters
         ----------
         cfg_path : str or Path, optional
-            The path to the configuration file. Defaults to a pre-defined location.
-
-        Notes
-        -----
-        The configuration file is an INI-style file with the following sections:
-
-        - run : dict
-            Contains configurations related to runtime settings like 'resort-limit', 'cores-used'.
-        - path : dict
-            Contains path settings like directories for 'run', 'results'.
-        - cluster : dict
-            Contains clustering parameters like 'max-clusters', 'max-iterations'.
-        - breach : dict
-            Contains breach analysis parameters like 'disconnect-voltage', 'max-breach-rate'.
-        - filter : dict
-            Contains filter parameters like 'low-cutoff', 'high-cutoff'.
-        - spike : dict
-            Contains spike-related settings like 'pre-time', 'post-time'.
-
-        .. note::
-           Due to the nature of INI files, all values are stored as strings. It is up to the user
-           to convert the values to the appropriate type.
-
-        Examples
-        --------
-        >>> cfg = SpkConfig()
-        >>> run = cfg.run
-        >>> print(type(run), run)
-        <class 'dict'> {'resort-limit': '3', 'cores-used': '8', ...}
-
-        >>> cfg.set('run', 'resort-limit', 5)
-        >>> print(cfg.run['resort-limit'])
-        '5'
+            The path to the configuration file. Defaults to the repository config.
+        base_path : str or Path, optional
+            The path to the base directory for the clustersort pipeline. Defaults to your home directory.
         """
-        if not cfg_path:
-            self.cfg_path = Path().home() / "clustersort" / "autosort_config.ini"
-            self.set_default_config()
+
+        if not base_path:
+            self.base_path = Path.home() / "clustersort"
         else:
-            self.cfg_path = cfg_path
+            self.base_path = Path(base_path)
+        self.base_path.mkdir(parents=True, exist_ok=True)
+
+        if not cfg_path:
+            repo_default = Path(__file__).parent.parent / "default_config.ini"
+            self.cfg_path = self.base_path / "default_config.ini"
+            if not repo_default.is_file():
+                raise Exception(
+                    f"Default configuration file not found in {self.cfg_path}"
+                    f"You can find one at https:://github.com/FlynnOConnell/clustersort/default_config.ini"
+                )
+            shutil.copyfile(
+                repo_default,
+                self.cfg_path,
+                follow_symlinks=True
+            )
+            self.set_default_config()
+
+        else:
+            self.cfg_path = Path(cfg_path)
+            if not self.cfg_path.is_file():
+                self.set_default_config()
+
         self.config = self.read_config()
-        self.params = self.get_all()
+        self.all_params = self.get_all()
         self._validate_config()
+
+    def __getitem__(self, item):
+        return self.all_params[item]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
 
     def get_section(self, section: str):
         """
@@ -189,7 +184,7 @@ class SpkConfig:
         dict
             A dictionary containing key-value pairs for the 'run' section.
         """
-        return self.get_section('run')
+        return self.get_section("run")
 
     @property
     def path(self):
@@ -203,7 +198,7 @@ class SpkConfig:
         dict
             A dictionary containing key-value pairs for the 'path' section.
         """
-        return self.get_section('path')
+        return self.get_section("path")
 
     @property
     def cluster(self):
@@ -215,109 +210,97 @@ class SpkConfig:
         dict
             A dictionary containing key-value pairs for the 'cluster' section.
         """
-        return self.get_section('cluster')
+        return self.get_section("cluster")
 
     @property
     def breach(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'breach' section.
-            """
-        return self.get_section('breach')
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'breach' section.
+        """
+        return self.get_section("breach")
 
     @property
     def filter(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'breach' section.
-            """
-        return self.get_section('filter')
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'breach' section.
+        """
+        return self.get_section("filter")
 
     @property
     def spike(self):
         """
-           Returns
-           -------
-           dict
-               A dictionary containing key-value pairs for the 'spike' section.
-           """
-        return self.get_section('spike')
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'spike' section.
+        """
+        return self.get_section("spike")
 
     @property
     def detection(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'detection' section.
-            """
-        return self.get_section('detection')
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'detection' section.
+        """
+        return self.get_section("detection")
 
     @property
     def pca(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'pca' section.
-            """
-        return self.get_section('pca')
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'pca' section.
+        """
+        return self.get_section("pca")
 
     @property
     def postprocess(self):
         """
-            Returns
-            -------
-            dict
-                A dictionary containing key-value pairs for the 'postprocess' section.
-            """
-        return self.get_section('postprocess')
+        Returns
+        -------
+        dict
+            A dictionary containing key-value pairs for the 'postprocess' section.
+        """
+        return self.get_section("postprocess")
 
     def read_config(self):
         """
-            Returns
-            -------
-            ConfigParser
-                A ConfigParser object loaded with the INI file.
-            """
+        Returns
+        -------
+        ConfigParser
+            A ConfigParser object loaded with the INI file.
+        """
         config = configparser.ConfigParser()
         config.read(self.cfg_path)
         return config
 
-    def set_config(self, default=False):
-        """
-            Parameters
-            ----------
-            default : bool, optional
-                If True, sets the configuration to its default settings. Defaults to False.
-            """
-        if default:
-            self.set_default_config()
-
-        if not self.cfg_path.is_file() or default:
-            self.set_default_config()
-            print(f"Default configuration file has been created. You can find it in {self.cfg_path}")
-
     def set_default_config(self) -> None:
         """
-            Sets the default configurations for all sections. Writes these to the configuration file.
-            """
-        assert self.cfg_path.parent.is_dir(), f"Parent directory {self.cfg_path.parent} does not exist"
-        self.cfg_path.parent.mkdir(parents=True, exist_ok=True)
-        default_data_path = self.cfg_path.parent
-        default_run_path = default_data_path / "to_run"
-        default_run_path.mkdir(parents=True, exist_ok=True)
-        default_results_path = default_data_path / "results"
-        default_results_path.mkdir(parents=True, exist_ok=True)
-        default_completed_path = default_data_path / "completed"
-        default_completed_path.mkdir(parents=True, exist_ok=True)
+        Sets the default configurations for all sections. Writes these to the configuration file.
+        """
+        assert (
+            self.cfg_path.is_file()
+        ), f"Parent directory {self.cfg_path} does not exist"  # this should never fail
 
         config = configparser.ConfigParser()
+
+        config["base"] = {"path": f"{self.base_path}"}
+
+        config["path"] = {
+            "data": str(self.base_path / "data"),
+        }
+
         config["run"] = {
+            "overwrite": "0",
             "resort-limit": "3",
             "cores-used": "8",
             "weekday-run": "2",
@@ -326,17 +309,12 @@ class SpkConfig:
             "manual-run": "2",
         }
 
-        config["path"] = {
-            "run": str(default_run_path),  # Path to directory containing files to be sorted
-            "results": str(default_results_path),  # Path to directory to store results
-            "completed": str(default_completed_path),  # Path to directory to store completed files
-        }
-
         config["cluster"] = {
+            "min-clusters": "2",  # must be >= 2
             "max-clusters": "7",
             "max-iterations": "1000",
             "convergence-criterion": ".0001",
-            "random-restarts": "10",
+            "restarts": "10",
             "l-ratio-cutoff": ".1",
             "intra-cluster-cutoff": "3",
         }
@@ -350,7 +328,10 @@ class SpkConfig:
 
         config["filter"] = {"low-cutoff": "300", "high-cutoff": "3000"}
 
-        config["spike"] = {"pre-time": "0.2", "post-time": "0.6", }
+        config["spike"] = {
+            "pre-time": "0.2",
+            "post-time": "0.6",
+        }
 
         config["detection"] = {"spike-detection": "2.0", "artifact-removal": "10.0"}
 
@@ -370,20 +351,33 @@ class SpkConfig:
         with open(self.cfg_path, "w") as configfile:
             config.write(configfile)
 
+    def reload_from_ini(self):
+        self.config = self.read_config()
+        self.all_params = self.get_all()
+
+    def save_to_ini(self):
+        with open(self.cfg_path, "w") as configfile:
+            self.config.write(configfile)
+
     def _validate_config(self):
         """
-            Validates the loaded configurations to ensure they meet specified criteria.
+        Validates the loaded configurations to ensure they meet specified criteria.
 
-            Raises
-            ------
-            AssertionError
-                If any of the loaded configurations are not valid.
-            """
-        assert (self.cfg_path.is_file()), f"Configuration file {self.cfg_path} does not exist"
-        assert (self.run["run-type"] in ["Auto", "Manual"]), (f"Run type {self.run['run-type']} is not valid. Options "
-                                                              f"are 'Auto' or 'Manual'")
-
-
-if __name__ == '__main__':
-    test_cfg = SpkConfig()
-    x = 5
+        Raises
+        ------
+        AssertionError
+            If any of the loaded configurations are not valid.
+        """
+        assert (
+            self.cfg_path.is_file()
+        ), f"Configuration file {self.cfg_path} does not exist"
+        assert self.run["run-type"] in ["Auto", "Manual"], (
+            f"Run type {self.run['run-type']} is not valid. Options "
+            f"are 'Auto' or 'Manual'"
+        )
+        assert self.path["data"] != "None", (
+            "Data path contains no files. Please check that your data path is correct."
+        )
+        if int(self.cluster["min-clusters"]) < 2:
+            self.set("cluster", "min-clusters", 2)
+            self.save_to_ini()

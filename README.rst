@@ -1,8 +1,8 @@
 Clustersort - Semi-Supervised Spike Sorting
 ===========================================
 
-This Python repository is adapted from the methods and code described in Mukherjee, Wachutka, & Katz (2017) [1]_.
-A large percentage of the clustering parameters were made in reference to Reddish (2005) [2]_.
+This Python repository is adapted from the methods and code described in Mukherjee, Wachutka, & Katz (2017) [1].
+A large percentage of the clustering parameters were made in reference to Reddish (2005) [2].
 
 Heavily inspired by `blechpy <https://github.com/nubs01/blechpy>`_.
 
