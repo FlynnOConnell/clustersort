@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from spk2extract import defaults, version
+from . import defaults, version
 
 
 def add_args(parser: argparse.ArgumentParser):
@@ -43,7 +43,7 @@ def parse_args(parser: argparse.ArgumentParser):
 
 
 def main():
-    from spk2extract import gui
+    from . import gui
     gui.run()
 
 

@@ -9,45 +9,40 @@ channels:
   - default
 dependencies:
   - black
-  - pyopenssl
   - packaging
+  - mypy
+  - pip
+  - pydata-sphinx-theme
+  - sphinx_rtd_theme
+  - numpydoc
+  - sphinx
+  - setuptools
+  - toml
+  - wheel
   - datashader
   - matplotlib
   - vispy
+  - datashader
+  - pyqt
+  - pyqt5-sip
+  - pyqt-stubs
+  - openpyxl
+  - h5py
+  - py-opencv
+  - opencv
+  - openssl
+  - pillow
+  - pyyaml
+  - pyopenssl
+  - numpy<=1.23.5
+  - numba
+  - pandas
+  - scikit-learn
+  - scikit-image
+  - scipy
+  - seaborn
+  - tifffile
   - statsmodels
   - umap-learn
-  - datashader # needs the default channel
-  - markupsafe=2.1.3=py39hd1e30aa_1
-  - matplotlib=3.8.0=py39hf3d152e_1
-  - matplotlib-base=3.8.0=py39he9076e7_1
-  - mypy=1.5.1=py39hd1e30aa_1
-  - numba=0.57.1=py39hb75a051_0
-  - numpy=1.23.5=py39h3d75532_0
-  - numpydoc=1.4.0=pyhd8ed1ab_1
-  - opencv=4.8.0=py39hf3d152e_4
-  - openpyxl=3.1.2=py39hd1e30aa_1
-  - openssl=3.1.3=hd590300_0
-  - pandas=2.1.1=py39hddac248_0
-  - pillow=10.0.1=py39h444a776_1
-  - pip=23.2.1=pyhd8ed1ab_0
-  - py-opencv=4.8.0=py39h8003fee_4
-  - pyct=0.4.6=py_0
-  - pyct-core=0.4.6=py_0
-  - pydata-sphinx-theme=0.13.3
-  - pyqt=5.15.9=py39h52134e7_5
-  - pyqt5-sip=12.12.2=py39h3d6467e_5
-  - python=3.9.18=h0755675_0_cpython
-  - python-dateutil=2.8.2=pyhd8ed1ab_0
-  - python-tzdata=2023.3=pyhd8ed1ab_0
-  - python_abi=3.9=4_cp39
-  - pyyaml=6.0.1=py39hd1e30aa_1
-  - scikit-image=0.21.0=py39h3d6467e_0
-  - scikit-learn=1.3.1=py39ha22ef79_0
-  - scipy=1.11.2=py39h474f0d3_1
-  - setuptools=68.2.2=pyhd8ed1ab_0
-  - sphinx=6.2.1=pyhd8ed1ab_0
-  - sphinx-design=0.5.0=pyhd8ed1ab_0
-  - tifffile=2023.9.26=pyhd8ed1ab_0
-  - toml=0.10.2=pyhd8ed1ab_0
-  - wheel=0.41.2=pyhd8ed1ab_0
-  - yaml=0.2.5=h7f98852_2
+  - pip:
+    - sonpy

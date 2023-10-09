@@ -4,9 +4,7 @@ Logger
 ======
 Initialization of the module logger.
 
-Colorized output, file and stream handlers are configured in :func:`configure_logger`.
-
 """
-from spk2extract.spk_log.logger_config import configure_logger
+from .logs import use_log_level, set_log_level, log_exception
 
-__all__ = ["configure_logger"]
+__all__ = ["use_log_level", "set_log_level", "log_exception"]

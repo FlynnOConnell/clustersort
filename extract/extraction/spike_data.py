@@ -12,10 +12,8 @@ import h5py
 import numpy as np
 from sonpy import lib as sp
 
-import spk2extract
-from spk2extract.spk_log.logger_config import configure_logger
-from spk2extract.util import extract_waveforms, filter_signal
-from spk2extract.util.cluster import detect_spikes
+from ..util import extract_waveforms, filter_signal
+from ..util.cluster import detect_spikes
 
 UnitData = namedtuple("UnitData", ["spikes", "times"])
 
