@@ -36,6 +36,10 @@ def read_h5(filename: str | Path) -> dict:
     return data
 
 
+def check_substring_content(main_string, substring):
+    """Checks if any combination of the substring is in the main string."""
+    return substring.lower() in main_string.lower()
+
 def run(params: SortConfig, parallel: bool = True, overwrite: bool = False):
     """
     Entry point for the clustersort package.
@@ -93,9 +97,14 @@ def run(params: SortConfig, parallel: bool = True, overwrite: bool = False):
 
     for curr_file in runfiles:
         logger.info(f"Processing file: {curr_file}")
-
         h5file = read_h5(curr_file)
-        unit_data = h5file["data"]
+        all_data = h5file["data"]
+
+        unit_data = {}
+        for key in all_data.keys():
+            if check_substring_content(key, "U"):
+                unit_data[key] = all_data[key]
+
         num_chan = len(unit_data)
 
         # Create the necessary directories
@@ -143,10 +152,10 @@ def run(params: SortConfig, parallel: bool = True, overwrite: bool = False):
                     p.join()
             else:
                 for i in range(chan_start, chan_end):
-                    chan_name = [list(h5file["data"].keys())[i]][0]
-                    chan_data = h5file["data"][chan_name]
+                    chan_name = [list(unit_data.keys())[i]][0]
+                    chan_data = unit_data[chan_name]
                     sampling_rate = h5file["metadata_channel"][chan_name][
-                        "sampling_rate"
+                        "fs"
                     ]
                     dir_manager.idx = i
                     sort(
@@ -165,8 +174,9 @@ def run(params: SortConfig, parallel: bool = True, overwrite: bool = False):
 
 
 if __name__ == "__main__":
-    logger.setLevel("WARNING")
+    logger.setLevel("DEBUG")
     main_params = SortConfig()
-    my_data = Path.home() / "spk2extract" / "h5"
+    my_data = Path.home() / "spk2extract" / "combined"
     main_params.set("path", "data", my_data)
+    main_params.save_to_ini()
     run(main_params, parallel=False, overwrite=False)

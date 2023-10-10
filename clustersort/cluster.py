@@ -13,6 +13,30 @@ from statsmodels.stats.diagnostic import lilliefors
 from clustersort.spk_config import SortConfig
 
 
+def group_consecutives(arr):
+    """
+    Searches array for runs of consecutive numbers. Returns a list of lists
+    of consecutive numbers found.
+
+    Parameters
+    ----------
+    arr : list or np.array
+
+    Returns
+    -------
+    list of lists
+    """
+    diff_arr = np.diff(arr)
+    change = np.where(diff_arr>1)[0] + 1
+    out = []
+    prev = 0
+    for i in change:
+        out.append(arr[prev:i])
+        prev = i
+
+    out.append(arr[prev:])
+    return out
+
 def implement_wavelet_transform(waves, n_pc=10):
     coeffs = pywt.wavedec(waves, "haar", axis=1)
     all_coeffs = np.column_stack(coeffs)
@@ -24,17 +48,14 @@ def implement_wavelet_transform(waves, n_pc=10):
     idx = np.argsort(p_vals)
     return all_coeffs[:, idx[:n_pc]]
 
-
 def implement_pca(scaled_slices):
     pca = PCA()
     pca_slices = pca.fit_transform(scaled_slices)
     return pca_slices, pca.explained_variance_ratio_
 
-
 def implement_umap(waves, n_pc=3, n_neighbors=30, min_dist=0.0):
     reducer = umap.UMAP(n_components=n_pc, n_neighbors=n_neighbors, min_dist=min_dist)
     return reducer.fit_transform(waves)
-
 
 def get_waveform_energy(waves):
     """
@@ -49,7 +70,6 @@ def get_waveform_energy(waves):
     np.array
     """
     return np.sqrt(np.sum(waves**2, axis=1)) / waves.shape[1]
-
 
 def get_spike_slopes(waves):
     """
@@ -76,11 +96,7 @@ def get_spike_slopes(waves):
 
     return slopes
 
-
-def get_ISI_and_violations(
-    spike_times,
-    fs,
-):
+def get_ISI_and_violations(spike_times, fs,):
     """
     Returns array of inter-spike-intervals (ms) and corresponding number of 1ms and 2ms violations.
 
@@ -104,7 +120,6 @@ def get_ISI_and_violations(
     violations2 = np.sum(isi < 2.0)
 
     return isi, violations1, violations2
-
 
 def scale_waveforms(waves, energy=None):
     """
@@ -137,7 +152,6 @@ def scale_waveforms(waves, energy=None):
         scaled_slices[i] = w[0] / w[1]
 
     return scaled_slices
-
 
 def compute_waveform_metrics(waves, n_pc=3, use_umap=False):
     """
@@ -182,7 +196,6 @@ def compute_waveform_metrics(waves, n_pc=3, use_umap=False):
     data_columns.extend(["PC%i" % i for i in range(n_pc)])
     return data, data_columns
 
-
 def get_mahalanobis_distances_to_cluster(data, model, clusters, target_cluster):
     """
     Computes mahalanobis distance from spikes in target_cluster to all clusters in a GMM model
@@ -216,7 +229,6 @@ def get_mahalanobis_distances_to_cluster(data, model, clusters, target_cluster):
         out_distances[other_cluster] = mahalanobis_dist
 
     return out_distances
-
 
 def get_recording_cutoff(
     filt_el,
@@ -283,10 +295,8 @@ def get_recording_cutoff(
 
     return recording_cutoff
 
-
 def UMAP_METRICS(waves, n_pc):
     return compute_waveform_metrics(waves, n_pc, use_umap=True)
-
 
 class ClusterGMM:
     def __init__(
