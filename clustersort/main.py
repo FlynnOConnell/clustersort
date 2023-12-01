@@ -17,7 +17,6 @@ from clustersort.sort import sort
 from clustersort.spk_config import SortConfig
 from clustersort.utils.progress import ProgressBarManager
 
-
 def __read_group(group: h5py.Group) -> dict:
     data = {}
     for attr_name, attr_value in group.attrs.items():
@@ -104,7 +103,6 @@ def run(params: SortConfig, parallel: bool = True, overwrite: bool = False):
         for key in all_data.keys():
             if check_substring_content(key, "U"):
                 unit_data[key] = all_data[key]
-
         num_chan = len(unit_data)
 
         # Create the necessary directories
